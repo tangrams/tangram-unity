@@ -22,7 +22,7 @@ public class TileData : MonoBehaviour {
 		}
 
 		GeoJSON geoJSON = new GeoJSON (root);
-		ArrayList layers = geoJSON.ExtractLayers ();
+		List<Layer> layers = geoJSON.ExtractLayers ();
 	}
 	
 	// Update is called once per frame
