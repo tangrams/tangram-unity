@@ -23,13 +23,18 @@ public class Mapzen : MonoBehaviour {
 		// Construct the HTTP request
 		{
 			string url = "https://tile.mapzen.com/mapzen/vector/v1/all/"
-				+ this.tilex.ToString () + "/"
-				+ this.tiley.ToString () + "/"
 				+ this.tilez.ToString () + "/"
-				+ ".json?api_key=vector-tiles-tyHL4AY";
+				+ this.tilex.ToString () + "/"
+				+ this.tiley.ToString () + ".json?api_key=vector-tiles-tyHL4AY";
+
+			Debug.Log ("URL request " + url);
 
 			this.callback = delegate (string error, string response) {
-				Debug.Log ("Error: " + error);
+				if (error != null) {
+					Debug.Log ("Error: " + error);
+					return;
+				}
+
 				Debug.Log ("Response: " + response);
 
 				// Adding a tile object to the scene
