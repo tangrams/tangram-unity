@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 public class Mapzen : MonoBehaviour {
 
 	[DllImport("UnityNativePlugin", EntryPoint = "UnityNativePlugin")]
-	public static extern void UnityNativePlugin();
+	public static extern int UnityNativePlugin();
 
 	delegate void HTTPRequestCallback(string error, string response);
 	private UnityWebRequest request;
@@ -18,7 +18,7 @@ public class Mapzen : MonoBehaviour {
 	public int tilez = 16;
 
 	void Start () {
-		//UnityNativePlugin ();
+		int returnValue = UnityNativePlugin ();
 
 		// Construct the HTTP request
 		{
