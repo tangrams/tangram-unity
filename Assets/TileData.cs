@@ -22,7 +22,11 @@ public class TileData : MonoBehaviour {
 		}
 
 		GeoJSON geoJSON = new GeoJSON (root);
-		List<Layer> layers = geoJSON.ExtractLayers ();
+
+		List<string> layerNames = new List<string>() {"buildings", "earth"};
+		List<Layer> layers = geoJSON.ExtractLayers (layerNames);
+
+		// TODO: build mesh with the layer geometry
 	}
 	
 	// Update is called once per frame
