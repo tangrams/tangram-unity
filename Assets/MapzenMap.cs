@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Runtime.InteropServices;
+using Mapzen;
+using Mapzen.VectorData;
 
-public class Mapzen : MonoBehaviour {
+public class MapzenMap : MonoBehaviour {
 
 	[DllImport("UnityNativePlugin", EntryPoint = "UnityNativePlugin")]
 	public static extern int UnityNativePlugin();
@@ -19,13 +21,14 @@ public class Mapzen : MonoBehaviour {
 
 	void Start () {
 		int returnValue = UnityNativePlugin ();
+		Debug.Log("Native plugin returned: " + returnValue);
 
 		// Construct the HTTP request
 		{
 			string url = "https://tile.mapzen.com/mapzen/vector/v1/all/"
-				+ this.tilez.ToString () + "/"
-				+ this.tilex.ToString () + "/"
-				+ this.tiley.ToString () + ".json?api_key=vector-tiles-tyHL4AY";
+				+ tilez.ToString () + "/"
+				+ tilex.ToString () + "/"
+				+ tiley.ToString () + ".json?api_key=vector-tiles-tyHL4AY";
 
 			Debug.Log ("URL request " + url);
 
@@ -40,8 +43,12 @@ public class Mapzen : MonoBehaviour {
 				// Adding a tile object to the scene
 				GameObject tilePrefab = Resources.Load ("Tile") as GameObject;
 
-				TileData data = tilePrefab.GetComponent<TileData>();
-				data.geoJSONData = response;
+				MapTile tile = tilePrefab.GetComponent<MapTile>();
+
+				var projection = GeoJSON.LocalCoordinateProjectionForTile(new TileAddress(tilex, tiley, tilez));
+				var geoJson = new GeoJSON(response, projection);
+
+				tile.layers = geoJson.GetLayersByName(new List<string> { "water", "roads" });
 
 				// Instantiate a prefab running the script TileData.Start()
 				Instantiate (tilePrefab);
