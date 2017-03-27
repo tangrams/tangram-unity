@@ -36,15 +36,17 @@ public class MapzenMap : MonoBehaviour {
 				// Adding a tile object to the scene
 				GameObject tilePrefab = Resources.Load("Tile") as GameObject;
 
-				MapTile tile = tilePrefab.GetComponent<MapTile>();
+				// Instantiate a prefab running the script TileData.Start()
+				var go = Instantiate(tilePrefab);
+
+				MapTile tile = go.GetComponent<MapTile>();
 
 				var projection = GeoJSON.LocalCoordinateProjectionForTile(new TileAddress(TileX, TileY, TileZ));
 				var geoJson = new GeoJSON(response, projection);
 
-				tile.layers = geoJson.GetLayersByName(new List<string> { "water", "roads" });
+				tile.Layers = geoJson.GetLayersByName(new List<string> { "water", "roads" });
 
-				// Instantiate a prefab running the script TileData.Start()
-				Instantiate(tilePrefab);
+				tile.BuildMesh();
 			};
 			request = UnityWebRequest.Get(url);
 		}
