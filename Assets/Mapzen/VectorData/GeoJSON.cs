@@ -21,8 +21,8 @@ namespace Mapzen
 			};
 		}
 
-		JSONNode root;
-		LocalCoordinateProjection transform;
+		private JSONNode root;
+		private LocalCoordinateProjection transform;
 
 		public GeoJSON(string geoJSONDataString, LocalCoordinateProjection transform)
 		{
@@ -103,7 +103,7 @@ namespace Mapzen
 
 			if (type != null && coords != null)
 			{
-				switch (type.ToString())
+				switch (type.Value)
 				{
 					case "Point": return GetPointGeometry(coords);
 					case "MultiPoint": return GetMultiPointGeometry(coords);
