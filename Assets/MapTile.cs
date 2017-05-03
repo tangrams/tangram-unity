@@ -9,48 +9,66 @@ public class MapTile : MonoBehaviour
 {
 	public List<FeatureCollection> Layers;
 
+    private Dictionary<String, Color> layerColors = new Dictionary<String, Color> {
+        { "water", Color.blue },
+        { "earth", Color.green },
+        { "roads", Color.gray },
+    };
+
 	public void BuildMesh()
 	{
-		var mesh = new Mesh();
-		GetComponent<MeshFilter>().mesh = mesh;
+        var mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
 
-		// Let's just build a square for now.
-		Vector3[] positions =
-		{
-			new Vector3(0f, 0f, 0f),
-			new Vector3(1f, 0f, 0f),
-			new Vector3(1f, 0f, 1f),
-			new Vector3(0f, 0f, 1f),
-		};
+        var indices = new List<int>();
+        var vertices = new List<Vector3>();
+        var colors = new List<Color>();
 
-		var tess = new Tess();
-		var contour = new ContourVertex[positions.Length];
-		var indices = new List<int>();
-		var vertices = new List<Vector3>();
+        foreach (var layer in Layers)
+        {
+            Color color = layerColors[layer.name];
 
-		for (int i = 0; i < positions.Length; ++i)
-		{
-			contour[i].Position = new Vec3 { X = positions[i].x, Y = positions[i].y, Z = positions[i].z };
-		}
+            foreach (var feature in layer.features)
+            {
+                var tess = new Tess();
 
-		tess.AddContour(contour, ContourOrientation.Original);
-		tess.Tessellate(WindingRule.NonZero, ElementType.Polygons, 3);
+                var geometry = feature.geometry;
 
-		for (int i = 0; i < tess.ElementCount * 3; ++i)
-		{
-			indices.Add(tess.Elements[i]);
-		}
+                if (geometry.type == GeometryType.Polygon)
+                {
+                    int pointIndex = 0;
+                    foreach (var ringSize in geometry.rings)
+                    {
+                        var contour = new ContourVertex[ringSize];
+                        for (int i = pointIndex; i < pointIndex + ringSize; ++i)
+                        {
+                            var point = geometry.points[i];
+                            contour[i].Position = new Vec3 { X = point.x, Y = point.y, Z = 0 };
+                        }
+                        tess.AddContour(contour, ContourOrientation.Original);
+                    }
+                }
+                tess.Tessellate(WindingRule.NonZero, ElementType.Polygons, 3);
 
-		// TODO: find how tess can return CCW polygons as output
-		indices.Reverse();
+                for (int i = 0; i < tess.ElementCount * 3; ++i)
+                {
+                    indices.Add(tess.Elements[i]);
+                }
 
-		for (int i = 0; i < tess.VertexCount; ++i)
-		{
-			var position = tess.Vertices[i].Position;
-			vertices.Add(new Vector3(position.X, position.Y, position.Z));
-		}
+                // TODO: find how tess can return CCW polygons as output
+                indices.Reverse();
+
+                for (int i = 0; i < tess.VertexCount; ++i)
+                {
+                    var position = tess.Vertices[i].Position;
+                    vertices.Add(new Vector3(position.X, position.Y, position.Z));
+                    colors.Add(color);
+                }
+            }
+        }
 
 		mesh.vertices = vertices.ToArray();
 		mesh.triangles = indices.ToArray();
+        mesh.colors = colors.ToArray();
 	}
 }
