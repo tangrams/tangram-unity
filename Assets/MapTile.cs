@@ -13,6 +13,7 @@ public class MapTile : MonoBehaviour
         { "water", Color.blue },
         { "earth", Color.green },
         { "roads", Color.gray },
+        { "buildings", Color.black },
     };
 
 	public void BuildMesh()
@@ -40,23 +41,24 @@ public class MapTile : MonoBehaviour
                     foreach (var ringSize in geometry.rings)
                     {
                         var contour = new ContourVertex[ringSize];
+                        int contourIndex = 0;
                         for (int i = pointIndex; i < pointIndex + ringSize; ++i)
                         {
                             var point = geometry.points[i];
-                            contour[i].Position = new Vec3 { X = point.x, Y = point.y, Z = 0 };
+                            contour[contourIndex++].Position = new Vec3 { X = point.x, Y = point.y, Z = 0 };
                         }
+                        pointIndex += ringSize;
                         tess.AddContour(contour, ContourOrientation.Original);
                     }
                 }
                 tess.Tessellate(WindingRule.NonZero, ElementType.Polygons, 3);
 
+				int offset = vertices.Count;
+
                 for (int i = 0; i < tess.ElementCount * 3; ++i)
                 {
-                    indices.Add(tess.Elements[i]);
+                    indices.Add(offset + tess.Elements[i]);
                 }
-
-                // TODO: find how tess can return CCW polygons as output
-                indices.Reverse();
 
                 for (int i = 0; i < tess.VertexCount; ++i)
                 {
@@ -65,7 +67,10 @@ public class MapTile : MonoBehaviour
                     colors.Add(color);
                 }
             }
-        }
+		}
+
+		// TODO: find how tess can return CCW polygons as output
+		indices.Reverse();
 
 		mesh.vertices = vertices.ToArray();
 		mesh.triangles = indices.ToArray();

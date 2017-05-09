@@ -44,7 +44,7 @@ public class MapzenMap : MonoBehaviour {
 				var projection = GeoJSON.LocalCoordinateProjectionForTile(new TileAddress(TileX, TileY, TileZ));
 				var geoJson = new GeoJSON(response, projection);
 
-				tile.Layers = geoJson.GetLayersByName(new List<string> { "water", "roads" });
+				tile.Layers = geoJson.GetLayersByName(new List<string> { "water", "roads", "earth", "buildings" });
 
 				tile.BuildMesh();
 			};
