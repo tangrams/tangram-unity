@@ -12,5 +12,21 @@ namespace Mapzen.VectorData
 
 		public Geometry geometry { get; set; }
 		public Dictionary<string, object> properties { get; set; }
+
+		public bool TryGetProperty<N>(string propertyKey, out N node)
+		{
+			object propertyValue;
+			if (properties.TryGetValue(propertyKey, out propertyValue))
+			{
+				var propertyNode = (N)propertyValue;
+				if (propertyNode != null)
+				{
+					node = propertyNode;
+					return true;
+				}
+			}
+			node = default(N);
+			return false;
+		}
 	}
 }

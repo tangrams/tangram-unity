@@ -41,12 +41,13 @@ public class MapzenMap : MonoBehaviour {
 
 				MapTile tile = go.GetComponent<MapTile>();
 
-				var projection = GeoJSON.LocalCoordinateProjectionForTile(new TileAddress(TileX, TileY, TileZ));
+				var tileAddress = new TileAddress(TileX, TileY, TileZ);
+				var projection = GeoJSON.LocalCoordinateProjectionForTile(tileAddress);
 				var geoJson = new GeoJSON(response, projection);
 
 				tile.Layers = geoJson.GetLayersByName(new List<string> { "water", "roads", "earth", "buildings" });
 
-				tile.BuildMesh();
+				tile.BuildMesh(tileAddress.GetSizeMercatorMeters());
 			};
 			request = UnityWebRequest.Get(url);
 		}
