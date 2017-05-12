@@ -7,65 +7,89 @@ using Mapzen;
 public class MapzenMap : MonoBehaviour {
 
 	delegate void HTTPRequestCallback(string error, string response);
-	private UnityWebRequest request;
 	private HTTPRequestCallback callback;
 
-	public int TileX = 19294;
-	public int TileY = 24642;
+	public int TileX = 19290;
+	public int TileY = 24632;
 	public int TileZ = 16;
+
+        public int TileRangeX = 5;
+        public int TileRangeY = 5;
 
 	public string ApiKey = "vector-tiles-tyHL4AY";
 
-	void Start() {
-
+        void Start()
+        {
 		// Construct the HTTP request
-		{
-			var url = string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.json?api_key={3}",
-				TileZ, TileX, TileY, ApiKey);
+                for (int x = 0; x < TileRangeX; ++x)
+                {
+                        for (int y = 0; y < TileRangeY; ++y)
+                        {
+                                int tileX = TileX + x;
+                                int tileY = TileY + y;
 
-			Debug.Log("URL request " + url);
+                                var url = string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.json?api_key={3}",
+                                        TileZ, tileX, tileY, ApiKey);
 
-			callback = delegate(string error, string response) {
-				if (error != null) {
-					Debug.Log("Error: " + error);
-					return;
-				}
+                                Debug.Log("URL request " + url);
 
-				Debug.Log("Response: " + response);
+                                callback = delegate(string error, string response)
+                                {
+                                        if (error != null)
+                                        {
+                                                Debug.Log("Error: " + error);
+                                                return;
+                                        }
 
-				// Adding a tile object to the scene
-				GameObject tilePrefab = Resources.Load("Tile") as GameObject;
+                                        if (response.Length == 0)
+                                        {
+                                                Debug.Log("Empty response");
+                                                return;
+                                        }
 
-				// Instantiate a prefab running the script TileData.Start()
-				var go = Instantiate(tilePrefab);
+                                        Debug.Log("Response: " + response);
 
-				MapTile tile = go.GetComponent<MapTile>();
+                                        // Adding a tile object to the scene
+                                        GameObject tilePrefab = Resources.Load("Tile") as GameObject;
 
-				var tileAddress = new TileAddress(TileX, TileY, TileZ);
-				var projection = GeoJSON.LocalCoordinateProjectionForTile(tileAddress);
-				var geoJson = new GeoJSON(response, projection);
+                                        // Instantiate a prefab running the script TileData.Start()
+                                        var go = Instantiate(tilePrefab);
 
-				tile.Layers = geoJson.GetLayersByName(new List<string> { "water", "roads", "earth", "buildings" });
+                                        MapTile tile = go.GetComponent<MapTile>();
 
-				tile.BuildMesh(tileAddress.GetSizeMercatorMeters());
-			};
-			request = UnityWebRequest.Get(url);
+                                        var tileAddress = new TileAddress(TileX, TileY, TileZ);
+                                        var projection = GeoJSON.LocalCoordinateProjectionForTile(tileAddress);
+                                        var geoJson = new GeoJSON(response, projection);
+
+                                        tile.Layers = geoJson.GetLayersByName(new List<string> {
+                                                "water",
+                                                "roads",
+                                                "earth",
+                                                "buildings"
+                                        });
+
+                                        tile.BuildMesh(tileAddress.GetSizeMercatorMeters());
+                                };
+                                UnityWebRequest request = UnityWebRequest.Get(url);
+
+                                // Starts the HTTP request
+                                StartCoroutine(DoHTTPRequest(request));
+                        }
 		}
-
-		// Starts the HTTP request
-		StartCoroutine(DoHTTPRequest());
 	}
 
 	// Runs an HTTP request
-	IEnumerator DoHTTPRequest() {
-		yield return request.Send();
+        IEnumerator DoHTTPRequest(UnityWebRequest request)
+        {
+                yield return request.Send();
 
 		string data = System.Text.Encoding.Default.GetString(request.downloadHandler.data);
 		callback(request.error, data);
 	}
 
 	// Update is called once per frame
-	void Update() {
+	void Update()
+        {
 
 	}
 }

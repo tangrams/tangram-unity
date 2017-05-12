@@ -56,18 +56,18 @@ public class MapTile : MonoBehaviour
 
                 // Initialize Unity mesh
                 {
-                        var mesh = new Mesh ();
-                        GetComponent<MeshFilter> ().mesh = mesh;
+                        var mesh = new Mesh();
+                        GetComponent<MeshFilter>().mesh = mesh;
 
-                        mesh.vertices = meshData.vertices.ToArray ();
-                        mesh.triangles = meshData.indices.ToArray ();
-                        mesh.colors = meshData.colors.ToArray ();
-                        mesh.RecalculateNormals ();
+                        mesh.vertices = meshData.vertices.ToArray();
+                        mesh.triangles = meshData.indices.ToArray();
+                        mesh.colors = meshData.colors.ToArray();
+                        mesh.RecalculateNormals();
                 }
         }
 
 	public void Update()
 	{
-		transform.Rotate(Vector3.up, Time.deltaTime * 10.0f);
+		//transform.Rotate(Vector3.up, Time.deltaTime * 10.0f);
 	}
 }
