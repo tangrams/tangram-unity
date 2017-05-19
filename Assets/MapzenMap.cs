@@ -6,8 +6,7 @@ using Mapzen;
 
 public class MapzenMap : MonoBehaviour {
 
-	delegate void HTTPRequestCallback(string error, string response);
-	private HTTPRequestCallback callback;
+        delegate void HTTPRequestCallback(string error, string response, TileAddress address);
 
 	public int TileX = 19290;
 	public int TileY = 24632;
@@ -17,6 +16,9 @@ public class MapzenMap : MonoBehaviour {
         public int TileRangeY = 5;
 
 	public string ApiKey = "vector-tiles-tyHL4AY";
+
+        private List<TileTask> pendingTasks = new List<TileTask>();
+        private AsyncWorker worker = new AsyncWorker(4);
 
         void Start()
         {
@@ -33,7 +35,7 @@ public class MapzenMap : MonoBehaviour {
 
                                 Debug.Log("URL request " + url);
 
-                                callback = delegate(string error, string response)
+                                HTTPRequestCallback callback = (string error, string response, TileAddress address) =>
                                 {
                                         if (error != null)
                                         {
@@ -57,39 +59,60 @@ public class MapzenMap : MonoBehaviour {
 
                                         MapTile tile = go.GetComponent<MapTile>();
 
-                                        var tileAddress = new TileAddress(TileX, TileY, TileZ);
-                                        var projection = GeoJSON.LocalCoordinateProjectionForTile(tileAddress);
-                                        var geoJson = new GeoJSON(response, projection);
-
-                                        tile.Layers = geoJson.GetLayersByName(new List<string> {
+                                        var layers = new List<string> {
                                                 "water",
                                                 "roads",
                                                 "earth",
                                                 "buildings"
-                                        });
+                                        };
 
-                                        tile.BuildMesh(tileAddress.GetSizeMercatorMeters());
+                                        TileTask task = new TileTask(address, layers, response, tile);
+
+                                        task.offsetX = (address.x - TileX);
+                                        task.offsetY = (address.y - TileY);
+
+                                        pendingTasks.Add(task);
+
+                                        worker.RunAsync(() => {
+                                                task.Start();
+                                        });
                                 };
                                 UnityWebRequest request = UnityWebRequest.Get(url);
 
                                 // Starts the HTTP request
-                                StartCoroutine(DoHTTPRequest(request));
+                                StartCoroutine(DoHTTPRequest(request, callback, new TileAddress(tileX, tileY, TileZ)));
                         }
 		}
 	}
 
 	// Runs an HTTP request
-        IEnumerator DoHTTPRequest(UnityWebRequest request)
+        IEnumerator DoHTTPRequest(UnityWebRequest request, HTTPRequestCallback callback, TileAddress address)
         {
                 yield return request.Send();
 
 		string data = System.Text.Encoding.Default.GetString(request.downloadHandler.data);
-		callback(request.error, data);
+
+                callback(request.error, data, address);
 	}
 
 	// Update is called once per frame
 	void Update()
         {
+                List<TileTask> readyTasks = new List<TileTask>();
 
-	}
+                foreach (TileTask task in pendingTasks) 
+                {
+                        if (task.IsReady()) 
+                        {
+                                task.GetMapTile ().BuildMesh (task.address.GetSizeMercatorMeters (), task.features);
+                                task.GetMapTile().CreateUnityMesh(task.offsetX, task.offsetY);
+                                readyTasks.Add(task);
+                        }
+                }
+
+                foreach (TileTask readyTask in readyTasks) 
+                {
+                        pendingTasks.Remove(readyTask);
+                }
+        }
 }

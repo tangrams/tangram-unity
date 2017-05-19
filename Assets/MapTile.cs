@@ -8,7 +8,7 @@ using LibTessDotNet;
 [RequireComponent(typeof(MeshFilter))]
 public class MapTile : MonoBehaviour
 {
-	public List<FeatureCollection> Layers;
+        private MeshData meshData;
 
         private Dictionary<String, Color> layerColors = new Dictionary<String, Color> {
                 { "water", Color.blue },
@@ -17,12 +17,12 @@ public class MapTile : MonoBehaviour
                 { "buildings", Color.black },
         };
 
-	public void BuildMesh(double tileScale)
+        public void BuildMesh(double tileScale, List<FeatureCollection> layers)
 	{
+                meshData = new MeshData();
 		float inverseTileScale = 1.0f / (float)tileScale;
-		var meshData = new MeshData();
 
-                foreach (var layer in Layers)
+                foreach (var layer in layers)
                 {
                         Color color = layerColors[layer.name];
 
@@ -53,17 +53,19 @@ public class MapTile : MonoBehaviour
                 }
 
                 meshData.FlipIndices();
+        }
 
-                // Initialize Unity mesh
-                {
-                        var mesh = new Mesh();
-                        GetComponent<MeshFilter>().mesh = mesh;
+        public void CreateUnityMesh(float offsetX, float offsetY)
+        {
+                var mesh = new Mesh();
+                GetComponent<MeshFilter>().mesh = mesh;
 
-                        mesh.vertices = meshData.vertices.ToArray();
-                        mesh.triangles = meshData.indices.ToArray();
-                        mesh.colors = meshData.colors.ToArray();
-                        mesh.RecalculateNormals();
-                }
+                mesh.vertices = meshData.vertices.ToArray();
+                mesh.triangles = meshData.indices.ToArray();
+                mesh.colors = meshData.colors.ToArray();
+                mesh.RecalculateNormals();
+
+                transform.Translate(new Vector3(offsetX, 0.0f, offsetY));
         }
 
 	public void Update()

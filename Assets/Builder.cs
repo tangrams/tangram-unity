@@ -22,6 +22,7 @@ public class Builder
                         }
 
                         pointIndex += ringSize;
+
                         tess.AddContour(contour, ContourOrientation.Original);
                 }
 
