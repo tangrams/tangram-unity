@@ -104,7 +104,6 @@ public class MapzenMap : MonoBehaviour {
                 {
                         if (task.IsReady()) 
                         {
-                                task.GetMapTile ().BuildMesh (task.address.GetSizeMercatorMeters (), task.features);
                                 task.GetMapTile().CreateUnityMesh(task.offsetX, task.offsetY);
                                 readyTasks.Add(task);
                         }

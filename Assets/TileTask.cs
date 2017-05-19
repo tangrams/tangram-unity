@@ -6,8 +6,7 @@ using UnityEngine;
 using Mapzen.VectorData;
 
 public class TileTask {
-        public TileAddress address;
-        public List<FeatureCollection> features;
+        private TileAddress address;
         private string response;
         private MapTile tile;
         private List<string> layers;
@@ -34,9 +33,8 @@ public class TileTask {
                 // Parse the GeoJSON
                 var geoJson = new GeoJSON(response, projection);
 
-                features = geoJson.GetLayersByName (layers);
                 // Tesselate the mesh
-                // tile.BuildMesh(address.GetSizeMercatorMeters(), geoJson.GetLayersByName(layers));
+                tile.BuildMesh(address.GetSizeMercatorMeters(), geoJson.GetLayersByName(layers));
 
                 ready = true;
         }
