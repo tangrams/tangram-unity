@@ -174,8 +174,15 @@ namespace Mapzen
 
 		Geometry GetMultiPolygonGeometry(JSONNode coords)
 		{
-			// TODO
-			return null;
+                        var geometry = new Geometry();
+                        geometry.type = GeometryType.Polygon;
+                        foreach (JSONNode polygonCoordinates in coords.Children)
+                        {
+                                var polygonGeometry = GetPolygonGeometry(polygonCoordinates);
+                                geometry.rings.AddRange(polygonGeometry.rings);
+                                geometry.points.AddRange(polygonGeometry.points);
+                        }
+                        return geometry;
 		}
 	}
 }
