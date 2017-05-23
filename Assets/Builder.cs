@@ -2,43 +2,43 @@
 using Mapzen.VectorData;
 using LibTessDotNet;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Builder
 {
     public static MeshData TesselatePolygon(Geometry geometry, Color color, float height)
     {
         var meshData = new MeshData();
-        var tess = new Tess();
+        Earcut earcut = new Earcut();
+        List<float> points = new List<float>();
+        List<int> rings = new List<int>();
 
         int pointIndex = 0;
         foreach (var ringSize in geometry.rings)
         {
-            var contour = new ContourVertex[ringSize];
-
             for (int i = pointIndex, contourIndex = 0; i < pointIndex + ringSize; ++i, ++contourIndex)
             {
                 var point = geometry.points[i];
-                contour[contourIndex].Position = new Vec3 { X = point.x, Y = height, Z = point.y };
+                points.Add(point.x);
+                points.Add(point.y);
             }
-
+            rings.Add(ringSize);
             pointIndex += ringSize;
+        }
+        earcut.Tesselate(points.ToArray(), rings.ToArray());
 
-            tess.AddContour(contour, ContourOrientation.Original);
+        for (int i = 0; i < earcut.indices.Length; ++i)
+        {
+            meshData.indices.Add((int)earcut.indices[i]);
         }
 
-        tess.Tessellate(WindingRule.NonZero, ElementType.Polygons, 3);
-
-        for (int i = 0; i < tess.ElementCount * 3; ++i)
+        for (int i = 0; i < earcut.vertices.Length; i += 2)
         {
-            meshData.indices.Add(tess.Elements[i]);
-        }
-
-        for (int i = 0; i < tess.VertexCount; ++i)
-        {
-            var position = tess.Vertices[i].Position;
-            meshData.vertices.Add(new Vector3(position.X, position.Y, position.Z));
+            meshData.vertices.Add(new Vector3(earcut.vertices[i], height, earcut.vertices[i + 1]));
             meshData.colors.Add(color);
         }
+
+        earcut.Release();
 
         return meshData;
     }

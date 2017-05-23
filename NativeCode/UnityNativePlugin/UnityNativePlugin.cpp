@@ -4,8 +4,8 @@
 #include <vector>
 
 extern "C" {
-    using Coord = double;
-    using N = unsigned int;
+    using Coord = float;
+    using N = int;
     using Point = std::array<Coord, 2>;
     using PolygonArray = std::vector<std::vector<Point>>;
     using EarcutContext = std::vector<mapbox::Earcut<Coord, N>>;
@@ -30,8 +30,8 @@ extern "C" {
         auto& earcut = earcuts[context];
         PolygonArray polygon;
         
-        double* points = reinterpret_cast<double*>(pointsBuffer);
-        unsigned int* rings = reinterpret_cast<unsigned int*>(ringsBuffer);
+        float* points = reinterpret_cast<float*>(pointsBuffer);
+        int* rings = reinterpret_cast<int*>(ringsBuffer);
 
         int point = 0;
 
