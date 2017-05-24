@@ -2,15 +2,15 @@
 
 namespace Mapzen.VectorData
 {
-	public class FeatureCollection
-	{
-		public FeatureCollection(string name = "")
-		{
-			this.name = name;
-			this.features = new List<Feature>();
-		}
+    public class FeatureCollection
+    {
+        public FeatureCollection(string name = "")
+        {
+            this.name = name;
+            this.features = new List<Feature>();
+        }
 
-		public string name;
-		public List<Feature> features;
-	}
+        public string name;
+        public List<Feature> features;
+    }
 }

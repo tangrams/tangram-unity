@@ -2,95 +2,98 @@
 using System.Threading;
 using System.Collections.Generic;
 
-public class AsyncWorker {
-	public delegate void Task();
-	private Thread[] threads;
-	private bool stopped;
-	private Queue<Task> tasks;
+public class AsyncWorker
+{
+    public delegate void Task();
 
-	public AsyncWorker(int nThreads)
-	{
-		tasks = new Queue<Task>();
-		threads = new Thread[nThreads];
-		stopped = false;
+    private Thread[] threads;
+    private bool stopped;
+    private Queue<Task> tasks;
 
-		for (int i = 0; i < threads.Length; ++i)
-		{
-			threads[i] = new Thread(new ThreadStart(this.ThreadMain));
-			threads[i].Start();
-		}
-	}
+    public AsyncWorker(int nThreads)
+    {
+        tasks = new Queue<Task>();
+        threads = new Thread[nThreads];
+        stopped = false;
 
-	public void RunAsync(Task task)
-	{
-		if (stopped)
-		{
-			return;
-		}
+        for (int i = 0; i < threads.Length; ++i)
+        {
+            threads[i] = new Thread(new ThreadStart(this.ThreadMain));
+            threads[i].Start();
+        }
+    }
 
-		lock (this)
-		{
-			tasks.Enqueue(task);
+    public void RunAsync(Task task)
+    {
+        if (stopped)
+        {
+            return;
+        }
 
-			// Awaken one waiting thread
-			Monitor.Pulse(this);
-		}
-	}
+        lock (this)
+        {
+            tasks.Enqueue(task);
 
-	public int RemainingTasks()
-	{
-		int tasksSize;
+            // Awaken one waiting thread
+            Monitor.Pulse(this);
+        }
+    }
 
-		lock (this)
-		{
-			tasksSize = tasks.Count;
-		}
+    public int RemainingTasks()
+    {
+        int tasksSize;
 
-		return tasksSize;
-	}
 
-	public void JoinAll()
-	{
-		stopped = true;
+        lock (this)
+        {
+            tasksSize = tasks.Count;
+        }
 
-		lock (this)
-		{
-			// Awaken all waiting threads
-			Monitor.PulseAll(this);
-		}
+        return tasksSize;
+    }
 
-		for (int i = 0; i < threads.Length; ++i)
-		{
-			threads[i].Join();
-		}
-	}
+    public void JoinAll()
+    {
+        stopped = true;
 
-	private void ThreadMain()
-	{
-		while (!stopped)
-		{
-			Task task = null;
+        lock (this)
+        {
+            // Awaken all waiting threads
+            Monitor.PulseAll(this);
+        }
 
-			lock (this)
-			{
-				// If a thread calls Pulse when no other threads are waiting, the Pulse is lost,
-				// make sure that this threads keep consuming tasks unless the queue is empty.
-				if (tasks.Count == 0)
-				{
-					Monitor.Wait(this);
-				}
+        for (int i = 0; i < threads.Length; ++i)
+        {
+            threads[i].Join();
+        }
+    }
 
-				// This thread might be awaken from a JoinAll() call with an empty queue
-				if (tasks.Count > 0)
-				{
-					task = tasks.Dequeue();
-				}
-			}
+    private void ThreadMain()
+    {
+        while (!stopped)
+        {
+            Task task = null;
 
-			if (task != null)
-			{
-				task.Invoke();
-			}
-		}
-	}
+            lock (this)
+            {
+                // If a thread calls Pulse when no other threads are waiting, the Pulse is lost,
+                // make sure that this threads keep consuming tasks unless the queue is empty.
+                if (tasks.Count == 0)
+                {
+                    Monitor.Wait(this);
+                }
+
+                // This thread might be awaken from a JoinAll() call with an empty queue
+                if (tasks.Count > 0)
+                {
+                    task = tasks.Dequeue();
+                }
+            }
+
+            if (task != null)
+            {
+                task.Invoke();
+            }
+        }
+    }
 }
