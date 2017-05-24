@@ -1,51 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using Mapzen;
-// TODO remove
-using UnityEngine;
 using Mapzen.VectorData;
 
-public class TileTask {
-	private TileAddress address;
-	private string response;
-	private MapTile tile;
-	private List<string> layers;
-	private bool ready;
+public class TileTask
+{
+    private TileAddress address;
+    private string response;
+    private MapTile tile;
+    private List<string> layers;
+    private bool ready;
 
-	// TODO: remove those offset once we have better tile placement
-	public float offsetX = 0.0f;
-	public float offsetY = 0.0f;
+    // TODO: remove those offset once we have better tile placement
+    public float offsetX = 0.0f;
+    public float offsetY = 0.0f;
 
-	public TileTask(TileAddress address, List<string> layers, string response, MapTile tile)
-	{
-		this.address = address;
-		this.response = response;
-		this.layers = layers;
-		this.tile = tile;
+    public TileTask(TileAddress address, List<string> layers, string response, MapTile tile)
+    {
+        this.address = address;
+        this.response = response;
+        this.layers = layers;
+        this.tile = tile;
 
-		ready = false;
-	}
+        ready = false;
+    }
 
-	public void Start()
-	{
-		var projection = GeoJSON.LocalCoordinateProjectionForTile(address);
+    public void Start()
+    {
+        var projection = GeoJSON.LocalCoordinateProjectionForTile(address);
 
-		// Parse the GeoJSON
-		var geoJson = new GeoJSON(response, projection);
+        // Parse the GeoJSON
+        var geoJson = new GeoJSON(response, projection);
 
-		// Tesselate the mesh
-		tile.BuildMesh(address.GetSizeMercatorMeters(), geoJson.GetLayersByName(layers));
+        // Tesselate the mesh
+        tile.BuildMesh(address.GetSizeMercatorMeters(), geoJson.GetLayersByName(layers));
 
-		ready = true;
-	}
+        ready = true;
+    }
 
-	public bool IsReady()
-	{
-		return ready;
-	}
+    public bool IsReady()
+    {
+        return ready;
+    }
 
-	public MapTile GetMapTile()
-	{
-		return tile;
-	}
+    public MapTile GetMapTile()
+    {
+        return tile;
+    }
 }
