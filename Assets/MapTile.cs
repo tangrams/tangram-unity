@@ -24,9 +24,9 @@ public class MapTile : MonoBehaviour
 
         foreach (var layer in layers)
         {
-            Color color = layerColors[layer.name];
+            Color color = layerColors[layer.Name];
 
-            foreach (var feature in layer.features)
+            foreach (var feature in layer.Features)
             {
                 // TODO: use extrusion scale and minHeight as options
                 float height = 0.0f;

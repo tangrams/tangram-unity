@@ -69,7 +69,7 @@ namespace Mapzen
 
             foreach (JSONNode feature in features.Children)
             {
-                layer.features.Add(GetFeature(feature));
+                layer.Features.Add(GetFeature(feature));
             }
 
             return layer;
