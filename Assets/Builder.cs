@@ -11,26 +11,22 @@ public class Builder
         var meshData = new MeshData();
         Earcut earcut = new Earcut();
         List<float> points = new List<float>();
-        List<int> rings = new List<int>();
 
         int pointIndex = 0;
         foreach (var ringSize in geometry.rings)
         {
-            for (int i = pointIndex, contourIndex = 0; i < pointIndex + ringSize; ++i, ++contourIndex)
+            for (int i = pointIndex; i < pointIndex + ringSize; ++i)
             {
                 var point = geometry.points[i];
                 points.Add(point.x);
                 points.Add(point.y);
             }
-            rings.Add(ringSize);
             pointIndex += ringSize;
         }
-        earcut.Tesselate(points.ToArray(), rings.ToArray());
 
-        for (int i = 0; i < earcut.indices.Length; ++i)
-        {
-            meshData.indices.Add((int)earcut.indices[i]);
-        }
+        earcut.Tesselate(points.ToArray(), geometry.rings.ToArray());
+
+        meshData.indices = new List<int>(earcut.indices);
 
         for (int i = 0; i < earcut.vertices.Length; i += 2)
         {
