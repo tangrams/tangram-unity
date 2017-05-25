@@ -18,7 +18,7 @@ public class Earcut
     [DllImport("UnityNativePlugin", EntryPoint = "GetVertices")]
     private static extern void GetVertices(uint context, IntPtr vertices);
 
-    private uint contextId = 0;
+    private uint contextId;
 
     public int[] indices { get; internal set; }
 
@@ -57,10 +57,7 @@ public class Earcut
 
     public void Release()
     {
-        if (contextId != 0)
-        {
-            ReleaseTesselationContext(contextId);
-        }
+        ReleaseTesselationContext(contextId);
     }
 }
 
