@@ -7,13 +7,13 @@ install:
   - UnityInstaller.exe /S
 build_script:
   - ps: |
-      'C:/Program Files/Unity/Editor/Unity.exe' \
-      -batchmode \
-      -nographics \
-      -silent-crashes \
-      -projectpath '$pwd' \
-      -buildWindows64Player '$pwd/output.exe' \
-      -logFile '$pwd/unity-build-log.txt' \
+      'C:/Program Files/Unity/Editor/Unity.exe' `
+      -batchmode `
+      -nographics `
+      -silent-crashes `
+      -projectpath '$pwd' `
+      -buildWindows64Player '$pwd/output.exe' `
+      -logFile '$pwd/unity-build-log.txt' `
       -quit
   - ps: cat '$pwd/unity-build-log.txt'
 artifacts:
