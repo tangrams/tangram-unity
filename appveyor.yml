@@ -7,19 +7,21 @@ install:
   - UnityInstaller.exe /S
 build_script:
   # Run Unity in batch mode: https://docs.unity3d.com/Manual/CommandLineArguments.html
-  # Pipe the output to null so that Powershell waits for the command to finish.
+  # Pipe the output so that Powershell waits for the command to finish.
   - ps: |
       &"C:/Program Files/Unity/Editor/Unity.exe" `
       -batchmode `
       -nographics `
       -silent-crashes `
       -projectpath "$pwd" `
-      -buildWindows64Player "$pwd/output.exe" `
+      -buildWindows64Player "$pwd/unity-build-output.exe" `
       -logFile '$pwd/unity-build-log.txt' `
       -quit `
-      | Out-Null
+      | Out-Default
   # Print the Unity log to the console.
   - ps: cat '$pwd/unity-build-log.txt'
 artifacts:
-  - path: output.exe
+  - path: unity-build-output.exe
     name: output
+  - path: unity-build-log.txt
+    name: log
