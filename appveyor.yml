@@ -18,10 +18,12 @@ build_script:
       -logFile "unity-build-log.txt" `
       -quit `
       | Out-Default
+after_build:
   # Print the Unity log to the console.
   - ps: cat "unity-build-log.txt"
-after_build:
-  - ps: Push-AppveyorArtifact unity-build-log.txt
+on_failure:
+  # Save the Unity log as an artifact.
+  - ps: Push-AppveyorArtifact "unity-build-log.txt"
 artifacts:
   - path: unity-build-output.exe
     name: output
