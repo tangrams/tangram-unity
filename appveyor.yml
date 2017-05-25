@@ -1,0 +1,17 @@
+install:
+  # Install Unity from Chocolatey https://chocolatey.org/packages/unity/
+  - cinst unity --version 5.6.1
+build_script:
+  - ps: |
+      'C:/Program Files/Unity/Editor/Unity.exe'
+      -batchmode
+      -nographics
+      -silent-crashes
+      -projectpath '$pwd'
+      -buildWindows64Player '$pwd/output.exe'
+      -logFile '$pwd/unity-build-log.txt'
+      -quit
+  - ps: cat '$pwd/unity-build-log.txt'
+artifacts:
+  - path: output.exe
+    name: output
