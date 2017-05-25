@@ -14,14 +14,14 @@ build_script:
       -nographics `
       -silent-crashes `
       -projectpath "$pwd" `
-      -buildWindows64Player "$pwd/unity-build-output.exe" `
-      -logFile '$pwd/unity-build-log.txt' `
+      -buildWindows64Player "unity-build-output.exe" `
+      -logFile "unity-build-log.txt" `
       -quit `
       | Out-Default
   # Print the Unity log to the console.
-  - ps: cat '$pwd/unity-build-log.txt'
+  - ps: cat "unity-build-log.txt"
+after_build:
+  - ps: Push-AppveyorArtifact unity-build-log.txt
 artifacts:
   - path: unity-build-output.exe
     name: output
-  - path: unity-build-log.txt
-    name: log
