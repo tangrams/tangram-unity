@@ -5,6 +5,8 @@ install:
   - curl -fsS -o UnityInstaller.exe http://netstorage.unity3d.com/unity/2860b30f0b54/Windows64EditorInstaller/UnitySetup64-5.6.1f1.exe
   # Install silently: https://docs.unity3d.com/Manual/InstallingUnity.html
   - UnityInstaller.exe /S
+  # Open Unity without batch mode to work around activation errors.
+  - C:/"Program Files"/Unity/Editor/Unity.exe
 build_script:
   # Run Unity in batch mode: https://docs.unity3d.com/Manual/CommandLineArguments.html
   # Pipe the output so that Powershell waits for the command to finish.
@@ -18,12 +20,12 @@ build_script:
       -logFile "unity-build-log.txt" `
       -quit `
       | Out-Default
-after_build:
+on_success:
   # Print the Unity log to the console.
   - ps: cat "unity-build-log.txt"
 on_failure:
-  # Save the Unity log as an artifact.
-  - ps: Push-AppveyorArtifact "unity-build-log.txt"
+  # Print the Unity log to the console.
+  - ps: cat "unity-build-log.txt"
 artifacts:
   - path: unity-build-output.exe
     name: output
