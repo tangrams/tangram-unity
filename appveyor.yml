@@ -1,12 +1,17 @@
 image:
   - Visual Studio 2015
+environment:
+  unity_username:
+    secure: FF3yi3HItfYxM3JTCZec/w==
+  unity_password:
+    secure: 3egUgwLAVGk3JABNP7gxxA==
+  unity_serial:
+    secure: I8orkKTnuPgUqJR4LlZHjplHvY/r8cqAa4TfGvy+AHw=
 install:
   # Grab a current link from: http://unity3d.com/get-unity/download/archive
   - curl -fsS -o UnityInstaller.exe http://netstorage.unity3d.com/unity/2860b30f0b54/Windows64EditorInstaller/UnitySetup64-5.6.1f1.exe
   # Install silently: https://docs.unity3d.com/Manual/InstallingUnity.html
   - UnityInstaller.exe /S
-  # Open Unity without batch mode to work around activation errors.
-  - C:/"Program Files"/Unity/Editor/Unity.exe
 build_script:
   # Run Unity in batch mode: https://docs.unity3d.com/Manual/CommandLineArguments.html
   # Pipe the output so that Powershell waits for the command to finish.
@@ -18,6 +23,9 @@ build_script:
       -projectpath "$pwd" `
       -buildWindows64Player "unity-build-output.exe" `
       -logFile "unity-build-log.txt" `
+      -username "$unity_username" `
+      -password "$unity_password" `
+      -serial "$unity_serial" `
       -quit `
       | Out-Default
 on_success:
