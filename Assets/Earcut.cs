@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 public class Earcut
 {
@@ -27,6 +28,7 @@ public class Earcut
     public Earcut()
     {
         contextId = CreateTesselationContext();
+        Debug.Assert(contextId > 0);
     }
 
     public void Tesselate(float[] points, int[] rings)
