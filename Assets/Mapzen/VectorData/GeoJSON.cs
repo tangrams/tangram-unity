@@ -161,15 +161,17 @@ namespace Mapzen
             var geometry = new Geometry();
             geometry.type = GeometryType.LineString;
             int segmentEndIndex = 0;
+            List<int> rings = new List<int>();
             foreach (JSONNode lineStringCoords in coords.Children)
             {
                 foreach (JSONNode pointCoords in lineStringCoords.Children)
                 {
                     geometry.points.Add(GetPoint(pointCoords));
                 }
-                geometry.rings.Add(geometry.points.Count - segmentEndIndex);
+                rings.Add(geometry.points.Count - segmentEndIndex);
                 segmentEndIndex = geometry.points.Count;
             }
+            geometry.rings.Add(rings);
             return geometry;
         }
 
