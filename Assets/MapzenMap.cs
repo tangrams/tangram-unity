@@ -1,12 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Networking;
 using Mapzen;
 
 public class MapzenMap : MonoBehaviour
 {
-    delegate void HTTPRequestCallback(string error,string response,TileAddress address);
+    delegate void HTTPRequestCallback(string error, string response, IntPtr userData);
 
     public int TileX = 19290;
     public int TileY = 24632;
@@ -35,8 +37,11 @@ public class MapzenMap : MonoBehaviour
 
                 Debug.Log("URL request " + url);
 
-                HTTPRequestCallback callback = (string error, string response, TileAddress address) =>
+                HTTPRequestCallback callback = (string error, string response, IntPtr userData) =>
                 {
+                    GCHandle addressHandle = GCHandle.FromIntPtr(userData);
+                    TileAddress address = (TileAddress)addressHandle.Target;
+
                     if (error != null)
                     {
                         Debug.Log("Error: " + error);
@@ -71,6 +76,7 @@ public class MapzenMap : MonoBehaviour
 
                     task.offsetX = (address.x - TileX);
                     task.offsetY = (address.y - TileY);
+                    addressHandle.Free();
 
                     pendingTasks.Add(task);
 
@@ -82,19 +88,20 @@ public class MapzenMap : MonoBehaviour
                 UnityWebRequest request = UnityWebRequest.Get(url);
 
                 // Starts the HTTP request
-                StartCoroutine(DoHTTPRequest(request, callback, new TileAddress(tileX, tileY, TileZ)));
+                GCHandle gch = GCHandle.Alloc(new TileAddress(tileX, tileY, TileZ));
+                StartCoroutine(DoHTTPRequest(request, callback, GCHandle.ToIntPtr(gch)));
             }
         }
     }
 
     // Runs an HTTP request
-    IEnumerator DoHTTPRequest(UnityWebRequest request, HTTPRequestCallback callback, TileAddress address)
+    IEnumerator DoHTTPRequest(UnityWebRequest request, HTTPRequestCallback callback, IntPtr userData)
     {
         yield return request.Send();
 
         string data = System.Text.Encoding.Default.GetString(request.downloadHandler.data);
 
-        callback(request.error, data, address);
+        callback(request.error, data, userData);
     }
 
     // Update is called once per frame
