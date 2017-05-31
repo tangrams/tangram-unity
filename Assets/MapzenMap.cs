@@ -1,13 +1,19 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Networking;
 using Mapzen;
 
 public class MapzenMap : MonoBehaviour
 {
-    delegate void HTTPRequestCallback(string error, byte[] response,TileAddress address);
+    public int TileX = 19290;
+    public int TileY = 24632;
+    public int TileZ = 16;
+
+    public int TileRangeX = 5;
+    public int TileRangeY = 5;
 
     public string ApiKey = "vector-tiles-tyHL4AY";
 
@@ -22,71 +28,72 @@ public class MapzenMap : MonoBehaviour
     private List<TileTask> pendingTasks = new List<TileTask>();
     private AsyncWorker worker = new AsyncWorker(nWorkers);
 
-    void Start()
-    {
-        TileBounds bounds = new TileBounds(Area);
+    private UnityIO tileIO = new UnityIO();
 
-        foreach (var tileAddress in bounds.TileAddressRange)
-        {
-            var wrappedTileAddress = tileAddress.Wrapped();
-            var url = string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
-                          wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey);
+    void fetchNetworkTile(object userData, Response response) {
+        TileAddress address = (TileAddress)userData;
 
-            HTTPRequestCallback callback = (string error, byte[] response, TileAddress address) =>
-            {
-                if (error != null)
-                {
-                    Debug.Log("Error: " + error);
-                    return;
-                }
-
-                if (response.Length == 0)
-                {
-                    Debug.Log("Empty response");
-                    return;
-                }
-
-                // Debug.Log("Response: " + response);
-
-                // Adding a tile object to the scene
-                GameObject tilePrefab = Resources.Load("Tile") as GameObject;
-
-                // Instantiate a prefab running the script TileData.Start()
-                var go = Instantiate(tilePrefab);
-
-                go.name = address.ToString();
-
-                go.transform.parent = this.transform;
-
-                MapTile tile = go.GetComponent<MapTile>();
-
-                TileTask task = new TileTask(address, response, tile);
-
-                task.offsetX = (address.x - bounds.min.x);
-                task.offsetY = (-address.y + bounds.min.y);
-
-                pendingTasks.Add(task);
-
-                worker.RunAsync(() =>
-                    {
-                        task.Start();
-                    });
-            };
-            UnityWebRequest request = UnityWebRequest.Get(url);
-
-            // Starts the HTTP request
-            StartCoroutine(DoHTTPRequest(request, callback, tileAddress));
+        if (response.error != null) {
+            Debug.Log("Error: " + response.error);
+            return;
         }
+
+        if (response.data.Length == 0) {
+            Debug.Log("Empty Response");
+            return;
+        }
+
+        string responseData = System.Text.Encoding.Default.GetString(response.data);
+
+        Debug.Log("Response: " + responseData);
+
+        GameObject tilePrefab = Resources.Load("Tile") as GameObject;
+
+        var go = Instantiate(tilePrefab);
+
+        MapTile tile = go.GetComponent<MapTile>();
+
+        var layers = new List<string>
+        {
+            "water",
+            "roads",
+            "earth",
+            "buildings"
+        };
+
+        TileTask task = new TileTask(address, layers, responseData, tile);
+        task.offsetX = (address.x - TileX);
+        task.offsetY = (address.y - TileY);
+
+        pendingTasks.Add(task);
+
+        worker.RunAsync(() =>
+        {
+            task.Start();
+        });
     }
 
-    // Runs an HTTP request
-    IEnumerator DoHTTPRequest(UnityWebRequest request, HTTPRequestCallback callback, TileAddress address)
+    void Start()
     {
-        yield return request.Send();
+        // Construct the HTTP request
+        for (int x = 0; x < TileRangeX; ++x)
+        {
+            for (int y = 0; y < TileRangeY; ++y)
+            {
+                int tileX = TileX + x;
+                int tileY = TileY + y;
 
-        byte[] data = request.downloadHandler.data;
+                // var url = string.Format("/Users/varuntalwar/Desktop/test/{0}/{1}/{2}.json",
+                //               TileZ, tileX, tileY);
+                var url = string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.json?api_key={3}",
+                              TileZ, tileX, tileY, ApiKey);
 
-        callback(request.error, data, address);
+                Debug.Log("URL request " + url);
+
+                object tileAddress = new TileAddress(tileX, tileY, TileZ);
+                StartCoroutine(tileIO.UnityIORequest(url, fetchNetworkTile, tileAddress));
+            }
+        }
     }
 
     // Update is called once per frame
