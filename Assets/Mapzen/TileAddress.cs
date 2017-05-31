@@ -36,6 +36,7 @@ namespace Mapzen
 
         public TileAddress GetParent()
         {
+            if (z == 0) { return this; }
             return new TileAddress(x >> 1, y >> 1, z - 1);
         }
 
