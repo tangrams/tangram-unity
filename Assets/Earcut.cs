@@ -4,19 +4,19 @@ using System.Diagnostics;
 
 public class Earcut
 {
-    [DllImport("UnityNativePlugin", EntryPoint = "CreateTesselationContext")]
+    [DllImport("Earcut", EntryPoint = "CreateTesselationContext")]
     private static extern uint CreateTesselationContext();
 
-    [DllImport("UnityNativePlugin", EntryPoint = "ReleaseTesselationContext")]
+    [DllImport("Earcut", EntryPoint = "ReleaseTesselationContext")]
     private static extern uint ReleaseTesselationContext(uint context);
 
-    [DllImport("UnityNativePlugin", EntryPoint = "TesselatePolygon")]
+    [DllImport("Earcut", EntryPoint = "TesselatePolygon")]
     private static extern void TesselatePolygon(uint context, IntPtr points, IntPtr rings, int nRings, out int nIndices, out int nVertices);
 
-    [DllImport("UnityNativePlugin", EntryPoint = "GetIndices")]
+    [DllImport("Earcut", EntryPoint = "GetIndices")]
     private static extern void GetIndices(uint context, IntPtr indices);
 
-    [DllImport("UnityNativePlugin", EntryPoint = "GetVertices")]
+    [DllImport("Earcut", EntryPoint = "GetVertices")]
     private static extern void GetVertices(uint context, IntPtr vertices);
 
     private uint contextId;
