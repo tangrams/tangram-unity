@@ -7,7 +7,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace mvtcs {
+namespace Mvtcs {
 
   /// <summary>Holder for reflection information generated from mvt.proto</summary>
   public static partial class MvtReflection {
@@ -37,9 +37,9 @@ namespace mvtcs {
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::mvtcs.Tile), global::mvtcs.Tile.Parser, new[]{ "Layers" }, null, new[]{ typeof(global::mvtcs.Tile.Types.GeomType) }, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::mvtcs.Tile.Types.Value), global::mvtcs.Tile.Types.Value.Parser, new[]{ "StringValue", "FloatValue", "DoubleValue", "IntValue", "UintValue", "SintValue", "BoolValue" }, new[]{ "Kind" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::mvtcs.Tile.Types.Feature), global::mvtcs.Tile.Types.Feature.Parser, new[]{ "Id", "Tags", "Type", "Geometry" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::mvtcs.Tile.Types.Layer), global::mvtcs.Tile.Types.Layer.Parser, new[]{ "Version", "Name", "Features", "Keys", "Values", "Extent" }, null, null, null)})
+            new pbr::GeneratedClrTypeInfo(typeof(Mvtcs.Tile), Mvtcs.Tile.Parser, new[]{ "Layers" }, null, new[]{ typeof(Mvtcs.Tile.Types.GeomType) }, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(Mvtcs.Tile.Types.Value), Mvtcs.Tile.Types.Value.Parser, new[]{ "StringValue", "FloatValue", "DoubleValue", "IntValue", "UintValue", "SintValue", "BoolValue" }, new[]{ "Kind" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(Mvtcs.Tile.Types.Feature), Mvtcs.Tile.Types.Feature.Parser, new[]{ "Id", "Tags", "Type", "Geometry" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(Mvtcs.Tile.Types.Layer), Mvtcs.Tile.Types.Layer.Parser, new[]{ "Version", "Name", "Features", "Keys", "Values", "Extent" }, null, null, null)})
           }));
     }
     #endregion
@@ -53,7 +53,7 @@ namespace mvtcs {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::mvtcs.MvtReflection.Descriptor.MessageTypes[0]; }
+      get { return Mvtcs.MvtReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -80,11 +80,11 @@ namespace mvtcs {
 
     /// <summary>Field number for the "layers" field.</summary>
     public const int LayersFieldNumber = 3;
-    private static readonly pb::FieldCodec<global::mvtcs.Tile.Types.Layer> _repeated_layers_codec
-        = pb::FieldCodec.ForMessage(26, global::mvtcs.Tile.Types.Layer.Parser);
-    private readonly pbc::RepeatedField<global::mvtcs.Tile.Types.Layer> layers_ = new pbc::RepeatedField<global::mvtcs.Tile.Types.Layer>();
+    private static readonly pb::FieldCodec<Mvtcs.Tile.Types.Layer> _repeated_layers_codec
+        = pb::FieldCodec.ForMessage(26, Mvtcs.Tile.Types.Layer.Parser);
+    private readonly pbc::RepeatedField<Mvtcs.Tile.Types.Layer> layers_ = new pbc::RepeatedField<Mvtcs.Tile.Types.Layer>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::mvtcs.Tile.Types.Layer> Layers {
+    public pbc::RepeatedField<Mvtcs.Tile.Types.Layer> Layers {
       get { return layers_; }
     }
 
@@ -174,7 +174,7 @@ namespace mvtcs {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static pbr::MessageDescriptor Descriptor {
-          get { return global::mvtcs.Tile.Descriptor.NestedTypes[0]; }
+          get { return Mvtcs.Tile.Descriptor.NestedTypes[0]; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -508,7 +508,7 @@ namespace mvtcs {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static pbr::MessageDescriptor Descriptor {
-          get { return global::mvtcs.Tile.Descriptor.NestedTypes[1]; }
+          get { return Mvtcs.Tile.Descriptor.NestedTypes[1]; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -565,12 +565,12 @@ namespace mvtcs {
 
         /// <summary>Field number for the "type" field.</summary>
         public const int TypeFieldNumber = 3;
-        private global::mvtcs.Tile.Types.GeomType type_ = 0;
+        private Mvtcs.Tile.Types.GeomType type_ = 0;
         /// <summary>
         /// The type of geometry stored in this feature.
         /// </summary>
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public global::mvtcs.Tile.Types.GeomType Type {
+        public Mvtcs.Tile.Types.GeomType Type {
           get { return type_; }
           set {
             type_ = value;
@@ -706,7 +706,7 @@ namespace mvtcs {
                 break;
               }
               case 24: {
-                type_ = (global::mvtcs.Tile.Types.GeomType) input.ReadEnum();
+                type_ = (Mvtcs.Tile.Types.GeomType) input.ReadEnum();
                 break;
               }
               case 34:
@@ -727,7 +727,7 @@ namespace mvtcs {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static pbr::MessageDescriptor Descriptor {
-          get { return global::mvtcs.Tile.Descriptor.NestedTypes[2]; }
+          get { return Mvtcs.Tile.Descriptor.NestedTypes[2]; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -787,14 +787,14 @@ namespace mvtcs {
 
         /// <summary>Field number for the "features" field.</summary>
         public const int FeaturesFieldNumber = 2;
-        private static readonly pb::FieldCodec<global::mvtcs.Tile.Types.Feature> _repeated_features_codec
-            = pb::FieldCodec.ForMessage(18, global::mvtcs.Tile.Types.Feature.Parser);
-        private readonly pbc::RepeatedField<global::mvtcs.Tile.Types.Feature> features_ = new pbc::RepeatedField<global::mvtcs.Tile.Types.Feature>();
+        private static readonly pb::FieldCodec<Mvtcs.Tile.Types.Feature> _repeated_features_codec
+            = pb::FieldCodec.ForMessage(18, Mvtcs.Tile.Types.Feature.Parser);
+        private readonly pbc::RepeatedField<Mvtcs.Tile.Types.Feature> features_ = new pbc::RepeatedField<Mvtcs.Tile.Types.Feature>();
         /// <summary>
         /// The actual features in this tile.
         /// </summary>
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public pbc::RepeatedField<global::mvtcs.Tile.Types.Feature> Features {
+        public pbc::RepeatedField<Mvtcs.Tile.Types.Feature> Features {
           get { return features_; }
         }
 
@@ -813,14 +813,14 @@ namespace mvtcs {
 
         /// <summary>Field number for the "values" field.</summary>
         public const int ValuesFieldNumber = 4;
-        private static readonly pb::FieldCodec<global::mvtcs.Tile.Types.Value> _repeated_values_codec
-            = pb::FieldCodec.ForMessage(34, global::mvtcs.Tile.Types.Value.Parser);
-        private readonly pbc::RepeatedField<global::mvtcs.Tile.Types.Value> values_ = new pbc::RepeatedField<global::mvtcs.Tile.Types.Value>();
+        private static readonly pb::FieldCodec<Mvtcs.Tile.Types.Value> _repeated_values_codec
+            = pb::FieldCodec.ForMessage(34, Mvtcs.Tile.Types.Value.Parser);
+        private readonly pbc::RepeatedField<Mvtcs.Tile.Types.Value> values_ = new pbc::RepeatedField<Mvtcs.Tile.Types.Value>();
         /// <summary>
         /// Dictionary encoding for values
         /// </summary>
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public pbc::RepeatedField<global::mvtcs.Tile.Types.Value> Values {
+        public pbc::RepeatedField<Mvtcs.Tile.Types.Value> Values {
           get { return values_; }
         }
 

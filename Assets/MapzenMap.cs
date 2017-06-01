@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +7,7 @@ using Mapzen;
 
 public class MapzenMap : MonoBehaviour
 {
-    delegate void HTTPRequestCallback(string error,string response,TileAddress address);
+    delegate void HTTPRequestCallback(string error, byte[] response,TileAddress address);
 
     public string ApiKey = "vector-tiles-tyHL4AY";
 
@@ -32,7 +32,7 @@ public class MapzenMap : MonoBehaviour
             var url = string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.json?api_key={3}",
                           wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey);
 
-            HTTPRequestCallback callback = (string error, string response, TileAddress address) =>
+            HTTPRequestCallback callback = (string error, byte[] response, TileAddress address) =>
             {
                 if (error != null)
                 {
@@ -56,15 +56,7 @@ public class MapzenMap : MonoBehaviour
 
                 MapTile tile = go.GetComponent<MapTile>();
 
-                var layers = new List<string>
-                {
-                    "water",
-                    "roads",
-                    "earth",
-                    "buildings"
-                };
-
-                TileTask task = new TileTask(address, layers, response, tile);
+                TileTask task = new TileTask(address, response, tile);
 
                 task.offsetX = (address.x - bounds.min.x);
                 task.offsetY = (-address.y + bounds.min.y);
@@ -88,7 +80,7 @@ public class MapzenMap : MonoBehaviour
     {
         yield return request.Send();
 
-        string data = System.Text.Encoding.Default.GetString(request.downloadHandler.data);
+        byte[] data = request.downloadHandler.data;
 
         callback(request.error, data, address);
     }

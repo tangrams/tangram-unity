@@ -2,31 +2,34 @@
 
 namespace Mapzen.VectorData
 {
-    public class Feature
+    public abstract class Feature
     {
-        public Feature()
+        public abstract GeometryType Type { get; }
+
+        public abstract bool TryGetProperty(string key, out object value);
+
+        public abstract bool HandleGeometry(IGeometryHandler handler);
+
+        public List<Point> CopyPoints()
         {
-            geometry = new Geometry();
-            properties = new Dictionary<string, object>();
+            var copier = new GeometryCopier();
+            HandleGeometry(copier);
+            return copier.Points;
         }
 
-        public Geometry geometry { get; set; }
-
-        public Dictionary<string, object> properties { get; set; }
-
-        public bool TryGetProperty(string key, out object value)
+        public List<List<Point>> CopyLineStrings()
         {
-            object propertyValue;
-            if (properties.TryGetValue(key, out propertyValue))
-            {
-                if (propertyValue != null)
-                {
-                    value = propertyValue;
-                    return true;
-                }
-            }
-            value = null;
-            return false;
+            var copier = new GeometryCopier();
+            HandleGeometry(copier);
+            return copier.LineStrings;
+        }
+
+        public List<List<List<Point>>> CopyPolygons()
+        {
+            var copier = new GeometryCopier();
+            HandleGeometry(copier);
+            return copier.Polygons;
         }
     }
 }
+

@@ -1,5 +1,4 @@
-﻿
-namespace Mapzen.VectorData
+﻿namespace Mapzen.VectorData
 {
     public struct Point
     {

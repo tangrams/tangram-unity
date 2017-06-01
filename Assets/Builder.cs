@@ -6,82 +6,135 @@ using UnityEngine;
 
 public class Builder
 {
-    public static void TesselatePolygon(MeshData outputMeshData, Geometry geometry, Material material, float height)
+    public struct PolygonOptions
     {
-        int pointOffset = 0;
-        foreach (var polygonRing in geometry.rings)
+        public Material Material;
+        public bool Extrude;
+        public float MinHeight;
+        public float MaxHeight;
+    }
+
+    protected struct PolygonBuilder : IGeometryHandler
+    {
+        public PolygonBuilder(MeshData outputMeshData, PolygonOptions options)
         {
-            Earcut earcut = new Earcut();
-            List<float> points = new List<float>();
+            this.outputMeshData = outputMeshData;
+            this.options = options;
+            this.coordinates = new List<float>();
+            this.rings = new List<int>();
+            this.lastPoint = new Point();
+            this.pointsInRing = 0;
+            this.extrusionVertices = new List<Vector3>();
+            this.extrusionIndices = new List<int>();
+        }
 
-            int pointIndex = 0;
-            foreach (var ringSize in polygonRing)
+        MeshData outputMeshData;
+        PolygonOptions options;
+
+        // Values for the tesselator.
+        List<float> coordinates;
+        List<int> rings;
+        int pointsInRing;
+
+        // Values for extrusions.
+        Point lastPoint;
+        List<Vector3> extrusionVertices;
+        List<int> extrusionIndices;
+
+        public bool OnPoint(Point point)
+        {
+            // For all but the first point in each ring, create a quad extending from the
+            // previous point to the current point and from MinHeight to MaxHeight.
+            if (options.Extrude && pointsInRing > 0)
             {
-                for (int i = pointIndex; i < pointIndex + ringSize; ++i)
-                {
-                    var point = geometry.points[i + pointOffset];
-                    points.Add(point.x);
-                    points.Add(point.y);
-                }
-                pointIndex += ringSize;
+                var p0 = lastPoint;
+                var p1 = point;
+
+                var indexOffset = extrusionVertices.Count;
+
+                extrusionVertices.Add(new Vector3(p0.x, options.MaxHeight, p0.y));
+                extrusionVertices.Add(new Vector3(p1.x, options.MaxHeight, p1.y));
+                extrusionVertices.Add(new Vector3(p0.x, options.MinHeight, p0.y));
+                extrusionVertices.Add(new Vector3(p1.x, options.MinHeight, p1.y));
+
+                extrusionIndices.Add(indexOffset + 2);
+                extrusionIndices.Add(indexOffset + 3);
+                extrusionIndices.Add(indexOffset + 1);
+                extrusionIndices.Add(indexOffset + 2);
+                extrusionIndices.Add(indexOffset + 1);
+                extrusionIndices.Add(indexOffset + 0);
             }
+            lastPoint = point;
 
-            pointOffset += pointIndex;
+            // Add the current point to the buffer of coordinates for the tesselator.
+            coordinates.Add(point.x);
+            coordinates.Add(point.y);
+            pointsInRing++;
 
-            earcut.Tesselate(points.ToArray(), polygonRing.ToArray());
+            return true;
+        }
 
-            var indices = new List<int>(earcut.indices);
+        public bool OnBeginLineString()
+        {
+            return false;
+        }
+
+        public bool OnEndLineString()
+        {
+            return false;
+        }
+
+        public bool OnBeginLinearRing()
+        {
+            pointsInRing = 0;
+            return true;
+        }
+
+        public bool OnEndLinearRing()
+        {
+            rings.Add(pointsInRing);
+            return true;
+        }
+
+        public bool OnBeginPolygon()
+        {
+            return true;
+        }
+
+        public bool OnEndPolygon()
+        {
+            // First add vertices and indices for extrusions.
+            outputMeshData.AddElements(extrusionVertices, extrusionIndices, options.Material);
+
+            // Then tesselate polygon interior and add vertices and indices.
+            var earcut = new Earcut();
+
+            earcut.Tesselate(coordinates.ToArray(), rings.ToArray());
+
             var vertices = new List<Vector3>(earcut.vertices.Length / 2);
 
             for (int i = 0; i < earcut.vertices.Length; i += 2)
             {
-                vertices.Add(new Vector3(earcut.vertices[i], height, earcut.vertices[i + 1]));
+                vertices.Add(new Vector3(earcut.vertices[i], options.MaxHeight, earcut.vertices[i + 1]));
             }
+
+            outputMeshData.AddElements(vertices, earcut.indices, options.Material);
 
             earcut.Release();
 
-            outputMeshData.AddElements(vertices, indices, material);
+            return true;
         }
     }
 
-    public static void TesselatePolygonExtrusion(MeshData outputMeshData, Geometry geometry, Material material, float minHeight, float height)
+    public static void TesselatePolygon(MeshData outputMeshData, Feature feature, Material material, float height)
     {
-        var vertices = new List<Vector3>();
-        var indices = new List<int>();
+        var options = new PolygonOptions();
+        options.Material = material;
+        options.MaxHeight = height;
 
-        int pointOffset = 0;
-        int indexOffset = 0;
-        foreach (var polygonRing in geometry.rings)
-        {
-            foreach (var ringSize in polygonRing)
-            {
-                for (int i = pointOffset; i < pointOffset + ringSize; i++)
-                {
-                    int curr = i;
-                    int next = (i + 1 == pointOffset + ringSize) ? pointOffset : i + 1;
+        var builder = new PolygonBuilder(outputMeshData, options);
 
-                    var p0 = geometry.points[curr];
-                    var p1 = geometry.points[next];
-
-                    vertices.Add(new Vector3(p0.x, height, p0.y));
-                    vertices.Add(new Vector3(p1.x, height, p1.y));
-                    vertices.Add(new Vector3(p0.x, minHeight, p0.y));
-                    vertices.Add(new Vector3(p1.x, minHeight, p1.y));
-
-                    indices.Add(indexOffset + 1);
-                    indices.Add(indexOffset + 3);
-                    indices.Add(indexOffset + 2);
-                    indices.Add(indexOffset + 1);
-                    indices.Add(indexOffset + 2);
-                    indices.Add(indexOffset + 0);
-
-                    indexOffset += 4;
-                }
-                pointOffset += ringSize;
-            }
-        }
-
-        outputMeshData.AddElements(vertices, indices, material);
+        feature.HandleGeometry(builder);
     }
 
     public static Vector2 Perp(Vector2 d)

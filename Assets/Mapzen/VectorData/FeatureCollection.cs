@@ -2,15 +2,10 @@
 
 namespace Mapzen.VectorData
 {
-    public class FeatureCollection
+    public abstract class FeatureCollection
     {
-        public FeatureCollection(string name = "")
-        {
-            Name = name;
-            Features = new List<Feature>();
-        }
+        public abstract string Name { get; }
 
-        public string Name;
-        public List<Feature> Features;
+        public abstract IEnumerable<Feature> Features { get; }
     }
 }

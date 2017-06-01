@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using Mapzen;
 using Mapzen.VectorData;
+using Mapzen.VectorData.Formats;
 
 public class TileTask
 {
     private TileAddress address;
-    private string response;
+    private byte[] response;
     private MapTile tile;
     private List<string> layers;
     private bool ready;
@@ -15,7 +16,7 @@ public class TileTask
     public float offsetX = 0.0f;
     public float offsetY = 0.0f;
 
-    public TileTask(TileAddress address, List<string> layers, string response, MapTile tile)
+    public TileTask(TileAddress address, List<string> layers, byte[] response, MapTile tile)
     {
         this.address = address;
         this.response = response;
@@ -27,13 +28,13 @@ public class TileTask
 
     public void Start()
     {
-        var projection = GeoJSON.LocalCoordinateProjectionForTile(address);
 
         // Parse the GeoJSON
-        var geoJson = new GeoJSON(response, projection);
+        var tileData = new GeoJsonTile(address, response);
+        // var tileData = new MvtTile(address, response);
 
         // Tesselate the mesh
-        tile.BuildMesh(address.GetSizeMercatorMeters(), geoJson.GetLayersByName(layers));
+        tile.BuildMesh(address.GetSizeMercatorMeters(), tileData.FeatureCollections);
 
         ready = true;
     }

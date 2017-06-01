@@ -4,7 +4,10 @@
     {
         Unknown = 0,
         Point = 1,
-        LineString = 2,
-        Polygon = 3,
+        MultiPoint = 2,
+        LineString = 3,
+        MultiLineString = 4,
+        Polygon = 5,
+        MultiPolygon = 6,
     }
 }

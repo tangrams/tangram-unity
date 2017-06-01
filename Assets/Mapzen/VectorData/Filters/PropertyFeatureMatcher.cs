@@ -7,7 +7,7 @@
         public bool MatchesFeature(Feature feature)
         {
             object property;
-            if (feature.properties.TryGetValue(Key, out property))
+            if (feature.TryGetProperty(Key, out property))
             {
                 return MatchesProperty(property);
             }

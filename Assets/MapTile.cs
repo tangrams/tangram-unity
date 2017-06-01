@@ -19,7 +19,7 @@ public class MapTile : MonoBehaviour
         var waterLayerFilter = new FeatureFilter().TakeAllFromCollections("water");
 
         // Filter that accepts all features in the "buildings" layer with a "height" property.
-        var buildingExtrusionFilter = new FeatureFilter().TakeAllFromCollections("buildings").Where(FeatureMatcher.HasPropertyInRange("height", null, 30));
+        var buildingExtrusionFilter = new FeatureFilter().TakeAllFromCollections("buildings");
 
         // Filter that accepts all features in the "earth" or "landuse" layers.
         var landLayerFilter = new FeatureFilter().TakeAllFromCollections("earth", "landuse");
@@ -51,7 +51,7 @@ public class MapTile : MonoBehaviour
         featureStyling.Add(highwayRoadLayerFilter, highwayRoadsMaterial);
     }
 
-    public void BuildMesh(double tileScale, List<FeatureCollection> layers)
+    public void BuildMesh(double tileScale, IEnumerable<FeatureCollection> layers)
     {
         float inverseTileScale = 1.0f / (float)tileScale;
 
@@ -77,14 +77,9 @@ public class MapTile : MonoBehaviour
                         height = (float)((double)heightValue * inverseTileScale);
                     }
 
-                    if (feature.geometry.type == GeometryType.Polygon)
+                    if (feature.Type == GeometryType.Polygon)
                     {
-                        Builder.TesselatePolygon(meshData, feature.geometry, material, height);
-
-                        if (height > 0.0f)
-                        {
-                            Builder.TesselatePolygonExtrusion(meshData, feature.geometry, material, minHeight, height);
-                        }
+                        Builder.TesselatePolygon(meshData, feature, material, height);
                     }
 
                     if (feature.geometry.type == GeometryType.LineString)
