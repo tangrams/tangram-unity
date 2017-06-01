@@ -15,6 +15,7 @@ extern "C" {
     struct EarcutContext {
         std::array<bool, CAPACITY> used;
         std::array<Earcut, CAPACITY> earcuts;
+        std::array<PolygonArray, CAPACITY> polygons;
     };
 
     EarcutContext earcutContext;
@@ -23,25 +24,19 @@ extern "C" {
 
     unsigned int CreateTesselationContext()
     {
-        {
-            std::lock_guard<std::mutex> guard(mutex);
-            if (!initialized) {
-                earcutContext.used.fill(false);
-                initialized = true;
-            }
+        std::lock_guard<std::mutex> guard(mutex);
+        if (!initialized) {
+            earcutContext.used.fill(false);
+            initialized = true;
         }
 
         // 0 is an invalid identifier
         unsigned int contextId = 0;
-
-        {
-            std::lock_guard<std::mutex> guard(mutex);
-            for (size_t i = 0; i < earcutContext.used.size(); ++i) {
-                if (!earcutContext.used[i]) {
-                    earcutContext.used[i] = true;
-                    contextId = (unsigned int)i + 1;
-                    break;
-                }
+        for (size_t i = 0; i < earcutContext.used.size(); ++i) {
+            if (!earcutContext.used[i]) {
+                earcutContext.used[i] = true;
+                contextId = (unsigned int)i + 1;
+                break;
             }
         }
 
@@ -52,14 +47,8 @@ extern "C" {
     {
         if (contextId == 0) { return; }
 
-        auto& earcut = earcutContext.earcuts[contextId - 1];
-        earcut.indices.clear();
-        earcut.vertices.clear();
-
-        {
-            std::lock_guard<std::mutex> guard(mutex);
-            earcutContext.used[contextId - 1] = false;
-        }
+        std::lock_guard<std::mutex> guard(mutex);
+        earcutContext.used[contextId - 1] = false;
     }
 
     void TesselatePolygon(unsigned int contextId, char* pointsBuffer, char* ringsBuffer,
@@ -69,14 +58,15 @@ extern "C" {
 
         int* rings = reinterpret_cast<int*>(ringsBuffer);
 
-        PolygonArray polygon(nRings);
+        auto& polygon = earcutContext.polygons[contextId - 1];
+        polygon.resize(nRings);
 
         for (int i = 0; i < nRings; ++i) {
             polygon[i].resize(rings[i]);
         }
 
         for (int i = 0, byteOffset = 0; i < nRings; ++i) {
-            size_t ringByteSize = rings[i] * sizeof(Point);
+            size_t ringByteSize = polygon[i].size() * sizeof(Point);
             std::memcpy(polygon[i].data(), pointsBuffer + byteOffset, ringByteSize);
             byteOffset += ringByteSize;
         }
