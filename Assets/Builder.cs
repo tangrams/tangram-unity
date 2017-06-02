@@ -1,18 +1,16 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Mapzen.VectorData;
 using UnityEngine;
-using System.Collections.Generic;
 
 public class Builder
 {
-    public static MeshData TesselatePolygon(Geometry geometry, Color color, float height)
+    public static void TesselatePolygon(MeshData outputMeshData, Geometry geometry, Material material, float height)
     {
-        var meshData = new MeshData();
-
         int pointOffset = 0;
         foreach (var polygonRing in geometry.rings)
         {
-            var polygonMeshData = new MeshData();
             Earcut earcut = new Earcut();
             List<float> points = new List<float>();
 
@@ -32,25 +30,25 @@ public class Builder
 
             earcut.Tesselate(points.ToArray(), polygonRing.ToArray());
 
-            polygonMeshData.indices = new List<int>(earcut.indices);
+            var indices = new List<int>(earcut.indices);
+            var vertices = new List<Vector3>(earcut.vertices.Length / 2);
 
             for (int i = 0; i < earcut.vertices.Length; i += 2)
             {
-                polygonMeshData.vertices.Add(new Vector3(earcut.vertices[i], height, earcut.vertices[i + 1]));
-                polygonMeshData.colors.Add(color);
+                vertices.Add(new Vector3(earcut.vertices[i], height, earcut.vertices[i + 1]));
             }
 
             earcut.Release();
 
-            meshData.Add(polygonMeshData);
+            outputMeshData.AddElements(vertices, indices, material);
         }
-
-        return meshData;
     }
 
-    public static MeshData TesselatePolygonExtrusion(Geometry geometry, Color color, float minHeight, float height)
+    public static void TesselatePolygonExtrusion(MeshData outputMeshData, Geometry geometry, Material material, float minHeight, float height)
     {
-        var meshData = new MeshData();
+
+        var vertices = new List<Vector3>();
+        var indices = new List<int>();
 
         int pointOffset = 0;
         foreach (var polygonRing in geometry.rings)
@@ -64,32 +62,26 @@ public class Builder
                     var p0 = geometry.points[pointOffset + i];
                     var p1 = geometry.points[pointOffset + i + 1];
 
-                    meshData.vertices.Add(new Vector3(p0.x, height, p0.y));
-                    meshData.vertices.Add(new Vector3(p1.x, height, p1.y));
-                    meshData.vertices.Add(new Vector3(p0.x, minHeight, p0.y));
-                    meshData.vertices.Add(new Vector3(p1.x, minHeight, p1.y));
+                    vertices.Add(new Vector3(p0.x, height, p0.y));
+                    vertices.Add(new Vector3(p1.x, height, p1.y));
+                    vertices.Add(new Vector3(p0.x, minHeight, p0.y));
+                    vertices.Add(new Vector3(p1.x, minHeight, p1.y));
 
-                    for (int colorIndex = 0; colorIndex < 4; ++colorIndex)
-                    {
-                        meshData.colors.Add(color);
-                    }
-
-                    meshData.indices.Add(indexOffset + 2);
-                    meshData.indices.Add(indexOffset + 3);
-                    meshData.indices.Add(indexOffset + 1);
-                    meshData.indices.Add(indexOffset + 2);
-                    meshData.indices.Add(indexOffset + 1);
-                    meshData.indices.Add(indexOffset + 0);
+                    indices.Add(indexOffset + 2);
+                    indices.Add(indexOffset + 3);
+                    indices.Add(indexOffset + 1);
+                    indices.Add(indexOffset + 2);
+                    indices.Add(indexOffset + 1);
+                    indices.Add(indexOffset + 0);
 
                     indexOffset += 4;
                 }
-
                 pointIndex += ringSize;
             }
 
             pointOffset += pointIndex;
         }
 
-        return meshData;
+        outputMeshData.AddElements(vertices, indices, material);
     }
 }
