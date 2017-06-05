@@ -1,6 +1,5 @@
 ﻿using System;
 using Mapzen.VectorData;
-using LibTessDotNet;
 using UnityEngine;
 using System.Collections.Generic;
 

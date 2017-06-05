@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mapzen.VectorData;
 using SimpleJSON;
-using LibTessDotNet;
 
 [RequireComponent(typeof(MeshFilter))]
 public class MapTile : MonoBehaviour
