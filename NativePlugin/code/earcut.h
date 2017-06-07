@@ -5,6 +5,7 @@
 #include <array>
 #include <cmath>
 #include <cassert>
+#include <cstring>
 
 namespace mapbox {
 

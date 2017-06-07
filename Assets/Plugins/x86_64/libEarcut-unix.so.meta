@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: cf71d078209f347fa83ff040764ac8e1
-timeCreated: 1496855765
+guid: 2921eab7799d941de836c192fdc0b44d
+timeCreated: 1496869702
 licenseType: Free
 PluginImporter:
   serializedVersion: 2
@@ -15,16 +15,16 @@ PluginImporter:
       second:
         enabled: 0
         settings:
-          Exclude Android: 0
-          Exclude Editor: 1
-          Exclude Linux: 1
-          Exclude Linux64: 1
-          Exclude LinuxUniversal: 1
-          Exclude OSXIntel: 1
-          Exclude OSXIntel64: 1
-          Exclude OSXUniversal: 1
-          Exclude Win: 1
-          Exclude Win64: 1
+          Exclude Android: 1
+          Exclude Editor: 0
+          Exclude Linux: 0
+          Exclude Linux64: 0
+          Exclude LinuxUniversal: 0
+          Exclude OSXIntel: 0
+          Exclude OSXIntel64: 0
+          Exclude OSXUniversal: 0
+          Exclude Win: 0
+          Exclude Win64: 0
           Exclude iOS: 1
     data:
       first:
@@ -32,15 +32,15 @@ PluginImporter:
       second:
         enabled: 0
         settings:
-          CPU: AnyCPU
-          OS: AnyOS
+          CPU: x86_64
+          OS: Linux
     data:
       first:
         Android: Android
       second:
-        enabled: 1
+        enabled: 0
         settings:
-          CPU: x86
+          CPU: ARMv7
     data:
       first:
         Any: 
@@ -51,80 +51,80 @@ PluginImporter:
       first:
         Editor: Editor
       second:
-        enabled: 0
+        enabled: 1
         settings:
-          CPU: x86
+          CPU: x86_64
           DefaultValueInitialized: true
     data:
       first:
         Facebook: Win
+      second:
+        enabled: 0
+        settings:
+          CPU: None
+    data:
+      first:
+        Facebook: Win64
       second:
         enabled: 1
         settings:
           CPU: AnyCPU
     data:
       first:
-        Facebook: Win64
-      second:
-        enabled: 0
-        settings:
-          CPU: None
-    data:
-      first:
         Standalone: Linux
       second:
-        enabled: 0
+        enabled: 1
         settings:
-          CPU: x86
+          CPU: None
     data:
       first:
         Standalone: Linux64
       second:
-        enabled: 0
+        enabled: 1
         settings:
-          CPU: None
+          CPU: x86_64
     data:
       first:
         Standalone: LinuxUniversal
       second:
-        enabled: 0
+        enabled: 1
         settings:
-          CPU: None
+          CPU: x86_64
     data:
       first:
         Standalone: OSXIntel
       second:
-        enabled: 0
+        enabled: 1
         settings:
-          CPU: AnyCPU
+          CPU: None
     data:
       first:
         Standalone: OSXIntel64
       second:
-        enabled: 0
-        settings:
-          CPU: None
-    data:
-      first:
-        Standalone: OSXUniversal
-      second:
-        enabled: 0
-        settings:
-          CPU: None
-    data:
-      first:
-        Standalone: Win
-      second:
-        enabled: 0
+        enabled: 1
         settings:
           CPU: AnyCPU
     data:
       first:
-        Standalone: Win64
+        Standalone: OSXUniversal
       second:
-        enabled: 0
+        enabled: 1
+        settings:
+          CPU: x86_64
+    data:
+      first:
+        Standalone: Win
+      second:
+        enabled: 1
         settings:
           CPU: None
+    data:
+      first:
+        Standalone: Win64
+      second:
+        enabled: 1
+        settings:
+          CPU: AnyCPU
     data:
       first:
         iPhone: iOS

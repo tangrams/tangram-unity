@@ -10,7 +10,7 @@ android {
 
     externalNativeBuild {
       cmake {
-        targets 'Earcut'
+        targets 'Earcut-android'
         cppFlags '-std=c++11'
         arguments '-DANDROID_TOOLCHAIN=clang',
                   '-DANDROID_STL=c++_shared'
