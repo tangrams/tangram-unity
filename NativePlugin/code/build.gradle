@@ -1,0 +1,43 @@
+apply plugin: 'com.android.library'
+
+android {
+  compileSdkVersion 25
+  buildToolsVersion '25.0.2'
+
+  defaultConfig {
+    minSdkVersion 15
+    targetSdkVersion 25
+
+    externalNativeBuild {
+      cmake {
+        targets 'Earcut'
+        cppFlags '-std=c++11'
+        arguments '-DANDROID_TOOLCHAIN=clang',
+                  '-DANDROID_STL=c++_shared'
+                    cppFlags '-std=c++14',
+                  '-pedantic',
+                  '-fPIC'
+      }
+    }
+  }
+
+  externalNativeBuild {
+    cmake {
+      path '../CMakeLists.txt'
+    }
+  }
+
+  buildTypes {
+    release {
+      externalNativeBuild {
+        cmake.cppFlags'-g0'
+      }
+    }
+  }
+
+  productFlavors {
+    full {
+      externalNativeBuild.cmake.abiFilters 'armeabi-v7a', 'x86'
+    }
+  }
+}
