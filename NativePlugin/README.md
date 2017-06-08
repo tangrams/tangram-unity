@@ -75,7 +75,7 @@ $ make -c build/ install
 
 #### Dependencies
 
-To build the Unity plugin for Android you will need [Android Studio](https://developer.android.com/studio/index.html) version 2.2 or newer on Mac OS X, Ubuntu, or Windows 10. Using the Android Studio SDK Manager, install or update the 'CMake', 'LLDB', and 'NDK' packages from the 'SDK Tools'  tab. 
+To build the Unity plugin for Android you will need [Android Studio](https://developer.android.com/studio/index.html) version 2.2 or newer on Mac OS X, Ubuntu, or Windows 10. Using the Android Studio SDK Manager, install or update the 'CMake', 'LLDB', and 'NDK' packages from the 'SDK Tools'  tab.
 
 After installing dependencies in Android Studio, you can execute Android builds from either the command line or the Android Studio interface.
 
@@ -87,4 +87,5 @@ After installing dependencies in Android Studio, you can execute Android builds 
 
 ```sh
 $ ./gradlew code:assembleFullRelease
+$ ./gradlew code:installLibraries
 ```

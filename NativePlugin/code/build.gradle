@@ -38,3 +38,12 @@ android {
     }
   }
 }
+
+task installLibraries(type: Copy)
+
+installLibraries {
+    description = 'Install libraries into the Unity plugin project...'
+    from 'build/intermediates/cmake/full/release/obj'
+    into '../../Assets/Plugins'
+    include('**/*')
+}
