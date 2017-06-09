@@ -1,3 +1,7 @@
+//
+// /!\ THIS FILE IS PART OF PLUGIN CODE FOR THE iOS PLATFORM -- DO NOT EDIT
+//
+
 #include "unity_earcut.h"
 #include "earcut.h"
 #include <array>

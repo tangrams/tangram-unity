@@ -1,5 +1,5 @@
 //
-// @CMAKE_DOCS@
+// /!\ THIS FILE IS PART OF PLUGIN CODE FOR THE WebGL PLATFORM -- DO NOT EDIT
 //
 
 #pragma once

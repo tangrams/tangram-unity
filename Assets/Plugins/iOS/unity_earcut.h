@@ -1,4 +1,12 @@
+//
+// /!\ THIS FILE IS PART OF PLUGIN CODE FOR THE iOS PLATFORM -- DO NOT EDIT
+//
+
+#ifdef WIN32
+#define UNITY_NATIVE_PLUGIN_EXPORT_API __declspec(dllexport)
+#else
 #define UNITY_NATIVE_PLUGIN_EXPORT_API __attribute__ ((visibility ("default")))
+#endif
 
 extern "C" {
     UNITY_NATIVE_PLUGIN_EXPORT_API unsigned int CreateTesselationContext();

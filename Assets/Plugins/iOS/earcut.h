@@ -1,3 +1,7 @@
+//
+// /!\ THIS FILE IS PART OF PLUGIN CODE FOR THE iOS PLATFORM -- DO NOT EDIT
+//
+
 #pragma once
 
 #include <vector>
@@ -5,6 +9,7 @@
 #include <array>
 #include <cmath>
 #include <cassert>
+#include <cstring>
 
 namespace mapbox {
 
