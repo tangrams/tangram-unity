@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using UnityEngine;
 using System.Collections.Generic;
 
 public class AsyncWorker
@@ -92,7 +93,14 @@ public class AsyncWorker
 
             if (task != null)
             {
-                task.Invoke();
+                try
+                {
+                    task.Invoke();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                }
             }
         }
     }
