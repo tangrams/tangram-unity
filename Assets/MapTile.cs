@@ -19,7 +19,7 @@ public class MapTile : MonoBehaviour
         var waterLayerFilter = new FeatureFilter().TakeAllFromCollections("water");
 
         // Filter that accepts all features in the "buildings" layer with a "height" property.
-        var buildingExtrusionFilter = new FeatureFilter().TakeAllFromCollections("buildings").Where(FeatureMatcher.HasProperty("height"));
+        var buildingExtrusionFilter = new FeatureFilter().TakeAllFromCollections("buildings").Where(FeatureMatcher.HasPropertyInRange("height", null, 30));
 
         // Filter that accepts all features in the "earth" or "landuse" layers.
         var landLayerFilter = new FeatureFilter().TakeAllFromCollections("earth", "landuse");
@@ -59,10 +59,11 @@ public class MapTile : MonoBehaviour
                     float height = 0.0f;
                     float minHeight = 0.0f;
 
-                    JSONNode heightNode;
-                    if (feature.TryGetProperty("height", out heightNode))
+                    object heightValue;
+                    if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
                     {
-                        height = heightNode * inverseTileScale;
+                        // For some reason we can't cast heightValue straight to float.
+                        height = (float)((double)heightValue * inverseTileScale);
                     }
 
                     if (feature.geometry.type == GeometryType.Polygon)

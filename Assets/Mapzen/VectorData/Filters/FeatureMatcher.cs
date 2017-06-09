@@ -54,7 +54,7 @@ namespace Mapzen.VectorData.Filters
             };
         }
 
-        public static IFeatureMatcher HasPropertyInRange(string property, IComparable min, IComparable max)
+        public static IFeatureMatcher HasPropertyInRange(string property, double? min, double? max)
         {
             return new PropertyRangeFeatureMatcher
             {
