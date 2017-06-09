@@ -1,7 +1,6 @@
 fileFormatVersion: 2
-guid: 5176b22f5418b44239d4f7ee0094f8bf
-folderAsset: yes
-timeCreated: 1496347752
+guid: 024c5b5e7f2cd4606aa63cb6c87b61da
+timeCreated: 1497039780
 licenseType: Free
 PluginImporter:
   serializedVersion: 2
@@ -18,14 +17,15 @@ PluginImporter:
         settings:
           Exclude Android: 1
           Exclude Editor: 0
-          Exclude Linux: 1
-          Exclude Linux64: 1
-          Exclude LinuxUniversal: 1
+          Exclude Linux: 0
+          Exclude Linux64: 0
+          Exclude LinuxUniversal: 0
           Exclude OSXIntel: 0
           Exclude OSXIntel64: 0
           Exclude OSXUniversal: 0
-          Exclude Win: 1
-          Exclude Win64: 1
+          Exclude WebGL: 1
+          Exclude Win: 0
+          Exclude Win64: 0
           Exclude iOS: 1
     data:
       first:
@@ -33,8 +33,8 @@ PluginImporter:
       second:
         enabled: 0
         settings:
-          CPU: AnyCPU
-          OS: OSX
+          CPU: x86
+          OS: Linux
     data:
       first:
         Android: Android
@@ -73,16 +73,23 @@ PluginImporter:
       first:
         Standalone: Linux
       second:
-        enabled: 0
+        enabled: 1
         settings:
           CPU: x86
     data:
       first:
         Standalone: Linux64
       second:
-        enabled: 0
+        enabled: 1
         settings:
           CPU: x86_64
+    data:
+      first:
+        Standalone: LinuxUniversal
+      second:
+        enabled: 1
+        settings:
+          CPU: AnyCPU
     data:
       first:
         Standalone: OSXIntel
@@ -102,19 +109,20 @@ PluginImporter:
         Standalone: OSXUniversal
       second:
         enabled: 1
-        settings: {}
+        settings:
+          CPU: AnyCPU
     data:
       first:
         Standalone: Win
       second:
-        enabled: 0
+        enabled: 1
         settings:
           CPU: AnyCPU
     data:
       first:
         Standalone: Win64
       second:
-        enabled: 0
+        enabled: 1
         settings:
           CPU: AnyCPU
     data:

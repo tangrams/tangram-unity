@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 5ac0eb357ad2f464f970ed01aebf02a7
-timeCreated: 1496869702
+guid: c6ded5be2c0744d06adf2fd8fc5c2b10
+timeCreated: 1497040015
 licenseType: Free
 PluginImporter:
   serializedVersion: 2
@@ -23,6 +23,7 @@ PluginImporter:
           Exclude OSXIntel: 1
           Exclude OSXIntel64: 1
           Exclude OSXUniversal: 1
+          Exclude WebGL: 1
           Exclude Win: 1
           Exclude Win64: 1
           Exclude iOS: 1

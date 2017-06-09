@@ -4,39 +4,39 @@ using System.Diagnostics;
 
 public class Earcut
 {
-    #if UNITY_IOS
+#if (UNITY_IOS || UNITY_WEBGL)
     [DllImport("__Internal")]
-    #else
+#else
     [DllImport("Earcut", EntryPoint = "CreateTesselationContext")]
-    #endif
+#endif
     private static extern uint CreateTesselationContext();
 
-    #if UNITY_IOS
+#if (UNITY_IOS || UNITY_WEBGL)
     [DllImport("__Internal")]
-    #else
+#else
     [DllImport("Earcut", EntryPoint = "ReleaseTesselationContext")]
-    #endif
+#endif
     private static extern uint ReleaseTesselationContext(uint context);
 
-    #if UNITY_IOS
+#if (UNITY_IOS || UNITY_WEBGL)
     [DllImport("__Internal")]
-    #else
+#else
     [DllImport("Earcut", EntryPoint = "TesselatePolygon")]
-    #endif
+#endif
     private static extern void TesselatePolygon(uint context, IntPtr points, IntPtr rings, int nRings, out int nIndices, out int nVertices);
 
-    #if UNITY_IOS
+#if (UNITY_IOS || UNITY_WEBGL)
     [DllImport("__Internal")]
-    #else
+#else
     [DllImport("Earcut", EntryPoint = "GetIndices")]
-    #endif
+#endif
     private static extern void GetIndices(uint context, IntPtr indices);
 
-    #if UNITY_IOS
+#if (UNITY_IOS || UNITY_WEBGL)
     [DllImport("__Internal")]
-    #else
+#else
     [DllImport("Earcut", EntryPoint = "GetVertices")]
-    #endif
+#endif
     private static extern void GetVertices(uint context, IntPtr vertices);
 
     private uint contextId;
