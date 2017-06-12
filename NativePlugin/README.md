@@ -89,3 +89,10 @@ After installing dependencies in Android Studio, you can execute Android builds 
 $ ./gradlew code:assembleFullRelease
 $ ./gradlew code:installLibraries
 ```
+
+>Note: If you have several versions of the JDKs installed on your machine, make sure that the Java version used in the Android builds is the same as the one used by Unity. (Can be checked at _Unity_ -> _Preferences_ -> _External Tools_).
+
+## WebGL
+
+Work in progress.
+
