@@ -50,7 +50,7 @@ public class MapzenMap : MonoBehaviour
                         return;
                     }
 
-                    Debug.Log("Response: " + response);
+                    // Debug.Log("Response: " + response);
 
                     // Adding a tile object to the scene
                     GameObject tilePrefab = Resources.Load("Tile") as GameObject;

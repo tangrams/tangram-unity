@@ -14,19 +14,18 @@ namespace Mapzen.VectorData
 
         public Dictionary<string, object> properties { get; set; }
 
-        public bool TryGetProperty<N>(string propertyKey, out N node)
+        public bool TryGetProperty(string key, out object value)
         {
             object propertyValue;
-            if (properties.TryGetValue(propertyKey, out propertyValue))
+            if (properties.TryGetValue(key, out propertyValue))
             {
-                var propertyNode = (N)propertyValue;
-                if (propertyNode != null)
+                if (propertyValue != null)
                 {
-                    node = propertyNode;
+                    value = propertyValue;
                     return true;
                 }
             }
-            node = default(N);
+            value = null;
             return false;
         }
     }

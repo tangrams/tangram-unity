@@ -69,7 +69,7 @@ namespace Mapzen
 
             foreach (JSONNode feature in features.Children)
             {
-                layer.features.Add(GetFeature(feature));
+                layer.Features.Add(GetFeature(feature));
             }
 
             return layer;
@@ -84,8 +84,16 @@ namespace Mapzen
             {
                 foreach (KeyValuePair<string, JSONNode> property in propertiesNode.AsObject)
                 {
-                    // TODO: Define more strict typing on property values.
-                    feature.properties.Add(property.Key, property.Value);
+                    // A property value is an object, but is only permitted to be a boolean, a double, or a string.
+                    object value;
+                    switch (property.Value.Tag)
+                    {
+                        case JSONNodeType.Boolean: value = property.Value.AsBool; break;
+                        case JSONNodeType.Number: value = property.Value.AsDouble; break;
+                        case JSONNodeType.String: value = property.Value.Value; break;
+                        default: value = null; break;
+                    }
+                    feature.properties.Add(property.Key, value);
                 }
             }
 

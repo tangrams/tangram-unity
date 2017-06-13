@@ -6,11 +6,11 @@ namespace Mapzen.VectorData
     {
         public FeatureCollection(string name = "")
         {
-            this.name = name;
-            this.features = new List<Feature>();
+            Name = name;
+            Features = new List<Feature>();
         }
 
-        public string name;
-        public List<Feature> features;
+        public string Name;
+        public List<Feature> Features;
     }
 }
