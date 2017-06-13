@@ -1,0 +1,45 @@
+apply plugin: 'com.android.library'
+
+android {
+  compileSdkVersion 25
+  buildToolsVersion '25.0.2'
+
+  defaultConfig {
+    externalNativeBuild {
+      cmake {
+        targets 'Earcut'
+        cppFlags '-std=c++14',
+                 '-pedantic',
+                 '-fPIC'
+        arguments '-DANDROID_TOOLCHAIN=clang',
+                  '-DANDROID_STL=c++_shared'
+        abiFilters 'armeabi-v7a', 'x86'
+      }
+    }
+  }
+
+  externalNativeBuild {
+    cmake {
+      path '../CMakeLists.txt'
+    }
+  }
+
+  buildTypes {
+    release {
+      externalNativeBuild {
+        cmake.cppFlags'-g0'
+      }
+    }
+  }
+}
+
+task installLibraries(type: Copy)
+installLibraries.dependsOn "assembleRelease"
+
+installLibraries {
+  description = 'Install libraries into the Unity plugin project...'
+  from 'build/outputs/aar/'
+  into '../../Assets/Plugins/Android/'
+  include 'earcut-release.aar'
+  rename 'earcut-release.aar', 'Earcut.aar'
+}

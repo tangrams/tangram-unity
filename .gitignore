@@ -1,3 +1,8 @@
+**/build
+
+# Vim
+*.swp
+
 .vscode/
 
 # Created by https://www.gitignore.io/api/macos,windows,linux,unity
