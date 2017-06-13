@@ -101,5 +101,10 @@ $ ./gradlew earcut:installLibraries
 
 ## WebGL
 
-Work in progress.
+Install emscripten SDK.
 
+```sh
+$ cmake . -Bbuild -DWEBGL=1 -DCMAKE_TOOLCHAIN_FILE=../emscripten.toolchain.cmake
+$ make -c build/
+$ make -c build/ install
+```
