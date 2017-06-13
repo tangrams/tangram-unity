@@ -17,7 +17,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
 set(NATIVE_PLUGIN Earcut)
 set(UNITY_ASSET_PATH ${PROJECT_SOURCE_DIR}/../Assets/Plugins)
 
-file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/code/*.h" "${PROJECT_SOURCE_DIR}/code/*.cpp")
+file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/earcut/*.h" "${PROJECT_SOURCE_DIR}/earcut/*.cpp")
 
 if(IOS)
   copy_unity_plugin_files(iOS)

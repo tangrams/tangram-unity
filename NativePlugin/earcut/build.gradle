@@ -8,12 +8,12 @@ android {
     externalNativeBuild {
       cmake {
         targets 'Earcut'
-        cppFlags '-std=c++11'
+        cppFlags '-std=c++14',
+                 '-pedantic',
+                 '-fPIC'
         arguments '-DANDROID_TOOLCHAIN=clang',
                   '-DANDROID_STL=c++_shared'
-                    cppFlags '-std=c++14',
-                  '-pedantic',
-                  '-fPIC'
+        abiFilters 'armeabi-v7a', 'x86'
       }
     }
   }
@@ -31,20 +31,15 @@ android {
       }
     }
   }
-
-  productFlavors {
-    full {
-      externalNativeBuild.cmake.abiFilters 'armeabi-v7a', 'x86'
-    }
-  }
 }
 
 task installLibraries(type: Copy)
+installLibraries.dependsOn "assembleRelease"
 
 installLibraries {
   description = 'Install libraries into the Unity plugin project...'
   from 'build/outputs/aar/'
   into '../../Assets/Plugins/Android/'
-  include 'code-full-release.aar'
-  rename 'code-full-release.aar', 'Earcut.aar'
+  include 'earcut-release.aar'
+  rename 'earcut-release.aar', 'Earcut.aar'
 }
