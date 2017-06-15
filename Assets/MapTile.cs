@@ -24,6 +24,9 @@ public class MapTile : MonoBehaviour
         // Filter that accepts all features in the "earth" or "landuse" layers.
         var landLayerFilter = new FeatureFilter().TakeAllFromCollections("earth", "landuse");
 
+        var minorRoadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads").Where(FeatureMatcher.HasPropertyWithValue("kind", "minor_road"));
+        var highwayRoadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads").Where(FeatureMatcher.HasPropertyWithValue("kind", "highway"));
+
         var baseMaterial = GetComponent<MeshRenderer>().material;
 
         var waterMaterial = new Material(baseMaterial);
@@ -35,9 +38,17 @@ public class MapTile : MonoBehaviour
         var landMaterial = new Material(baseMaterial);
         landMaterial.color = Color.green;
 
+        var minorRoadsMaterial = new Material(baseMaterial);
+        minorRoadsMaterial.color = Color.white;
+
+        var highwayRoadsMaterial = new Material(baseMaterial);
+        highwayRoadsMaterial.color = Color.black;
+
         featureStyling.Add(waterLayerFilter, waterMaterial);
         featureStyling.Add(buildingExtrusionFilter, buildingMaterial);
         featureStyling.Add(landLayerFilter, landMaterial);
+        featureStyling.Add(minorRoadLayerFilter, minorRoadsMaterial);
+        featureStyling.Add(highwayRoadLayerFilter, highwayRoadsMaterial);
     }
 
     public void BuildMesh(double tileScale, List<FeatureCollection> layers)
@@ -74,6 +85,17 @@ public class MapTile : MonoBehaviour
                         {
                             Builder.TesselatePolygonExtrusion(meshData, feature.geometry, material, minHeight, height);
                         }
+                    }
+
+                    if (feature.geometry.type == GeometryType.LineString)
+                    {
+                        float polylineExtrusion = (float)(5.0 * inverseTileScale);
+                        float polylineHeight = (float)(3.0 * inverseTileScale);
+
+                        var polygonGeometry = Builder.PolylineToPolygon(feature.geometry, polylineExtrusion);
+
+                        Builder.TesselatePolygon(meshData, polygonGeometry, material, polylineHeight);
+                        Builder.TesselatePolygonExtrusion(meshData, polygonGeometry, material, 0.0f, polylineHeight);
                     }
                 }
             }
