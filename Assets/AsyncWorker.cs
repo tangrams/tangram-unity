@@ -1,29 +1,12 @@
-﻿#if !UNITY_WEBGL
-using System.Threading;
-#endif
-using System;
 using UnityEngine;
+﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 
 public class AsyncWorker
 {
     public delegate void Task();
 
-    #if UNITY_WEBGL
-    public AsyncWorker(int nThreads)
-    {
-    }
-
-    public void RunAsync(Task task)
-    {
-        task.Invoke();
-    }
-
-    public int RemainingTasks()
-    {
-        return 0;
-    }
-    #else
     private Thread[] threads;
     private bool stopped;
     private Queue<Task> tasks;
@@ -41,10 +24,17 @@ public class AsyncWorker
         }
     }
 
+    // Immediately runs the task if no worker have been instantiated
     public void RunAsync(Task task)
     {
         if (stopped)
         {
+            return;
+        }
+
+        if (threads.Length == 0)
+        {
+            task.Invoke();
             return;
         }
 
@@ -59,8 +49,12 @@ public class AsyncWorker
 
     public int RemainingTasks()
     {
-        int tasksSize;
+        if (threads.Length == 0)
+        {
+            return 0;
+        }
 
+        int tasksSize;
 
         lock (this)
         {
@@ -73,6 +67,11 @@ public class AsyncWorker
     public void JoinAll()
     {
         stopped = true;
+
+        if (threads.Length == 0)
+        {
+            return;
+        }
 
         lock (this)
         {
@@ -121,5 +120,4 @@ public class AsyncWorker
             }
         }
     }
-    #endif
 }
