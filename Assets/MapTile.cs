@@ -13,7 +13,7 @@ public class MapTile : MonoBehaviour
 
     private Dictionary<IFeatureFilter, Material> featureStyling = new Dictionary<IFeatureFilter, Material>();
 
-    public void Start()
+    public void Awake()
     {
         // Filter that accepts all features in the "water" layer.
         var waterLayerFilter = new FeatureFilter().TakeAllFromCollections("water");
