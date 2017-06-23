@@ -4,39 +4,26 @@ using System.Diagnostics;
 
 public class Earcut
 {
+    private const string LibraryName =
 #if (UNITY_IOS || UNITY_WEBGL)
-    [DllImport("__Internal")]
+        "__Internal";
 #else
-    [DllImport("Earcut", EntryPoint = "CreateTesselationContext")]
+        "Earcut";
 #endif
+
+    [DllImport(LibraryName, EntryPoint = "CreateTesselationContext")]
     private static extern uint CreateTesselationContext();
 
-#if (UNITY_IOS || UNITY_WEBGL)
-    [DllImport("__Internal")]
-#else
-    [DllImport("Earcut", EntryPoint = "ReleaseTesselationContext")]
-#endif
+    [DllImport(LibraryName, EntryPoint = "ReleaseTesselationContext")]
     private static extern uint ReleaseTesselationContext(uint context);
 
-#if (UNITY_IOS || UNITY_WEBGL)
-    [DllImport("__Internal")]
-#else
-    [DllImport("Earcut", EntryPoint = "TesselatePolygon")]
-#endif
+    [DllImport(LibraryName, EntryPoint = "TesselatePolygon")]
     private static extern void TesselatePolygon(uint context, IntPtr points, IntPtr rings, int nRings, out int nIndices, out int nVertices);
 
-#if (UNITY_IOS || UNITY_WEBGL)
-    [DllImport("__Internal")]
-#else
-    [DllImport("Earcut", EntryPoint = "GetIndices")]
-#endif
+    [DllImport(LibraryName, EntryPoint = "GetIndices")]
     private static extern void GetIndices(uint context, IntPtr indices);
 
-#if (UNITY_IOS || UNITY_WEBGL)
-    [DllImport("__Internal")]
-#else
-    [DllImport("Earcut", EntryPoint = "GetVertices")]
-#endif
+    [DllImport(LibraryName, EntryPoint = "GetVertices")]
     private static extern void GetVertices(uint context, IntPtr vertices);
 
     private uint contextId;
@@ -82,4 +69,3 @@ public class Earcut
         ReleaseTesselationContext(contextId);
     }
 }
-
