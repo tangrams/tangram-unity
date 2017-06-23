@@ -30,7 +30,7 @@ public class MapzenMap : MonoBehaviour
 
     private UnityIO tileIO = new UnityIO();
 
-    void fetchNetworkTile(object userData, Response response) {
+    void onTileFetched(object userData, UnityIO.Response response) {
         TileAddress address = (TileAddress)userData;
 
         if (response.error != null) {
@@ -83,15 +83,13 @@ public class MapzenMap : MonoBehaviour
                 int tileX = TileX + x;
                 int tileY = TileY + y;
 
-                // var url = string.Format("/Users/varuntalwar/Desktop/test/{0}/{1}/{2}.json",
-                //               TileZ, tileX, tileY);
-                var url = string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.json?api_key={3}",
-                              TileZ, tileX, tileY, ApiKey);
+				var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.json?api_key={3}",
+					TileZ, tileX, tileY, ApiKey));
 
-                Debug.Log("URL request " + url);
+				Debug.Log("URL request " + uri.AbsoluteUri);
 
                 object tileAddress = new TileAddress(tileX, tileY, TileZ);
-                StartCoroutine(tileIO.UnityIORequest(url, fetchNetworkTile, tileAddress));
+                StartCoroutine(tileIO.FetchData(uri, onTileFetched, tileAddress));
             }
         }
     }
