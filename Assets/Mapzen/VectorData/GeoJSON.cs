@@ -88,10 +88,18 @@ namespace Mapzen
                     object value;
                     switch (property.Value.Tag)
                     {
-                        case JSONNodeType.Boolean: value = property.Value.AsBool; break;
-                        case JSONNodeType.Number: value = property.Value.AsDouble; break;
-                        case JSONNodeType.String: value = property.Value.Value; break;
-                        default: value = null; break;
+                        case JSONNodeType.Boolean:
+                            value = property.Value.AsBool;
+                            break;
+                        case JSONNodeType.Number:
+                            value = property.Value.AsDouble;
+                            break;
+                        case JSONNodeType.String:
+                            value = property.Value.Value;
+                            break;
+                        default:
+                            value = null;
+                            break;
                     }
                     feature.properties.Add(property.Key, value);
                 }
@@ -154,6 +162,7 @@ namespace Mapzen
             {
                 geometry.points.Add(GetPoint(pointCoords));
             }
+            geometry.rings.Add(new List<int>() { geometry.points.Count });
             return geometry;
         }
 
