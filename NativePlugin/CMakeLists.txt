@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(Earcut)
 
-macro(copy_unity_plugin_files PLUGIN_PLATFORM_NAME)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
+set(NATIVE_PLUGIN Earcut)
+set(UNITY_ASSET_PATH ${PROJECT_SOURCE_DIR}/../Assets/Plugins)
+
+file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/earcut/*.h" "${PROJECT_SOURCE_DIR}/earcut/*.cpp")
+
+if(IOS)
+  set(PLUGIN_PLATFORM_NAME iOS)
   message(STATUS "${PLUGIN_PLATFORM_NAME} native plugin files will be copied to ${UNITY_ASSET_PATH}/${PLUGIN_PLATFORM_NAME}")
   set(CMAKE_DOCS "/!\\ THIS FILE IS PART OF PLUGIN CODE FOR THE ${PLUGIN_PLATFORM_NAME} PLATFORM -- DO NOT EDIT")
   set(CONFIGURED_FILES "")
@@ -11,18 +18,11 @@ macro(copy_unity_plugin_files PLUGIN_PLATFORM_NAME)
     configure_file(${_source} ${CONFIGURED_FILE})
     file(COPY ${CONFIGURED_FILE} DESTINATION ${UNITY_ASSET_PATH}/${PLUGIN_PLATFORM_NAME}/)
   endforeach()
-endmacro(copy_unity_plugin_files)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
-set(NATIVE_PLUGIN Earcut)
-set(UNITY_ASSET_PATH ${PROJECT_SOURCE_DIR}/../Assets/Plugins)
-
-file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/earcut/*.h" "${PROJECT_SOURCE_DIR}/earcut/*.cpp")
-
-if(IOS)
-  copy_unity_plugin_files(iOS)
 elseif(WEBGL)
-  copy_unity_plugin_files(WebGL)
+  set(NATIVE_PLUGIN ${NATIVE_PLUGIN})
+  add_library(${NATIVE_PLUGIN} SHARED ${SOURCES})
+  set_target_properties(${NATIVE_PLUGIN} PROPERTIES PREFIX "" SUFFIX ".bc")
+  install(TARGETS ${NATIVE_PLUGIN} DESTINATION ${UNITY_ASSET_PATH}/WebGL)
 elseif(ANDROID)
   set(NATIVE_PLUGIN ${NATIVE_PLUGIN})
   add_library(${NATIVE_PLUGIN} SHARED ${SOURCES})

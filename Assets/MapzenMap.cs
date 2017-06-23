@@ -18,8 +18,14 @@ public class MapzenMap : MonoBehaviour
 
     public string ApiKey = "vector-tiles-tyHL4AY";
 
+    #if UNITY_WEBGL
+    private const int nWorkers = 0;
+    #else
+    private const int nWorkers = 4;
+    #endif
+
     private List<TileTask> pendingTasks = new List<TileTask>();
-    private AsyncWorker worker = new AsyncWorker(4);
+    private AsyncWorker worker = new AsyncWorker(nWorkers);
 
     void Start()
     {
