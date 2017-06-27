@@ -29,6 +29,8 @@ public class MapzenMap : MonoBehaviour
 
     void Start()
     {
+        TileAddress addr = TileAddress.FromLngLat(new LngLat(-73.935242, 40.730610), 16, 256);
+
         // Construct the HTTP request
         for (int x = 0; x < TileRangeX; ++x)
         {

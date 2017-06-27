@@ -12,6 +12,22 @@ namespace Mapzen
             this.z = z;
         }
 
+        public static TileAddress FromLngLat(LngLat lngLat, int zoom, int pixelTileSize)
+        {
+            double tileResolution = Geo.EarthCircumferenceMeters / pixelTileSize;
+            double tileSize = tileResolution / (1 << zoom);
+
+            MercatorMeters meters = Geo.Project(lngLat);
+
+            double px = meters.x / tileSize;
+            double py = meters.y / tileSize;
+
+            int tileX = (int)(Math.Ceiling(px / pixelTileSize) - 1);
+            int tileY = (int)(Math.Ceiling(py / pixelTileSize) - 1);
+
+            return new TileAddress(tileX, ((1 << zoom) - 1) - tileY, zoom);
+        }
+
         public readonly int x;
         public readonly int y;
         public readonly int z;
