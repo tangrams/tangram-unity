@@ -66,20 +66,21 @@ public class MapTile : MonoBehaviour
 
                 foreach (var feature in filteredFeatures)
                 {
-                    // TODO: use extrusion scale and minHeight as options
-                    float height = 0.0f;
-                    float minHeight = 0.0f;
+                    var options = new PolygonBuilder.Options();
+                    options.Material = material;
 
                     object heightValue;
                     if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
                     {
                         // For some reason we can't cast heightValue straight to float.
-                        height = (float)((double)heightValue * inverseTileScale);
+                        options.MaxHeight = (float)((double)heightValue * inverseTileScale);
+                        options.Extrude = true;
                     }
 
                     if (feature.Type == GeometryType.Polygon)
                     {
-                        Builder.TesselatePolygon(meshData, feature, material, height);
+                        var builder = new PolygonBuilder(meshData, options);
+                        feature.HandleGeometry(builder);
                     }
 
                     if (feature.geometry.type == GeometryType.LineString)
