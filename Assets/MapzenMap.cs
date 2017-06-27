@@ -77,7 +77,7 @@ public class MapzenMap : MonoBehaviour
                     TileTask task = new TileTask(address, layers, response, tile);
 
                     task.offsetX = (address.x - TileX);
-                    task.offsetY = (address.y - TileY);
+                    task.offsetY = TileRangeY - (address.y - TileY);
 
                     pendingTasks.Add(task);
 

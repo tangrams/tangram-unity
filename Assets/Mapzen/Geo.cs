@@ -11,7 +11,7 @@ namespace Mapzen
         public static MercatorMeters Project(LngLat lngLat)
         {
             double x = lngLat.longitude * EarthHalfCircumferenceMeters / 180.0 + EarthHalfCircumferenceMeters;
-            double y = -Math.Log(Math.Tan(0.25 * Math.PI + lngLat.latitude * Math.PI / 360.0)) * EarthRadiusMeters + EarthHalfCircumferenceMeters;
+            double y = Math.Log(Math.Tan(0.25 * Math.PI + lngLat.latitude * Math.PI / 360.0)) * EarthRadiusMeters + EarthHalfCircumferenceMeters;
             return new MercatorMeters(x, y);
         }
 

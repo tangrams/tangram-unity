@@ -42,7 +42,7 @@ namespace Mapzen
         public MercatorMeters GetOriginMercatorMeters()
         {
             double metersPerTile = GetSizeMercatorMeters();
-            return new MercatorMeters(x * metersPerTile, y * metersPerTile);
+            return new MercatorMeters(x * metersPerTile, Geo.EarthCircumferenceMeters - y * metersPerTile);
         }
 
         public int CompareTo(object obj)
