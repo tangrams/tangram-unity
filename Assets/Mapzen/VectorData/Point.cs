@@ -4,11 +4,11 @@
     {
         public Point(float x, float y)
         {
-            this.x = x;
-            this.y = y;
+            this.X = x;
+            this.Y = y;
         }
 
-        public float x;
-        public float y;
+        public float X;
+        public float Y;
     }
 }
