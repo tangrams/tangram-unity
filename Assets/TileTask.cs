@@ -9,18 +9,16 @@ public class TileTask
     private TileAddress address;
     private byte[] response;
     private MapTile tile;
-    private List<string> layers;
     private bool ready;
 
     // TODO: remove those offset once we have better tile placement
     public float offsetX = 0.0f;
     public float offsetY = 0.0f;
 
-    public TileTask(TileAddress address, List<string> layers, byte[] response, MapTile tile)
+    public TileTask(TileAddress address, byte[] response, MapTile tile)
     {
         this.address = address;
         this.response = response;
-        this.layers = layers;
         this.tile = tile;
 
         ready = false;
