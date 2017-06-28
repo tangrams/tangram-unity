@@ -84,15 +84,16 @@ public class MapTile : MonoBehaviour
                         feature.HandleGeometry(builder);
                     }
 
-                    if (feature.geometry.type == GeometryType.LineString)
+                    if (feature.Type == GeometryType.LineString)
                     {
-                        float polylineExtrusion = (float)(5.0 * inverseTileScale);
-                        float polylineHeight = (float)(3.0 * inverseTileScale);
+                        var polylineOptions = new PolylineBuilder.Options();
+                        polylineOptions.Material = material;
+                        polylineOptions.Width = (float)(5.0 * inverseTileScale);
+                        polylineOptions.Extrude = true;
+                        polylineOptions.MaxHeight = (float)(3.0 * inverseTileScale);
 
-                        var polygonGeometry = Builder.PolylineToPolygon(feature.geometry, polylineExtrusion);
-
-                        Builder.TesselatePolygon(meshData, polygonGeometry, material, polylineHeight);
-                        Builder.TesselatePolygonExtrusion(meshData, polygonGeometry, material, 0.0f, polylineHeight);
+                        var builder = new PolylineBuilder(meshData, polylineOptions);
+                        feature.HandleGeometry(builder);
                     }
                 }
             }
