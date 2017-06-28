@@ -16,7 +16,7 @@ public class MapzenMap : MonoBehaviour
     #if UNITY_WEBGL
     private const int nWorkers = 0;
     #else
-    private const int nWorkers = 4;
+    private const int nWorkers = 2;
     #endif
 
     private List<TileTask> pendingTasks = new List<TileTask>();
