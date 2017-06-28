@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Mapzen;
 using Mapzen.VectorData;
 using Mapzen.VectorData.Filters;
 using SimpleJSON;
