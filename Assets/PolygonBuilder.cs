@@ -55,11 +55,11 @@ public class PolygonBuilder : IGeometryHandler
             extrusionVertices.Add(new Vector3(p0.X, options.MinHeight, p0.Y));
             extrusionVertices.Add(new Vector3(p1.X, options.MinHeight, p1.Y));
 
-            extrusionIndices.Add(indexOffset + 2);
+            extrusionIndices.Add(indexOffset + 1);
             extrusionIndices.Add(indexOffset + 3);
-            extrusionIndices.Add(indexOffset + 1);
             extrusionIndices.Add(indexOffset + 2);
             extrusionIndices.Add(indexOffset + 1);
+            extrusionIndices.Add(indexOffset + 2);
             extrusionIndices.Add(indexOffset + 0);
         }
         lastPoint = point;

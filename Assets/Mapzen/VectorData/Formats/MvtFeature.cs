@@ -155,7 +155,7 @@ namespace Mapzen.VectorData.Formats
 
             public Point CurrentPoint()
             {
-                return new Point(x * scale, y * scale);
+                return new Point(x * scale, (extent - y) * scale);
             }
         }
 
