@@ -135,12 +135,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f99f332e167bc4c5cb799d5f5171e0b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TileX: 19293
-  TileY: 24640
-  TileZ: 16
-  TileRangeX: 4
-  TileRangeY: 4
   ApiKey: vector-tiles-tyHL4AY
+  Area:
+    min:
+      longitude: -74.019463
+      latitude: 40.700446
+    max:
+      longitude: -73.998306
+      latitude: 40.716939
+    zoom: 16
 --- !u!4 &349009245
 Transform:
   m_ObjectHideFlags: 0

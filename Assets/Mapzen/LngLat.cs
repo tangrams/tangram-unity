@@ -2,6 +2,7 @@
 
 namespace Mapzen
 {
+    [System.Serializable]
     public struct LngLat
     {
         public LngLat(double lng, double lat)
