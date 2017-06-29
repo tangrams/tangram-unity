@@ -68,11 +68,11 @@ public class Builder
                     vertices.Add(new Vector3(p0.x, minHeight, p0.y));
                     vertices.Add(new Vector3(p1.x, minHeight, p1.y));
 
-                    indices.Add(indexOffset + 2);
+                    indices.Add(indexOffset + 1);
                     indices.Add(indexOffset + 3);
-                    indices.Add(indexOffset + 1);
                     indices.Add(indexOffset + 2);
                     indices.Add(indexOffset + 1);
+                    indices.Add(indexOffset + 2);
                     indices.Add(indexOffset + 0);
 
                     indexOffset += 4;

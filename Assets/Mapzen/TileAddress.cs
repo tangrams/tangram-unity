@@ -12,9 +12,9 @@ namespace Mapzen
             this.z = z;
         }
 
-        public static TileAddress FromLngLat(LngLat lngLat, int zoom, int pixelTileSize)
+        public static TileAddress FromLngLat(LngLat lngLat, int zoom)
         {
-            double tileResolution = Geo.EarthCircumferenceMeters / pixelTileSize;
+            double tileResolution = Geo.EarthCircumferenceMeters / Geo.TilePixelSize;
             double tileSize = tileResolution / (1 << zoom);
 
             MercatorMeters meters = Geo.Project(lngLat);
@@ -22,10 +22,10 @@ namespace Mapzen
             double px = meters.x / tileSize;
             double py = meters.y / tileSize;
 
-            int tileX = (int)(Math.Ceiling(px / pixelTileSize) - 1);
-            int tileY = (int)(Math.Ceiling(py / pixelTileSize) - 1);
+            int tileX = (int)(Math.Ceiling(px / Geo.TilePixelSize) - 1);
+            int tileY = (int)(Math.Ceiling(py / Geo.TilePixelSize) - 1);
 
-            return new TileAddress(tileX, ((1 << zoom) - 1) - tileY, zoom);
+            return new TileAddress(tileX, tileY, zoom);
         }
 
         public readonly int x;
@@ -58,7 +58,7 @@ namespace Mapzen
         public MercatorMeters GetOriginMercatorMeters()
         {
             double metersPerTile = GetSizeMercatorMeters();
-            return new MercatorMeters(x * metersPerTile, Geo.EarthCircumferenceMeters - y * metersPerTile);
+            return new MercatorMeters(x * metersPerTile, y * metersPerTile);
         }
 
         public int CompareTo(object obj)
