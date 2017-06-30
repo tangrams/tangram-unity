@@ -26,7 +26,7 @@ public class MapzenMap : MonoBehaviour
     {
         TileBounds bounds = new TileBounds(Area);
 
-        foreach (var tileAddress in bounds.TileAddressRange())
+        foreach (var tileAddress in bounds.TileAddressRange)
         {
             var url = string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.json?api_key={3}",
                           tileAddress.z, tileAddress.x, tileAddress.y, ApiKey);
