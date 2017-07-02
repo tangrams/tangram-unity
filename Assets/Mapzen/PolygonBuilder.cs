@@ -41,7 +41,7 @@ namespace Mapzen
         List<Vector3> extrusionVertices;
         List<int> extrusionIndices;
 
-        public bool OnPoint(Point point)
+        public void OnPoint(Point point)
         {
             // For all but the first point in each ring, create a quad extending from the
             // previous point to the current point and from MinHeight to MaxHeight.
@@ -70,42 +70,35 @@ namespace Mapzen
             coordinates.Add(point.X);
             coordinates.Add(point.Y);
             pointsInRing++;
-
-            return true;
         }
 
-        public bool OnBeginLineString()
+        public void OnBeginLineString()
         {
-            return false;
         }
 
-        public bool OnEndLineString()
+        public void OnEndLineString()
         {
-            return false;
         }
 
-        public bool OnBeginLinearRing()
+        public void OnBeginLinearRing()
         {
             pointsInRing = 0;
-            return true;
         }
 
-        public bool OnEndLinearRing()
+        public void OnEndLinearRing()
         {
             rings.Add(pointsInRing);
-            return true;
         }
 
-        public bool OnBeginPolygon()
+        public void OnBeginPolygon()
         {
             coordinates.Clear();
             rings.Clear();
             extrusionVertices.Clear();
             extrusionIndices.Clear();
-            return true;
         }
 
-        public bool OnEndPolygon()
+        public void OnEndPolygon()
         {
             // First add vertices and indices for extrusions.
             outputMeshData.AddElements(extrusionVertices, extrusionIndices, options.Material);
@@ -125,8 +118,6 @@ namespace Mapzen
             outputMeshData.AddElements(vertices, earcut.indices, options.Material);
 
             earcut.Release();
-
-            return true;
         }
     }
 }

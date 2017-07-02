@@ -35,7 +35,7 @@ namespace Mapzen
         Vector2 lastPoint;
         int pointsInLineString;
 
-        public bool OnPoint(Point point)
+        public void OnPoint(Point point)
         {
             var currPoint = new Vector2(point.X, point.Y);
             if (pointsInLineString > 0)
@@ -61,38 +61,31 @@ namespace Mapzen
 
             lastPoint = currPoint;
             pointsInLineString++;
-            return true;
         }
 
-        public bool OnBeginLineString()
+        public void OnBeginLineString()
         {
             pointsInLineString = 0;
-            return true;
         }
 
-        public bool OnEndLineString()
+        public void OnEndLineString()
         {
-            return true;
         }
 
-        public bool OnBeginLinearRing()
+        public void OnBeginLinearRing()
         {
-            return false;
         }
 
-        public bool OnEndLinearRing()
+        public void OnEndLinearRing()
         {
-            return false;
         }
 
-        public bool OnBeginPolygon()
+        public void OnBeginPolygon()
         {
-            return false;
         }
 
-        public bool OnEndPolygon()
+        public void OnEndPolygon()
         {
-            return false;
         }
 
         public static Vector2 Perp(Vector2 d)

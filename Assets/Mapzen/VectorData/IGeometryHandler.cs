@@ -6,9 +6,6 @@ namespace Mapzen.VectorData
     /// Interface for receiving geometry from a vector feature  as a stream of events.
     /// </summary>
     /// <remarks>
-    /// Implementers of this interface should return <c>true</c> from all methods to continue receiving
-    /// events or return <c>false</c> to stop processing events immediately.
-    /// 
     /// Each type of geometry produces a specific pattern of events.
     /// Point geometry:
     ///   One or more instances of OnPoint()
@@ -24,36 +21,36 @@ namespace Mapzen.VectorData
         /// Receive a Point in the current geometry.
         /// </summary>
         /// <param name="point">Point.</param>
-        bool OnPoint(Point point);
+        void OnPoint(Point point);
 
         /// <summary>
         /// Begin receiving a LineString geometry.
         /// </summary>
-        bool OnBeginLineString();
+        void OnBeginLineString();
 
         /// <summary>
         /// Finish the current LineString geometry.
         /// </summary>
-        bool OnEndLineString();
+        void OnEndLineString();
 
         /// <summary>
         /// Begin receiving a LinearRing geometry within a Polygon.
         /// </summary>
-        bool OnBeginLinearRing();
+        void OnBeginLinearRing();
 
         /// <summary>
         /// Finish the current LinearRing geometry.
         /// </summary>
-        bool OnEndLinearRing();
+        void OnEndLinearRing();
 
         /// <summary>
         /// Begin receiving a Polygon geometry.
         /// </summary>
-        bool OnBeginPolygon();
+        void OnBeginPolygon();
 
         /// <summary>
         /// Finish the current Polygon geometry.
         /// </summary>
-        bool OnEndPolygon();
+        void OnEndPolygon();
     }
 }
