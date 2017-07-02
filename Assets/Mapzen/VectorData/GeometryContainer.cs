@@ -1,57 +1,80 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Mapzen.VectorData
 {
-    public class GeometryContainer : IGeometryHandler
+    public class GeometryContainer
     {
-        // Flat list of all points in the geometry.
-        private List<Point> coordinates = new List<Point>();
+        public GeometryType Type = GeometryType.Unknown;
 
-        // Element i in the list indicates a LineString whose points
-        // start at element i-1 and end at element i in the coordinates; 
-        // the first LineString begins at 0.
-        private List<int> lineStringCoordinateIndices = new List<int>();
+        public List<Point> Points;
+        public List<List<Point>> LineStrings;
+        public List<List<List<Point>>> Polygons;
 
-        // Element i in the list indicates a Polygon whose rings start
-        // at element i-1 and end at element i in the LineStrings;
-        // the first Polygon begins at 0.
-        private List<int> polygonLineStringIndices = new List<int>();
-
-        public bool OnPoint(Point point)
+        public GeometryContainer(Feature feature)
         {
-            throw new NotImplementedException();
+            Type = feature.Type;
+            feature.HandleGeometry(new Copier(this));
         }
 
-        public bool OnBeginLineString()
+        protected class Copier : IGeometryHandler
         {
-            throw new NotImplementedException();
-        }
+            GeometryContainer container;
+            List<Point> receiver;
 
-        public bool OnEndLineString()
-        {
-            throw new NotImplementedException();
-        }
+            public Copier(GeometryContainer container)
+            {
+                this.container = container;
+            }
 
-        public bool OnBeginLinearRing()
-        {
-            throw new NotImplementedException();
-        }
+            public void OnPoint(Point point)
+            {
+                if (receiver == null)
+                {
+                    container.Points = new List<Point>();
+                    receiver = container.Points;
+                }
+                receiver.Add(point);
+            }
 
-        public bool OnEndLinearRing()
-        {
-            throw new NotImplementedException();
-        }
+            public void OnBeginLineString()
+            {
+                if (container.LineStrings == null)
+                {
+                    container.LineStrings = new List<List<Point>>();
+                }
+                container.LineStrings.Add(new List<Point>());
+                receiver = container.LineStrings.Last();
+            }
 
-        public bool OnBeginPolygon()
-        {
-            throw new NotImplementedException();
-        }
+            public void OnEndLineString()
+            {
+            }
 
-        public bool OnEndPolygon()
-        {
-            throw new NotImplementedException();
+            public void OnBeginLinearRing()
+            {
+                var polygon = container.Polygons.Last();
+                polygon.Add(new List<Point>());
+                receiver = polygon.Last();
+            }
+
+            public void OnEndLinearRing()
+            {
+            }
+
+            public void OnBeginPolygon()
+            {
+                if (container.Polygons == null)
+                {
+                    container.Polygons = new List<List<List<Point>>>();
+                }
+                container.Polygons.Add(new List<List<Point>>());
+            }
+
+            public void OnEndPolygon()
+            {
+            }
         }
     }
 }
-
