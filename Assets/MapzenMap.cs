@@ -56,6 +56,8 @@ public class MapzenMap : MonoBehaviour
 
                 go.name = address.ToString();
 
+                go.transform.parent = this.transform;
+
                 MapTile tile = go.GetComponent<MapTile>();
 
                 TileTask task = new TileTask(address, response, tile);
