@@ -54,6 +54,8 @@ public class MapzenMap : MonoBehaviour
                 // Instantiate a prefab running the script TileData.Start()
                 var go = Instantiate(tilePrefab);
 
+                go.name = address.ToString();
+
                 MapTile tile = go.GetComponent<MapTile>();
 
                 TileTask task = new TileTask(address, response, tile);
