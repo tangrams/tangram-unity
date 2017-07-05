@@ -25,8 +25,7 @@ public class MapTile : MonoBehaviour
         // Filter that accepts all features in the "earth" or "landuse" layers.
         var landLayerFilter = new FeatureFilter().TakeAllFromCollections("earth", "landuse");
 
-        var minorRoadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads").Where(FeatureMatcher.HasPropertyWithValue("kind", "minor_road"));
-        var highwayRoadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads").Where(FeatureMatcher.HasPropertyWithValue("kind", "highway"));
+        var roadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads");
 
         var baseMaterial = GetComponent<MeshRenderer>().material;
 
@@ -48,8 +47,7 @@ public class MapTile : MonoBehaviour
         featureStyling.Add(waterLayerFilter, waterMaterial);
         featureStyling.Add(buildingExtrusionFilter, buildingMaterial);
         featureStyling.Add(landLayerFilter, landMaterial);
-        featureStyling.Add(minorRoadLayerFilter, minorRoadsMaterial);
-        featureStyling.Add(highwayRoadLayerFilter, highwayRoadsMaterial);
+        featureStyling.Add(roadLayerFilter, minorRoadsMaterial);
     }
 
     public void BuildMesh(double tileScale, IEnumerable<FeatureCollection> layers)
@@ -91,6 +89,7 @@ public class MapTile : MonoBehaviour
                         polylineOptions.Width = (float)(5.0 * inverseTileScale);
                         polylineOptions.Extrude = true;
                         polylineOptions.MaxHeight = (float)(3.0 * inverseTileScale);
+                        polylineOptions.MiterLimit = 3.0f;
 
                         var builder = new PolylineBuilder(meshData, polylineOptions);
                         feature.HandleGeometry(builder);

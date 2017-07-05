@@ -7,7 +7,7 @@ using Mapzen;
 
 public class MapzenMap : MonoBehaviour
 {
-    delegate void HTTPRequestCallback(string error, byte[] response,TileAddress address);
+    delegate void HTTPRequestCallback(string error,byte[] response,TileAddress address);
 
     public string ApiKey = "vector-tiles-tyHL4AY";
 
@@ -29,7 +29,7 @@ public class MapzenMap : MonoBehaviour
         foreach (var tileAddress in bounds.TileAddressRange)
         {
             var wrappedTileAddress = tileAddress.Wrapped();
-            var url = string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.json?api_key={3}",
+            var url = string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
                           wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey);
 
             HTTPRequestCallback callback = (string error, byte[] response, TileAddress address) =>
