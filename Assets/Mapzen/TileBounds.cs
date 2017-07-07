@@ -29,8 +29,20 @@ namespace Mapzen
         {
             this.area = area;
 
-            min = TileAddress.FromLngLat(area.min, area.zoom);
-            max = TileAddress.FromLngLat(area.max, area.zoom);
+            LngLat minLngLat = area.min;
+            LngLat maxLngLat = area.max;
+
+            if (minLngLat.latitude > maxLngLat.latitude)
+            {
+                Util.Swap(ref minLngLat.latitude, ref maxLngLat.latitude);
+            }
+            if (minLngLat.longitude > maxLngLat.longitude)
+            {
+                Util.Swap(ref minLngLat.longitude, ref maxLngLat.longitude);
+            }
+
+            min = TileAddress.FromLngLat(minLngLat, area.zoom);
+            max = TileAddress.FromLngLat(maxLngLat, area.zoom);
         }
 
         public IEnumerable<TileAddress> TileAddressRange

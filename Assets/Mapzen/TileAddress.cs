@@ -14,16 +14,15 @@ namespace Mapzen
 
         public static TileAddress FromLngLat(LngLat lngLat, int zoom)
         {
-            double tileResolution = Geo.EarthCircumferenceMeters / Geo.TilePixelSize;
-            double tileSize = tileResolution / (1 << zoom);
+            double tileSize = Geo.EarthCircumferenceMeters / (1 << zoom);
 
             MercatorMeters meters = Geo.Project(lngLat);
 
             double px = meters.x / tileSize;
             double py = meters.y / tileSize;
 
-            int tileX = (int)(Math.Ceiling(px / Geo.TilePixelSize) - 1);
-            int tileY = (int)(Math.Ceiling(py / Geo.TilePixelSize) - 1);
+            int tileX = (int)(Math.Ceiling(px) - 1);
+            int tileY = (int)(Math.Ceiling(py) - 1);
 
             return new TileAddress(tileX, tileY, zoom);
         }
