@@ -8,7 +8,19 @@ using Mapzen;
 
 public class MapzenMap : MonoBehaviour
 {
+    public struct GameObjectTask
+    {
+        public GameObject gameObject;
+        public TileTask task;
+    }
+
+    public interface IMapzenMapListener
+    {
+        void OnGameObjectReady(GameObject go);
+    }
+
     public string ApiKey = "vector-tiles-tyHL4AY";
+    public IMapzenMapListener Listener;
 
     public TileArea Area = new TileArea(new LngLat(-74.014892578125, 40.70562793820589), new LngLat(-74.00390625, 40.713955826286046), 16);
 
@@ -18,7 +30,7 @@ public class MapzenMap : MonoBehaviour
     private const int nWorkers = 2;
     #endif
 
-    private List<TileTask> pendingTasks = new List<TileTask>();
+    private List<GameObjectTask> pendingTasks = new List<GameObjectTask>();
     private AsyncWorker worker = new AsyncWorker(nWorkers);
 
     private UnityIO tileIO = new UnityIO();
@@ -35,15 +47,15 @@ public class MapzenMap : MonoBehaviour
 
             Debug.Log("URL request " + uri.AbsoluteUri);
 
-            UnityIO.IORequestCallback onTileFetched = (response) => 
+            UnityIO.IORequestCallback onTileFetched = (response) =>
             {
-                if (response.hasError()) 
+                if (response.hasError())
                 {
                     Debug.Log("TileIO Error: " + response.error);
                     return;
                 }
 
-                if (response.data.Length == 0) 
+                if (response.data.Length == 0)
                 {
                     Debug.Log("Empty Response");
                     return;
@@ -62,10 +74,14 @@ public class MapzenMap : MonoBehaviour
 
                 TileTask task = new TileTask(tileAddress, response.data, tile);
 
+                GameObjectTask pendingTask = new GameObjectTask();
+                pendingTask.task = task;
+                pendingTask.gameObject = go;
+
                 task.offsetX = (tileAddress.x - bounds.min.x);
                 task.offsetY = (-tileAddress.y + bounds.min.y);
 
-                pendingTasks.Add(task);
+                pendingTasks.Add(pendingTask);
 
                 worker.RunAsync(() =>
                     {
@@ -81,18 +97,23 @@ public class MapzenMap : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        List<TileTask> readyTasks = new List<TileTask>();
+        List<GameObjectTask> readyTasks = new List<GameObjectTask>();
 
-        foreach (TileTask task in pendingTasks)
+        foreach (var gameObjectTask in pendingTasks)
         {
-            if (task.IsReady())
+            if (gameObjectTask.task.IsReady())
             {
-                task.GetMapTile().CreateUnityMesh(task.offsetX, task.offsetY);
-                readyTasks.Add(task);
+                gameObjectTask.task.GetMapTile().CreateUnityMesh(gameObjectTask.task.offsetX, gameObjectTask.task.offsetY);
+                readyTasks.Add(gameObjectTask);
+
+                if (Listener != null)
+                {
+                    Listener.OnGameObjectReady(gameObjectTask.gameObject);
+                }
             }
         }
 
-        foreach (TileTask readyTask in readyTasks)
+        foreach (var readyTask in readyTasks)
         {
             pendingTasks.Remove(readyTask);
         }
