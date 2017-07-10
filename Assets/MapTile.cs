@@ -78,13 +78,13 @@ public class MapTile : MonoBehaviour
                         options.Extrude = true;
                     }
 
-                    if (feature.Type == GeometryType.Polygon)
+                    if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                     {
                         var builder = new PolygonBuilder(meshData, options);
                         feature.HandleGeometry(builder);
                     }
 
-                    if (feature.Type == GeometryType.LineString)
+                    if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
                     {
                         var polylineOptions = new PolylineBuilder.Options();
                         polylineOptions.Material = material;
