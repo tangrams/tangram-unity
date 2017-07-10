@@ -18,11 +18,8 @@ namespace Mapzen
 
             MercatorMeters meters = Geo.Project(lngLat);
 
-            double px = meters.x / tileSize;
-            double py = meters.y / tileSize;
-
-            int tileX = (int)(Math.Ceiling(px) - 1);
-            int tileY = (int)(Math.Ceiling(py) - 1);
+            int tileX = (int)(meters.x / tileSize);
+            int tileY = (int)(meters.y / tileSize);
 
             return new TileAddress(tileX, tileY, zoom);
         }
