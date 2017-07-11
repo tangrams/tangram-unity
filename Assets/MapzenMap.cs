@@ -14,16 +14,10 @@ public class MapzenMap : MonoBehaviour
         public TileTask task;
     }
 
-    public interface IMapzenMapListener
-    {
-        void OnGameObjectReady(GameObject go);
-    }
-
     public string ApiKey = "vector-tiles-tyHL4AY";
-    public bool SaveTilesOnDisk = false;
-    public IMapzenMapListener Listener;
 
     public TileArea Area = new TileArea(new LngLat(-74.014892578125, 40.70562793820589), new LngLat(-74.00390625, 40.713955826286046), 16);
+    private List<GameObject> tiles;
 
     #if UNITY_WEBGL
     private const int nWorkers = 0;
@@ -31,14 +25,21 @@ public class MapzenMap : MonoBehaviour
     private const int nWorkers = 2;
     #endif
 
-    private List<GameObjectTask> pendingTasks = new List<GameObjectTask>();
-    private AsyncWorker worker = new AsyncWorker(nWorkers);
+    private List<GameObjectTask> pendingTasks;
+
+    private AsyncWorker worker;
+
+    [SerializeField]
+    private string exportPath = "Assets/Generated";
 
     private UnityIO tileIO = new UnityIO();
 
     void Start()
     {
         TileBounds bounds = new TileBounds(Area);
+        tiles = new List<GameObject>();
+        pendingTasks = new List<GameObjectTask>();
+        worker = new AsyncWorker(nWorkers);
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -106,17 +107,33 @@ public class MapzenMap : MonoBehaviour
             {
                 gameObjectTask.task.GetMapTile().CreateUnityMesh(gameObjectTask.task.offsetX, gameObjectTask.task.offsetY);
                 readyTasks.Add(gameObjectTask);
-
-                if (Listener != null)
-                {
-                    Listener.OnGameObjectReady(gameObjectTask.gameObject);
-                }
+                tiles.Add(gameObjectTask.gameObject);
             }
         }
 
         foreach (var readyTask in readyTasks)
         {
             pendingTasks.Remove(readyTask);
+        }
+    }
+
+    public List<GameObject> Tiles
+    {
+        get
+        {
+            return tiles;
+        }
+    }
+
+    public string ExportPath
+    {
+        get
+        {
+            return exportPath;
+        }
+        set
+        {
+            exportPath = value;
         }
     }
 }
