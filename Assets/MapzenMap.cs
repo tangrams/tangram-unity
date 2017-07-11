@@ -20,6 +20,7 @@ public class MapzenMap : MonoBehaviour
     }
 
     public string ApiKey = "vector-tiles-tyHL4AY";
+    public bool SaveTilesOnDisk = false;
     public IMapzenMapListener Listener;
 
     public TileArea Area = new TileArea(new LngLat(-74.014892578125, 40.70562793820589), new LngLat(-74.00390625, 40.713955826286046), 16);

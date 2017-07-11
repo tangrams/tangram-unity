@@ -6,13 +6,11 @@ using Mapzen;
 public class MapzenMapEditor : Editor, MapzenMap.IMapzenMapListener
 {
     private MapzenMap mapzenMap;
+    private const string saveRoot = "Assets/Generated/";
 
     void OnEnable()
     {
         mapzenMap = (MapzenMap)target;
-
-        // Register as listener on download completion
-        mapzenMap.Listener = this;
     }
 
     public override void OnInspectorGUI()
@@ -21,12 +19,35 @@ public class MapzenMapEditor : Editor, MapzenMap.IMapzenMapListener
 
         GUILayout.Space(10);
 
+        // Register as listener on download completion
+        if (mapzenMap.SaveTilesOnDisk)
+        {
+            mapzenMap.Listener = this;
+        }
+
         base.OnInspectorGUI();
     }
 
     public void OnGameObjectReady(GameObject go)
     {
-        var prefab = PrefabUtility.CreateEmptyPrefab("Assets/" + go.name + ".prefab");
+        string localPath = saveRoot + go.name + ".prefab";
+
+        // if (AssetDatabase.LoadAssetAtPath(localPath, typeof(GameObject)))
+        //{
+        //   if (EditorUtility.DisplayDialog("Are you sure?", "The tile prefab already exists. Do you want to overwrite it?", "Yes", "No"))
+        //    {
+        //        SaveGameObjectToDisk(go, localPath);
+        //    }
+        //}
+        //else
+        {
+            SaveGameObjectToDisk(go, localPath);
+        }
+    }
+
+    private void SaveGameObjectToDisk(GameObject go, string localPath)
+    {
+        var prefab = PrefabUtility.CreateEmptyPrefab(localPath);
         var serializedPrefab = PrefabUtility.ReplacePrefab(go, prefab, ReplacePrefabOptions.ConnectToPrefab);
 
         var meshFilter = go.GetComponent<MeshFilter>().mesh;
@@ -35,6 +56,12 @@ public class MapzenMapEditor : Editor, MapzenMap.IMapzenMapListener
         serializedPrefab.GetComponent<MeshFilter>().mesh = meshFilter;
         serializedPrefab.GetComponent<MeshRenderer>().materials = materials;
 
-        AssetDatabase.CreateAsset(meshFilter, "Assets/" + go.name + "-mesh.asset");
+        for (int i = 0; i < materials.Length; ++i)
+        {
+            AssetDatabase.CreateAsset(materials[i], saveRoot + i + ".mat");
+        }
+
+        AssetDatabase.CreateAsset(meshFilter, saveRoot + go.name + ".asset");
+        AssetDatabase.SaveAssets();
     }
 }

@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4687856860202350}
   - component: {fileID: 114127161518583280}
   m_Layer: 0
-  m_Name: Mapzen
+  m_Name: MapzenMapEditor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
