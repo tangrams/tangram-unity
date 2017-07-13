@@ -28,8 +28,9 @@ public class MapzenMap : MonoBehaviour
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
+            var wrappedTileAddress = tileAddress.Wrapped();
             var url = string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.json?api_key={3}",
-                          tileAddress.z, tileAddress.x, tileAddress.y, ApiKey);
+                          wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey);
 
             HTTPRequestCallback callback = (string error, string response, TileAddress address) =>
             {

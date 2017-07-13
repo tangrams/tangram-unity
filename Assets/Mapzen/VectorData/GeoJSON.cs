@@ -14,7 +14,7 @@ namespace Mapzen
             return delegate(LngLat lngLat)
             {
                 var meters = lngLat.ToMercatorMeters();
-                var origin = address.GetOriginMercatorMeters();
+                var origin = address.Wrapped().GetOriginMercatorMeters();
                 var scale = address.GetSizeMercatorMeters();
                 var x = (meters.x - origin.x) / scale;
                 var y = (origin.y - meters.y) / scale;
