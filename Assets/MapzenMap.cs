@@ -4,42 +4,64 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Networking;
+using Mapzen.VectorData;
+using Mapzen.VectorData.Filters;
 using Mapzen;
 
 public class MapzenMap : MonoBehaviour
 {
-    public struct GameObjectTask
-    {
-        public GameObject gameObject;
-        public TileTask task;
-    }
-
     public string ApiKey = "vector-tiles-tyHL4AY";
 
     public TileArea Area = new TileArea(new LngLat(-74.014892578125, 40.70562793820589), new LngLat(-74.00390625, 40.713955826286046), 16);
-    private List<GameObject> tiles;
-
-    #if UNITY_WEBGL
-    private const int nWorkers = 0;
-    #else
-    private const int nWorkers = 2;
-    #endif
-
-    private List<GameObjectTask> pendingTasks;
-
-    private AsyncWorker worker;
+    private List<GameObject> tiles = new List<GameObject>();
 
     [SerializeField]
     private string exportPath = "Assets/Generated";
 
     private UnityIO tileIO = new UnityIO();
 
-    void Start()
+    public void DownloadTiles()
     {
+        tiles.Clear();
+
+        GameObject tilePrefab = Resources.Load("Tile") as GameObject;
+
+        Dictionary<IFeatureFilter, Material> featureStyling = new Dictionary<IFeatureFilter, Material>();
+
+        // Filter that accepts all features in the "water" layer.
+        var waterLayerFilter = new FeatureFilter().TakeAllFromCollections("water");
+
+        // Filter that accepts all features in the "buildings" layer with a "height" property.
+        var buildingExtrusionFilter = new FeatureFilter().TakeAllFromCollections("buildings");
+
+        // Filter that accepts all features in the "earth" or "landuse" layers.
+        var landLayerFilter = new FeatureFilter().TakeAllFromCollections("earth", "landuse");
+
+        var roadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads");
+
+        var baseMaterial = GetComponent<MeshRenderer>().material;
+
+        var waterMaterial = new Material(baseMaterial);
+        waterMaterial.color = Color.blue;
+
+        var buildingMaterial = new Material(baseMaterial);
+        buildingMaterial.color = Color.gray;
+
+        var landMaterial = new Material(baseMaterial);
+        landMaterial.color = Color.green;
+
+        var minorRoadsMaterial = new Material(baseMaterial);
+        minorRoadsMaterial.color = Color.white;
+
+        var highwayRoadsMaterial = new Material(baseMaterial);
+        highwayRoadsMaterial.color = Color.black;
+
+        featureStyling.Add(waterLayerFilter, waterMaterial);
+        featureStyling.Add(buildingExtrusionFilter, buildingMaterial);
+        featureStyling.Add(landLayerFilter, landMaterial);
+        featureStyling.Add(roadLayerFilter, minorRoadsMaterial);
+
         TileBounds bounds = new TileBounds(Area);
-        tiles = new List<GameObject>();
-        pendingTasks = new List<GameObjectTask>();
-        worker = new AsyncWorker(nWorkers);
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -74,46 +96,18 @@ public class MapzenMap : MonoBehaviour
 
                 MapTile tile = go.GetComponent<MapTile>();
 
-                TileTask task = new TileTask(tileAddress, response.data, tile);
+                float offsetX = (tileAddress.x - TileX);
+                float offsetY = (-tileAddress.y + TileY);
 
-                GameObjectTask pendingTask = new GameObjectTask();
-                pendingTask.task = task;
-                pendingTask.gameObject = go;
+                TileTask task = new TileTask(tileAddress, response, offsetX, offsetY);
+                task.Start(featureStyling);
+                tile.CreateUnityMesh(task.Data, offsetX, offsetY);
 
-                task.offsetX = (tileAddress.x - bounds.min.x);
-                task.offsetY = (-tileAddress.y + bounds.min.y);
-
-                pendingTasks.Add(pendingTask);
-
-                worker.RunAsync(() =>
-                    {
-                        task.Start();
-                    });
+                tiles.Add(go);
             };
 
             // Starts the HTTP request
             StartCoroutine(tileIO.FetchNetworkData(uri, onTileFetched));
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        List<GameObjectTask> readyTasks = new List<GameObjectTask>();
-
-        foreach (var gameObjectTask in pendingTasks)
-        {
-            if (gameObjectTask.task.IsReady())
-            {
-                gameObjectTask.task.GetMapTile().CreateUnityMesh(gameObjectTask.task.offsetX, gameObjectTask.task.offsetY);
-                readyTasks.Add(gameObjectTask);
-                tiles.Add(gameObjectTask.gameObject);
-            }
-        }
-
-        foreach (var readyTask in readyTasks)
-        {
-            pendingTasks.Remove(readyTask);
         }
     }
 

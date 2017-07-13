@@ -28,6 +28,10 @@ public class MapzenMapEditor : Editor
         {
             ExportGameObjects();
         }
+        if (GUILayout.Button("Download"))
+        {
+            mapzenMap.DownloadTiles();
+        }
 
         EditorUtility.ClearProgressBar();
 
