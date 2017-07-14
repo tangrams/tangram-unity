@@ -7,6 +7,7 @@ namespace Mapzen
         public static readonly double EarthRadiusMeters = 6378137.0;
         public static readonly double EarthCircumferenceMeters = EarthRadiusMeters * Math.PI * 2.0;
         public static readonly double EarthHalfCircumferenceMeters = EarthRadiusMeters * Math.PI;
+        public static readonly int TilePixelSize = 256;
 
         public static MercatorMeters Project(LngLat lngLat)
         {

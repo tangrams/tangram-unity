@@ -6,15 +6,42 @@ namespace Mapzen
     {
         public TileAddress(int x, int y, int z)
         {
-            int max = 1 << z;
-            this.x = x % max;
-            this.y = y % max;
+            this.x = x;
+            this.y = y;
             this.z = z;
+        }
+
+        public static TileAddress FromLngLat(LngLat lngLat, int zoom)
+        {
+            double tileSize = Geo.EarthCircumferenceMeters / (1 << zoom);
+
+            MercatorMeters meters = Geo.Project(lngLat);
+
+            int tileX = (int)(meters.x / tileSize);
+            int tileY = (int)(meters.y / tileSize);
+
+            return new TileAddress(tileX, tileY, zoom);
         }
 
         public readonly int x;
         public readonly int y;
         public readonly int z;
+
+        public TileAddress Wrapped()
+        {
+            int max = 1 << z;
+            int tileAddressX = x % max;
+            int tileAddressY = y % max;
+            if (tileAddressX < 0)
+            {
+                tileAddressX += max;
+            }
+            if (tileAddressY < 0)
+            {
+                tileAddressY += max;
+            }
+            return new TileAddress(tileAddressX, tileAddressY, this.z);
+        }
 
         public TileAddress GetParent()
         {
