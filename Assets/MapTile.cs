@@ -89,10 +89,10 @@ public class MapTile : MonoBehaviour
 
                     if (feature.geometry.type == GeometryType.LineString)
                     {
-                        float polylineExtrusion = (float)(5.0 * inverseTileScale);
+                        float polylineExtrusion = (float)(7.0 * inverseTileScale);
                         float polylineHeight = (float)(3.0 * inverseTileScale);
 
-                        var polygonGeometry = Builder.PolylineToPolygon(feature.geometry, polylineExtrusion);
+                        var polygonGeometry = Builder.PolylineToPolygon(feature.geometry, polylineExtrusion, 3.0f);
 
                         Builder.TesselatePolygon(meshData, polygonGeometry, material, polylineHeight);
                         Builder.TesselatePolygonExtrusion(meshData, polygonGeometry, material, 0.0f, polylineHeight);
