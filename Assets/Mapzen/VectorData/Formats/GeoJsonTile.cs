@@ -10,14 +10,15 @@ namespace Mapzen.VectorData.Formats
 
         public static LocalCoordinateProjection LocalCoordinateProjectionForTile(TileAddress address)
         {
+            var origin = address.GetOriginMercatorMeters();
+            var scale = address.GetSizeMercatorMeters();
+
             return delegate(double longitude, double latitude)
             {
                 var lngLat = new LngLat(longitude, latitude);
                 var meters = lngLat.ToMercatorMeters();
-                var origin = address.GetOriginMercatorMeters();
-                var scale = address.GetSizeMercatorMeters();
                 var x = (meters.x - origin.x) / scale;
-                var y = (origin.y - meters.y) / scale;
+                var y = (meters.y - origin.y) / scale;
                 return new Point((float)x, (float)y);
             };
         }

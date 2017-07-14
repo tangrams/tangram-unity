@@ -24,5 +24,17 @@ namespace Mapzen
         {
             return Geo.Project(this);
         }
+
+        public TileAddress ToTileAddress(int zoom)
+        {
+            double metersPerTile = Geo.EarthCircumferenceMeters / (1 << zoom);
+
+            MercatorMeters meters = ToMercatorMeters();
+
+            int tileX = (int)((meters.x + Geo.EarthHalfCircumferenceMeters) / metersPerTile);
+            int tileY = (int)((Geo.EarthHalfCircumferenceMeters - meters.y) / metersPerTile);
+
+            return new TileAddress(tileX, tileY, zoom);
+        }
     }
 }
