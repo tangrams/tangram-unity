@@ -20,14 +20,14 @@ public class MapzenMap : MonoBehaviour
 
     private UnityIO tileIO = new UnityIO();
 
+    [SerializeField]
+    private Dictionary<IFeatureFilter, Material> featureStyling = new Dictionary<IFeatureFilter, Material>();
+
     public void DownloadTiles()
     {
-        tiles.Clear();
-
         GameObject tilePrefab = Resources.Load("Tile") as GameObject;
 
-        Dictionary<IFeatureFilter, Material> featureStyling = new Dictionary<IFeatureFilter, Material>();
-
+        /*
         // Filter that accepts all features in the "water" layer.
         var waterLayerFilter = new FeatureFilter().TakeAllFromCollections("water");
 
@@ -37,7 +37,8 @@ public class MapzenMap : MonoBehaviour
         // Filter that accepts all features in the "earth" or "landuse" layers.
         var landLayerFilter = new FeatureFilter().TakeAllFromCollections("earth", "landuse");
 
-        var roadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads");
+        var minorRoadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads").Where(FeatureMatcher.HasPropertyWithValue("kind", "minor_road"));
+        var highwayRoadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads").Where(FeatureMatcher.HasPropertyWithValue("kind", "highway"));
 
         var baseMaterial = GetComponent<MeshRenderer>().material;
 
@@ -59,7 +60,9 @@ public class MapzenMap : MonoBehaviour
         featureStyling.Add(waterLayerFilter, waterMaterial);
         featureStyling.Add(buildingExtrusionFilter, buildingMaterial);
         featureStyling.Add(landLayerFilter, landMaterial);
-        featureStyling.Add(roadLayerFilter, minorRoadsMaterial);
+        featureStyling.Add(minorRoadLayerFilter, minorRoadsMaterial);
+        featureStyling.Add(highwayRoadLayerFilter, highwayRoadsMaterial);
+        */
 
         TileBounds bounds = new TileBounds(Area);
 
@@ -117,6 +120,12 @@ public class MapzenMap : MonoBehaviour
         {
             return tiles;
         }
+    }
+
+
+    public Dictionary<IFeatureFilter, Material> FeatureStyling
+    {
+        get { return featureStyling; }
     }
 
     public string ExportPath

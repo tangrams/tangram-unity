@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using Mapzen;
+using Mapzen.VectorData.Filters;
 using System;
 using System.IO;
 
@@ -8,6 +9,8 @@ using System.IO;
 public class MapzenMapEditor : Editor
 {
     private MapzenMap mapzenMap;
+    private string featureCollection = "";
+    private Material featureMaterial;
 
     void OnEnable()
     {
@@ -30,7 +33,27 @@ public class MapzenMapEditor : Editor
         }
         if (GUILayout.Button("Download"))
         {
+            ClearTiles();
             mapzenMap.DownloadTiles();
+        }
+        if (GUILayout.Button("Clear"))
+        {
+            ClearTiles();
+        }
+
+        featureCollection = GUILayout.TextField(featureCollection);
+        EditorGUILayout.BeginHorizontal();
+        featureMaterial = EditorGUILayout.ObjectField(featureMaterial, typeof(Material)) as Material;
+        EditorGUILayout.EndHorizontal();
+
+        if (GUILayout.Button("AddFilter")
+            && featureMaterial != null
+            && featureCollection.Length > 0)
+        {
+            var featureFilter = new FeatureFilter()
+                .TakeAllFromCollections(featureCollection);
+
+            mapzenMap.FeatureStyling.Add(featureFilter, featureMaterial);
         }
 
         EditorUtility.ClearProgressBar();
@@ -38,6 +61,15 @@ public class MapzenMapEditor : Editor
         GUILayout.Space(10);
 
         base.OnInspectorGUI();
+    }
+
+    public void ClearTiles()
+    {
+        for (int i = 0; i < mapzenMap.Tiles.Count; ++i)
+        {
+            DestroyImmediate(mapzenMap.Tiles[i]);
+        }
+        mapzenMap.Tiles.Clear();
     }
 
     private static bool CreateDirectoryAtPath(string path)
