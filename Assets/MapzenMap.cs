@@ -25,7 +25,6 @@ public class MapzenMap : MonoBehaviour
 
     public void DownloadTiles()
     {
-        GameObject tilePrefab = Resources.Load("Tile") as GameObject;
 
         /*
         // Filter that accepts all features in the "water" layer.
@@ -65,6 +64,7 @@ public class MapzenMap : MonoBehaviour
         */
 
         TileBounds bounds = new TileBounds(Area);
+        GameObject tilePrefab = Resources.Load("Tile") as GameObject;
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -88,9 +88,6 @@ public class MapzenMap : MonoBehaviour
                     return;
                 }
 
-                // Adding a tile object to the scene
-                GameObject tilePrefab = Resources.Load("Tile") as GameObject;
-
                 // Instantiate a prefab running the script TileData.Start()
                 var go = Instantiate(tilePrefab);
 
@@ -99,8 +96,8 @@ public class MapzenMap : MonoBehaviour
 
                 MapTile tile = go.GetComponent<MapTile>();
 
-                float offsetX = (tileAddress.x - TileX);
-                float offsetY = (-tileAddress.y + TileY);
+                float offsetX = (tileAddress.x - bounds.min.x);
+                float offsetY = (-tileAddress.y + bounds.min.y);
 
                 TileTask task = new TileTask(tileAddress, response, offsetX, offsetY);
                 task.Start(featureStyling);

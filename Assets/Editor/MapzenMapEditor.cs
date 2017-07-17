@@ -39,6 +39,7 @@ public class MapzenMapEditor : Editor
         if (GUILayout.Button("Clear"))
         {
             ClearTiles();
+            mapzenMap.FeatureStyling.Clear();
         }
 
         featureCollection = GUILayout.TextField(featureCollection);
