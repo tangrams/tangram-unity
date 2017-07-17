@@ -2,6 +2,9 @@
 
 namespace Mapzen
 {
+    /// <summary>
+    /// TileAddress identifies an area on Earth in a quadtree heirarchy.
+    /// </summary>
     public struct TileAddress : IComparable, IEquatable<TileAddress>
     {
         public TileAddress(int x, int y, int z)
@@ -9,18 +12,6 @@ namespace Mapzen
             this.x = x;
             this.y = y;
             this.z = z;
-        }
-
-        public static TileAddress FromLngLat(LngLat lngLat, int zoom)
-        {
-            double tileSize = Geo.EarthCircumferenceMeters / (1 << zoom);
-
-            MercatorMeters meters = Geo.Project(lngLat);
-
-            int tileX = (int)(meters.x / tileSize);
-            int tileY = (int)(meters.y / tileSize);
-
-            return new TileAddress(tileX, tileY, zoom);
         }
 
         public readonly int x;
@@ -66,10 +57,16 @@ namespace Mapzen
             return Geo.EarthCircumferenceMeters / (1 << z);
         }
 
+        /// <summary>
+        /// Gets the South-West corner of the area represented by this TileAddress.
+        /// </summary>
+        /// <returns>The origin in mercator meters.</returns>
         public MercatorMeters GetOriginMercatorMeters()
         {
             double metersPerTile = GetSizeMercatorMeters();
-            return new MercatorMeters(x * metersPerTile, y * metersPerTile);
+            double metersEast = x * metersPerTile - Geo.EarthHalfCircumferenceMeters;
+            double metersNorth = -(y + 1) * metersPerTile + Geo.EarthHalfCircumferenceMeters;
+            return new MercatorMeters(metersEast, metersNorth);
         }
 
         public int CompareTo(object obj)

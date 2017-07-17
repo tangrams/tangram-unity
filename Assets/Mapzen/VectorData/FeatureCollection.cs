@@ -2,15 +2,25 @@
 
 namespace Mapzen.VectorData
 {
-    public class FeatureCollection
+    /// <summary>
+    /// Abstract FeatureCollection base class.
+    /// </summary>
+    /// <remarks>
+    /// FeatureCollection provides an abstract interface for accessing named groups ofvector tile features. Each vector
+    /// tile format has its own implementation of FeatureCollection.
+    /// </remarks>
+    public abstract class FeatureCollection
     {
-        public FeatureCollection(string name = "")
-        {
-            Name = name;
-            Features = new List<Feature>();
-        }
+        /// <summary>
+        /// Gets a string name identifying this collection.
+        /// </summary>
+        /// <value>The name.</value>
+        public abstract string Name { get; }
 
-        public string Name;
-        public List<Feature> Features;
+        /// <summary>
+        /// Enumerates the Features in this collection.
+        /// </summary>
+        /// <value>The features.</value>
+        public abstract IEnumerable<Feature> Features { get; }
     }
 }

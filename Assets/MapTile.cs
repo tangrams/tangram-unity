@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Mapzen;
 using Mapzen.VectorData;
 using Mapzen.VectorData.Filters;
 using SimpleJSON;
@@ -19,7 +20,7 @@ public class MapTile : MonoBehaviour
         var waterLayerFilter = new FeatureFilter().TakeAllFromCollections("water");
 
         // Filter that accepts all features in the "buildings" layer with a "height" property.
-        var buildingExtrusionFilter = new FeatureFilter().TakeAllFromCollections("buildings").Where(FeatureMatcher.HasPropertyInRange("height", null, 30));
+        var buildingExtrusionFilter = new FeatureFilter().TakeAllFromCollections("buildings");
 
         // Filter that accepts all features in the "earth" or "landuse" layers.
         var landLayerFilter = new FeatureFilter().TakeAllFromCollections("earth", "landuse");
@@ -51,7 +52,7 @@ public class MapTile : MonoBehaviour
         featureStyling.Add(highwayRoadLayerFilter, highwayRoadsMaterial);
     }
 
-    public void BuildMesh(double tileScale, List<FeatureCollection> layers)
+    public void BuildMesh(double tileScale, IEnumerable<FeatureCollection> layers)
     {
         float inverseTileScale = 1.0f / (float)tileScale;
 
@@ -66,36 +67,33 @@ public class MapTile : MonoBehaviour
 
                 foreach (var feature in filteredFeatures)
                 {
-                    // TODO: use extrusion scale and minHeight as options
-                    float height = 0.0f;
-                    float minHeight = 0.0f;
+                    var options = new PolygonBuilder.Options();
+                    options.Material = material;
 
                     object heightValue;
                     if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
                     {
                         // For some reason we can't cast heightValue straight to float.
-                        height = (float)((double)heightValue * inverseTileScale);
+                        options.MaxHeight = (float)((double)heightValue * inverseTileScale);
+                        options.Extrude = true;
                     }
 
-                    if (feature.geometry.type == GeometryType.Polygon)
+                    if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                     {
-                        Builder.TesselatePolygon(meshData, feature.geometry, material, height);
-
-                        if (height > 0.0f)
-                        {
-                            Builder.TesselatePolygonExtrusion(meshData, feature.geometry, material, minHeight, height);
-                        }
+                        var builder = new PolygonBuilder(meshData, options);
+                        feature.HandleGeometry(builder);
                     }
 
-                    if (feature.geometry.type == GeometryType.LineString)
+                    if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
                     {
-                        float polylineExtrusion = (float)(5.0 * inverseTileScale);
-                        float polylineHeight = (float)(3.0 * inverseTileScale);
+                        var polylineOptions = new PolylineBuilder.Options();
+                        polylineOptions.Material = material;
+                        polylineOptions.Width = (float)(5.0 * inverseTileScale);
+                        polylineOptions.Extrude = true;
+                        polylineOptions.MaxHeight = (float)(3.0 * inverseTileScale);
 
-                        var polygonGeometry = Builder.PolylineToPolygon(feature.geometry, polylineExtrusion);
-
-                        Builder.TesselatePolygon(meshData, polygonGeometry, material, polylineHeight);
-                        Builder.TesselatePolygonExtrusion(meshData, polygonGeometry, material, 0.0f, polylineHeight);
+                        var builder = new PolylineBuilder(meshData, polylineOptions);
+                        feature.HandleGeometry(builder);
                     }
                 }
             }

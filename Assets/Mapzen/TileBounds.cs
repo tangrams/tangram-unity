@@ -41,8 +41,8 @@ namespace Mapzen
                 Util.Swap(ref minLngLat.longitude, ref maxLngLat.longitude);
             }
 
-            min = TileAddress.FromLngLat(minLngLat, area.zoom);
-            max = TileAddress.FromLngLat(maxLngLat, area.zoom);
+            min = minLngLat.ToTileAddress(area.zoom);
+            max = maxLngLat.ToTileAddress(area.zoom);
         }
 
         public IEnumerable<TileAddress> TileAddressRange
