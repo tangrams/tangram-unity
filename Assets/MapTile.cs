@@ -10,10 +10,6 @@ using SimpleJSON;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class MapTile : MonoBehaviour
 {
-    public void Awake()
-    {
-    }
-
     public void CreateUnityMesh(MeshData meshData, float offsetX, float offsetY)
     {
         var mesh = new Mesh();

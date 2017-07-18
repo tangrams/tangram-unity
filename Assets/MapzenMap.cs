@@ -12,7 +12,11 @@ public class MapzenMap : MonoBehaviour
 {
     public string ApiKey = "vector-tiles-tyHL4AY";
 
-    public TileArea Area = new TileArea(new LngLat(-74.014892578125, 40.70562793820589), new LngLat(-74.00390625, 40.713955826286046), 16);
+    public TileArea Area = new TileArea(
+        new LngLat(-74.014892578125, 40.70562793820589),
+        new LngLat(-74.00390625, 40.713955826286046),
+        16);
+
     private List<GameObject> tiles = new List<GameObject>();
 
     [SerializeField]
@@ -25,44 +29,6 @@ public class MapzenMap : MonoBehaviour
 
     public void DownloadTiles()
     {
-
-        /*
-        // Filter that accepts all features in the "water" layer.
-        var waterLayerFilter = new FeatureFilter().TakeAllFromCollections("water");
-
-        // Filter that accepts all features in the "buildings" layer with a "height" property.
-        var buildingExtrusionFilter = new FeatureFilter().TakeAllFromCollections("buildings");
-
-        // Filter that accepts all features in the "earth" or "landuse" layers.
-        var landLayerFilter = new FeatureFilter().TakeAllFromCollections("earth", "landuse");
-
-        var minorRoadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads").Where(FeatureMatcher.HasPropertyWithValue("kind", "minor_road"));
-        var highwayRoadLayerFilter = new FeatureFilter().TakeAllFromCollections("roads").Where(FeatureMatcher.HasPropertyWithValue("kind", "highway"));
-
-        var baseMaterial = GetComponent<MeshRenderer>().material;
-
-        var waterMaterial = new Material(baseMaterial);
-        waterMaterial.color = Color.blue;
-
-        var buildingMaterial = new Material(baseMaterial);
-        buildingMaterial.color = Color.gray;
-
-        var landMaterial = new Material(baseMaterial);
-        landMaterial.color = Color.green;
-
-        var minorRoadsMaterial = new Material(baseMaterial);
-        minorRoadsMaterial.color = Color.white;
-
-        var highwayRoadsMaterial = new Material(baseMaterial);
-        highwayRoadsMaterial.color = Color.black;
-
-        featureStyling.Add(waterLayerFilter, waterMaterial);
-        featureStyling.Add(buildingExtrusionFilter, buildingMaterial);
-        featureStyling.Add(landLayerFilter, landMaterial);
-        featureStyling.Add(minorRoadLayerFilter, minorRoadsMaterial);
-        featureStyling.Add(highwayRoadLayerFilter, highwayRoadsMaterial);
-        */
-
         TileBounds bounds = new TileBounds(Area);
         GameObject tilePrefab = Resources.Load("Tile") as GameObject;
 
