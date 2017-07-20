@@ -28,7 +28,7 @@ public class TileTask
         ready = false;
     }
 
-    public void Start(Dictionary<IFeatureFilter, Material> featureStyling)
+    public void Start(List<FeatureStyle> featureStyling)
     {
         // Parse the GeoJSON
         // var tileData = new GeoJsonTile(address, response);
@@ -36,10 +36,9 @@ public class TileTask
 
         float inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
 
-        foreach (var entry in featureStyling)
+        foreach (var style in featureStyling)
         {
-            var filter = entry.Key;
-            var material = entry.Value;
+            var filter = style.Filter;
 
             foreach (var layer in tileData.FeatureCollections)
             {
@@ -47,31 +46,16 @@ public class TileTask
 
                 foreach (var feature in filteredFeatures)
                 {
-                    var options = new PolygonBuilder.Options();
-                    options.Material = material;
-
-                    object heightValue;
-                    if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
+                    var polygonOptions = style.PolygonOptions(feature, inverseTileScale);
+                    if (polygonOptions != null)
                     {
-                        // For some reason we can't cast heightValue straight to float.
-                        options.MaxHeight = (float)((double)heightValue * inverseTileScale);
-                        options.Extrude = true;
-                    }
-
-                    if (feature.Type == GeometryType.Polygon)
-                    {
-                        var builder = new PolygonBuilder(Data, options);
+                        var builder = new PolygonBuilder(Data, polygonOptions);
                         feature.HandleGeometry(builder);
                     }
 
-                    if (feature.Type == GeometryType.LineString)
+                    var polylineOptions = style.PolylineOptions(feature, inverseTileScale);
+                    if (polylineOptions != null)
                     {
-                        var polylineOptions = new PolylineBuilder.Options();
-                        polylineOptions.Material = material;
-                        polylineOptions.Width = (float)(5.0 * inverseTileScale);
-                        polylineOptions.Extrude = true;
-                        polylineOptions.MaxHeight = (float)(3.0 * inverseTileScale);
-
                         var builder = new PolylineBuilder(Data, polylineOptions);
                         feature.HandleGeometry(builder);
                     }

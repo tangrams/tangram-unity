@@ -142,7 +142,7 @@ public class MapzenMapEditor : Editor
             var featureFilter = new FeatureFilter()
                 .TakeAllFromCollections(layers.ToArray());
 
-            mapzenMap.FeatureStyling.Add(featureFilter, featureMaterial);
+            mapzenMap.FeatureStyling.Add(new FeatureStyle(featureFilter, featureMaterial));
         }
 
         GUILayout.Space(10);
@@ -154,13 +154,13 @@ public class MapzenMapEditor : Editor
 
             foreach (var featureStyling in mapzenMap.FeatureStyling)
             {
-                FeatureFilter filter = featureStyling.Key as FeatureFilter;
+                FeatureFilter filter = featureStyling.Filter as FeatureFilter;
                 EditorGUILayout.BeginHorizontal();
                 foreach (var layer in filter.CollectionNameSet)
                 {
                     GUILayout.TextField(layer);
                 }
-                GUILayout.TextField(featureStyling.Value.name);
+                GUILayout.TextField(featureStyling.Material.name);
                 EditorGUILayout.EndHorizontal();
             }
 

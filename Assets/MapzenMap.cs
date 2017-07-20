@@ -25,7 +25,7 @@ public class MapzenMap : MonoBehaviour
     private UnityIO tileIO = new UnityIO();
 
     [SerializeField]
-    private Dictionary<IFeatureFilter, Material> featureStyling = new Dictionary<IFeatureFilter, Material>();
+    private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
 
     public void DownloadTiles()
     {
@@ -86,7 +86,7 @@ public class MapzenMap : MonoBehaviour
     }
 
 
-    public Dictionary<IFeatureFilter, Material> FeatureStyling
+    public List<FeatureStyle> FeatureStyling
     {
         get { return featureStyling; }
     }

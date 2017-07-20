@@ -6,7 +6,7 @@ namespace Mapzen
 {
     public class PolygonBuilder : IGeometryHandler
     {
-        public struct Options
+        public class Options
         {
             public Material Material;
             public bool Extrude;
