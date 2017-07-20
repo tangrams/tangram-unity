@@ -7,7 +7,7 @@ using Mapzen;
 
 public class MapzenMap : MonoBehaviour
 {
-    delegate void HTTPRequestCallback(string error,byte[] response,TileAddress address);
+    delegate void HTTPRequestCallback(string error, byte[] response,TileAddress address);
 
     public string ApiKey = "vector-tiles-tyHL4AY";
 
