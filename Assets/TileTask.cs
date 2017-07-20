@@ -28,8 +28,8 @@ public class TileTask
     {
 
         // Parse the GeoJSON
-        var tileData = new GeoJsonTile(address, response);
-        // var tileData = new MvtTile(address, response);
+        // var tileData = new GeoJsonTile(address, response);
+        var tileData = new MvtTile(address, response);
 
         // Tesselate the mesh
         tile.BuildMesh(address.GetSizeMercatorMeters(), tileData.FeatureCollections);
