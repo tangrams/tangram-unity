@@ -18,6 +18,7 @@ public class MapzenMapEditor : Editor
     private static GUIContent addLayerButtonContent = new GUIContent("+", "Add layer collection");
     private static GUIContent removeLayerButtonContent = new GUIContent("-", "Remove layer collection");
     private List<string> layers = new List<string>();
+    private int selectedLayer;
     private List<string> defaultLayers = new List<string>(new string[]
         {
             "boundaries",
@@ -82,22 +83,19 @@ public class MapzenMapEditor : Editor
 
         // Default layers
         {
-            foreach (var defaultLayer in defaultLayers)
+            EditorGUILayout.BeginHorizontal();
+            selectedLayer = EditorGUILayout.Popup("Default layer:", selectedLayer, defaultLayers.ToArray());
+            if (GUILayout.Button(addLayerButtonContent, buttonWidth))
             {
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label(defaultLayer);
-                if (GUILayout.Button(addLayerButtonContent, buttonWidth))
-                {
-                    layers.Add(defaultLayer);
-                }
-                EditorGUILayout.EndHorizontal();
+                layers.Add(defaultLayers[selectedLayer]);
             }
+            EditorGUILayout.EndHorizontal();
         }
 
         // Custom layer entry
         {
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Custom:");
+            GUILayout.Label("Custom layer:");
             customFeatureCollection = GUILayout.TextField(customFeatureCollection);
             if (GUILayout.Button(addLayerButtonContent, buttonWidth)
                 && customFeatureCollection.Length > 0)
