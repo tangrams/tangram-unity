@@ -19,10 +19,17 @@ namespace Mapzen
             internal set;
         }
 
-        public FeatureStyle(IFeatureFilter filter, Material material)
+        public PolygonBuilder.Options polygonBuilderOptions;
+        private PolylineBuilder.Options polylineBuilderOptions;
+
+        public FeatureStyle(IFeatureFilter filter, Material material,
+                            PolygonBuilder.Options polygonBuilderOptions,
+                            PolylineBuilder.Options polylineBuilderOptions)
         {
             this.Filter = filter;
             this.Material = material;
+            this.polygonBuilderOptions = polygonBuilderOptions;
+            this.polylineBuilderOptions = polylineBuilderOptions;
         }
 
         public PolygonBuilder.Options PolygonOptions(Feature feature, float inverseTileScale)
@@ -55,9 +62,10 @@ namespace Mapzen
 
             var polylineOptions = new PolylineBuilder.Options();
             polylineOptions.Material = this.Material;
-            polylineOptions.Width = 5.0f * inverseTileScale;
+            polylineOptions.Width = 15.0f * inverseTileScale;
             polylineOptions.Extrude = true;
             polylineOptions.MaxHeight = 3.0f * inverseTileScale;
+            polylineOptions.MiterLimit = 3.0f;
 
             return polylineOptions;
         }

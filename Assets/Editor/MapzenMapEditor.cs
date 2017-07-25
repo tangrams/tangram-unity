@@ -11,35 +11,26 @@ public class MapzenMapEditor : Editor
 {
     private MapzenMap mapzenMap;
     private Material featureMaterial;
-    private bool showFilterGUI = true;
+
+    private PolylineBuilderEditor polylineBuilderEditor;
+    private PolygonBuilderEditor polygonBuilderEditor;
+    private FeatureFilterEditor featureFilterEditor;
+
+    private bool showFeatureStyleGUI = true;
     private bool showExportGUI = true;
-    private string customFeatureCollection = "";
-    private static GUILayoutOption buttonWidth = GUILayout.Width(50.0f);
-    private static GUIContent addLayerButtonContent = new GUIContent("+", "Add layer collection");
-    private static GUIContent removeLayerButtonContent = new GUIContent("-", "Remove layer collection");
-    private List<string> layers = new List<string>();
-    private int selectedLayer;
-    private List<string> defaultLayers = new List<string>(new string[]
-        {
-            "boundaries",
-            "buildings",
-            "earth",
-            "landuse",
-            "places",
-            "pois",
-            "roads",
-            "transit",
-            "water"
-        });
 
     void OnEnable()
     {
         mapzenMap = (MapzenMap)target;
+
+        polygonBuilderEditor = new PolygonBuilderEditor();
+        polylineBuilderEditor = new PolylineBuilderEditor();
+        featureFilterEditor = new FeatureFilterEditor();
     }
 
     public override void OnInspectorGUI()
     {
-        FilterGUI();
+        FeatureStyleGUI();
 
         ExportGUI();
 
@@ -73,74 +64,33 @@ public class MapzenMapEditor : Editor
         }
     }
 
-    private void FilterGUI()
+    private void FeatureStyleGUI()
     {
-        showFilterGUI = EditorGUILayout.Foldout(showFilterGUI, "Feature collection filtering");
-        if (!showFilterGUI)
+        showFeatureStyleGUI = EditorGUILayout.Foldout(showFeatureStyleGUI, "Feature collection filtering");
+        if (!showFeatureStyleGUI)
         {
             return;
         }
 
-        // Default layers
-        {
-            EditorGUILayout.BeginHorizontal();
-            selectedLayer = EditorGUILayout.Popup("Default layer:", selectedLayer, defaultLayers.ToArray());
-            if (GUILayout.Button(addLayerButtonContent, buttonWidth))
-            {
-                layers.Add(defaultLayers[selectedLayer]);
-            }
-            EditorGUILayout.EndHorizontal();
-        }
-
-        // Custom layer entry
-        {
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Custom layer:");
-            customFeatureCollection = GUILayout.TextField(customFeatureCollection);
-            if (GUILayout.Button(addLayerButtonContent, buttonWidth)
-                && customFeatureCollection.Length > 0)
-            {
-                layers.Add(customFeatureCollection);
-            }
-            EditorGUILayout.EndHorizontal();
-        }
-
-        GUILayout.Space(10);
-
-        // Show currently create filters
-        if (layers.Count > 0)
-        {
-            GUILayout.Label("Filter layers:");
-
-            for (int i = layers.Count - 1; i >= 0; i--)
-            {
-                string layer = layers[i];
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.TextField(layer);
-                if (GUILayout.Button(removeLayerButtonContent, buttonWidth))
-                {
-                    layers.RemoveAt(i);
-                }
-                EditorGUILayout.EndHorizontal();
-            }
-        }
-
         // Material associated with the filter
+        EditorGUILayout.BeginHorizontal();
         {
-            EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Filter material:");
             featureMaterial = EditorGUILayout.ObjectField(featureMaterial, typeof(Material)) as Material;
-            EditorGUILayout.EndHorizontal();
         }
+        EditorGUILayout.EndHorizontal();
+
+        var featureFilter = featureFilterEditor.OnInspectorGUI();
+        var polygonOptions = polygonBuilderEditor.OnInspectorGUI();
+        var polylineOptions = polylineBuilderEditor.OnInspectorGUI();
 
         if (GUILayout.Button("Create Filter")
             && featureMaterial != null
-            && layers.Count > 0)
+            && featureFilter != null)
         {
-            var featureFilter = new FeatureFilter()
-                .TakeAllFromCollections(layers.ToArray());
-
-            mapzenMap.FeatureStyling.Add(new FeatureStyle(featureFilter, featureMaterial));
+            var featureStyle = new FeatureStyle(featureFilter, featureMaterial,
+                    polygonOptions, polylineOptions);
+            mapzenMap.FeatureStyling.Add(featureStyle);
         }
 
         GUILayout.Space(10);
