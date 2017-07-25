@@ -30,42 +30,6 @@ public class MapzenMap : MonoBehaviour
 
     private UnityIO tileIO = new UnityIO();
 
-    void onTileFetched(object userData, UnityIO.Response response) {
-        TileAddress address = (TileAddress)userData;
-
-        if (response.hasError()) {
-            Debug.Log("TileIO Error: " + response.error);
-            return;
-        }
-
-        if (response.data.Length == 0) {
-            Debug.Log("Empty Response");
-            return;
-        }
-
-        GameObject tilePrefab = Resources.Load("Tile") as GameObject;
-
-        var go = Instantiate(tilePrefab);
-
-        go.name = address.ToString();
-
-        go.transform.parent = this.transform;
-
-        MapTile tile = go.GetComponent<MapTile>();
-
-        TileTask task = new TileTask(address, response.data, tile);
-
-        task.offsetX = (address.x - TileX);
-        task.offsetY = (address.y - TileY);
-
-        pendingTasks.Add(task);
-
-        worker.RunAsync(() =>
-        {
-            task.Start();
-        });
-    }
-
     void Start()
     {
         // Construct the HTTP request
@@ -81,8 +45,39 @@ public class MapzenMap : MonoBehaviour
 
 				Debug.Log("URL request " + uri.AbsoluteUri);
 
-                object tileAddress = new TileAddress(tileX, tileY, TileZ);
-                StartCoroutine(tileIO.FetchNetworkData(uri, onTileFetched, tileAddress));
+                TileAddress tileAddress = new TileAddress(tileX, tileY, TileZ);
+
+                UnityIO.IORequestCallback onTileFetched = (response) => { 
+                    if (response.hasError()) {
+                        Debug.Log("TileIO Error: " + response.error);
+                        return;
+                    }
+                    if (response.data.Length == 0) {
+                        Debug.Log("Empty Response");
+                        return;
+                    }
+
+                    GameObject tilePrefab = Resources.Load("Tile") as GameObject;
+
+                    var go = Instantiate(tilePrefab);
+                    go.name = tileAddress.ToString();
+                    go.transform.parent = this.transform;
+
+                    MapTile tile = go.GetComponent<MapTile>();
+
+                    TileTask task = new TileTask(tileAddress, response.data, tile);
+                    task.offsetX = (tileAddress.x - TileX);
+                    task.offsetY = (tileAddress.y - TileY);
+
+                    pendingTasks.Add(task);
+
+                    worker.RunAsync(() =>
+                    {
+                        task.Start();
+                    });
+                };
+
+                StartCoroutine(tileIO.FetchNetworkData(uri, onTileFetched));
             }
         }
     }

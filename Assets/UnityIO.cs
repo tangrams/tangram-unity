@@ -24,9 +24,9 @@ public class UnityIO
         }
     }
 
-    public delegate void IORequestCallback(object userData, Response response);
+    public delegate void IORequestCallback(Response response);
 
-    public IEnumerator FetchNetworkData(Uri uri, IORequestCallback callback, object userData) {
+    public IEnumerator FetchNetworkData(Uri uri, IORequestCallback callback) {
 
         Response response;
 
@@ -48,11 +48,11 @@ public class UnityIO
             }
             response = new Response(requestError, request.downloadHandler.data);
         }
-        callback(userData, response);
+        callback(response);
     }
 
     // Note: uri must be constructed using Application.dataPath + "/Resources/" + assetName as base path
-    public IEnumerator FetchAssetData(Uri uri, IORequestCallback callback, object userData) {
+    public IEnumerator FetchAssetData(Uri uri, IORequestCallback callback) {
 
         Response response;
 
@@ -70,7 +70,7 @@ public class UnityIO
 
             response = new Response(null, textAsset.bytes);
         }
-        callback(userData, response);
+        callback(response);
     }
 }
 
