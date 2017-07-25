@@ -33,10 +33,6 @@ public class FeatureFilterEditor
         });
 
 
-    public FeatureFilterEditor()
-    {
-    }
-
     public IFeatureFilter OnInspectorGUI()
     {
         // Default layers
