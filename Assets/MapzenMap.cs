@@ -33,8 +33,8 @@ public class MapzenMap : MonoBehaviour
     void onTileFetched(object userData, UnityIO.Response response) {
         TileAddress address = (TileAddress)userData;
 
-        if (response.error != null) {
-            Debug.Log("Error: " + response.error);
+        if (response.hasError()) {
+            Debug.Log("TileIO Error: " + response.error);
             return;
         }
 
@@ -82,7 +82,7 @@ public class MapzenMap : MonoBehaviour
 				Debug.Log("URL request " + uri.AbsoluteUri);
 
                 object tileAddress = new TileAddress(tileX, tileY, TileZ);
-                StartCoroutine(tileIO.FetchData(uri, onTileFetched, tileAddress));
+                StartCoroutine(tileIO.FetchNetworkData(uri, onTileFetched, tileAddress));
             }
         }
     }
