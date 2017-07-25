@@ -43,25 +43,18 @@ public class MapzenMap : MonoBehaviour
             return;
         }
 
-        string responseData = System.Text.Encoding.Default.GetString(response.data);
-
-        Debug.Log("Response: " + responseData);
-
         GameObject tilePrefab = Resources.Load("Tile") as GameObject;
 
         var go = Instantiate(tilePrefab);
 
+        go.name = address.ToString();
+
+        go.transform.parent = this.transform;
+
         MapTile tile = go.GetComponent<MapTile>();
 
-        var layers = new List<string>
-        {
-            "water",
-            "roads",
-            "earth",
-            "buildings"
-        };
+        TileTask task = new TileTask(address, response.data, tile);
 
-        TileTask task = new TileTask(address, layers, responseData, tile);
         task.offsetX = (address.x - TileX);
         task.offsetY = (address.y - TileY);
 
@@ -83,7 +76,7 @@ public class MapzenMap : MonoBehaviour
                 int tileX = TileX + x;
                 int tileY = TileY + y;
 
-				var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.json?api_key={3}",
+				var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
 					TileZ, tileX, tileY, ApiKey));
 
 				Debug.Log("URL request " + uri.AbsoluteUri);
