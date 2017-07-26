@@ -13,16 +13,16 @@ public class MapzenMap : MonoBehaviour
     public string ApiKey = "vector-tiles-tyHL4AY";
 
     public TileArea Area = new TileArea(
-        new LngLat(-74.014892578125, 40.70562793820589),
-        new LngLat(-74.00390625, 40.713955826286046),
-        16);
+                               new LngLat(-74.014892578125, 40.70562793820589),
+                               new LngLat(-74.00390625, 40.713955826286046),
+                               16);
 
     private List<GameObject> tiles = new List<GameObject>();
 
+    private UnityIO tileIO = new UnityIO();
+
     [SerializeField]
     private string exportPath = "Assets/Generated";
-
-    private UnityIO tileIO = new UnityIO();
 
     [SerializeField]
     private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
@@ -36,7 +36,7 @@ public class MapzenMap : MonoBehaviour
         {
             var wrappedTileAddress = tileAddress.Wrapped();
             var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
-                          wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey));
+                              wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey));
 
             Debug.Log("URL request " + uri.AbsoluteUri);
 
@@ -65,7 +65,7 @@ public class MapzenMap : MonoBehaviour
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
-                TileTask task = new TileTask(tileAddress, response, offsetX, offsetY);
+                TileTask task = new TileTask(tileAddress, response.data, offsetX, offsetY);
                 task.Start(featureStyling);
                 tile.CreateUnityMesh(task.Data, offsetX, offsetY);
 
