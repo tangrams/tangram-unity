@@ -32,12 +32,7 @@ public class PolygonBuilderEditor
         GUILayout.BeginHorizontal();
         {
             GUILayout.Label("Max Height: ");
-            maxHeight = GUILayout.TextField(maxHeight, layoutWidth);
-            try {
-                options.MaxHeight = float.Parse(maxHeight);
-            } catch (FormatException) {
-                Debug.Log("Invalid number given for PolygonBuilder.MaxHeight");
-            }
+            EditorUtil.FloatField(ref maxHeight, ref options.MaxHeight, layoutWidth);
         }
         GUILayout.EndHorizontal();
 

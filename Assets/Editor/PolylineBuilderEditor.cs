@@ -36,24 +36,14 @@ public class PolylineBuilderEditor
         GUILayout.BeginHorizontal();
         {
             GUILayout.Label("Width ");
-            width = GUILayout.TextField(width, layoutWidth);
-            try {
-                options.Width = float.Parse(width);
-            } catch (FormatException) {
-                Debug.Log("Invalid number given for PolylineBuilder.Width");
-            }
+            EditorUtil.FloatField(ref width, ref options.Width, layoutWidth);
         }
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
         {
             GUILayout.Label("Max Height: ");
-            maxHeight = GUILayout.TextField(maxHeight, layoutWidth);
-            try {
-                options.MaxHeight = float.Parse(maxHeight);
-            } catch (FormatException) {
-                Debug.Log("Invalid number given for PolylineBuilder.MaxHeight");
-            }
+            EditorUtil.FloatField(ref maxHeight, ref options.MaxHeight, layoutWidth);
         }
         GUILayout.EndHorizontal();
 
