@@ -46,16 +46,16 @@ public class TileTask
 
                 foreach (var feature in filteredFeatures)
                 {
-                    var polygonOptions = style.PolygonOptions(feature, inverseTileScale);
-                    if (polygonOptions != null)
+                    if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                     {
+                        var polygonOptions = style.PolygonOptions(feature, inverseTileScale);
                         var builder = new PolygonBuilder(Data, polygonOptions);
                         feature.HandleGeometry(builder);
                     }
 
-                    var polylineOptions = style.PolylineOptions(feature, inverseTileScale);
-                    if (polylineOptions != null)
+                    if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
                     {
+                        var polylineOptions = style.PolylineOptions(feature, inverseTileScale);
                         var builder = new PolylineBuilder(Data, polylineOptions);
                         feature.HandleGeometry(builder);
                     }

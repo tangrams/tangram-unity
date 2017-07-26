@@ -6,20 +6,20 @@ public class MapzenMapEditor : Editor
 {
     private MapzenMap mapzenMap;
 
-    private FeatureStyleEditor featureStyleEditor;
-    private TileDataEditor tileDataEditor;
+    private FeatureStyleEditor featureStyleEditor = new FeatureStyleEditor();
+    private TileDataEditor tileDataEditor = new TileDataEditor();
 
     void OnEnable()
     {
         mapzenMap = (MapzenMap)target;
-        featureStyleEditor = new FeatureStyleEditor();
-        tileDataEditor = new TileDataEditor();
     }
 
     public override void OnInspectorGUI()
     {
         featureStyleEditor.OnInspectorGUI(mapzenMap);
+
         tileDataEditor.OnInspectorGUI(mapzenMap);
+
         base.OnInspectorGUI();
     }
 }

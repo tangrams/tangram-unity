@@ -34,40 +34,35 @@ namespace Mapzen
 
         public PolygonBuilder.Options PolygonOptions(Feature feature, float inverseTileScale)
         {
-            if (feature.Type != GeometryType.Polygon && feature.Type != GeometryType.MultiPolygon)
+            var options = polygonBuilderOptions;
+
+            options.Material = this.Material;
+
+            if (options.MaxHeight > 0.0f)
             {
-                return null;
+                options.MaxHeight *= inverseTileScale;
+            }
+            else
+            {
+                object heightValue;
+                if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
+                {
+                    options.MaxHeight = (float)((double)heightValue * inverseTileScale);
+                }
             }
 
-            var polygonOptions = new PolygonBuilder.Options();
-
-            object heightValue;
-            if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
-            {
-                polygonOptions.MaxHeight = (float)((double)heightValue * inverseTileScale);
-                polygonOptions.Extrude = true;
-            }
-
-            polygonOptions.Material = this.Material;
-
-            return polygonOptions;
+            return options;
         }
 
         public PolylineBuilder.Options PolylineOptions(Feature feature, float inverseTileScale)
         {
-            if (feature.Type != GeometryType.LineString && feature.Type != GeometryType.MultiLineString)
-            {
-                return null;
-            }
+            var options = polylineBuilderOptions;
 
-            var polylineOptions = new PolylineBuilder.Options();
-            polylineOptions.Material = this.Material;
-            polylineOptions.Width = 15.0f * inverseTileScale;
-            polylineOptions.Extrude = true;
-            polylineOptions.MaxHeight = 3.0f * inverseTileScale;
-            polylineOptions.MiterLimit = 3.0f;
+            options.Material = this.Material;
+            options.Width *= inverseTileScale;
+            options.MaxHeight *= inverseTileScale;
 
-            return polylineOptions;
+            return options;
         }
     }
 }

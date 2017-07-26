@@ -11,7 +11,7 @@ namespace Mapzen
         private List<Vector2> polyline;
         private Options options;
 
-        public class Options
+        public struct Options
         {
             public Material Material;
             public bool Extrude;
