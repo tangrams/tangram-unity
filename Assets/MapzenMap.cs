@@ -8,13 +8,6 @@ using Mapzen;
 
 public class MapzenMap : MonoBehaviour
 {
-    public int TileX = 19290;
-    public int TileY = 24632;
-    public int TileZ = 16;
-
-    public int TileRangeX = 5;
-    public int TileRangeY = 5;
-
     public string ApiKey = "vector-tiles-tyHL4AY";
 
     public TileArea Area = new TileArea(new LngLat(-74.014892578125, 40.70562793820589), new LngLat(-74.00390625, 40.713955826286046), 16);
@@ -32,53 +25,56 @@ public class MapzenMap : MonoBehaviour
 
     void Start()
     {
-        // Construct the HTTP request
-        for (int x = 0; x < TileRangeX; ++x)
+        TileBounds bounds = new TileBounds(Area);
+
+        foreach (var tileAddress in bounds.TileAddressRange)
         {
-            for (int y = 0; y < TileRangeY; ++y)
+            var wrappedTileAddress = tileAddress.Wrapped();
+            var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
+                          wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey));
+
+            Debug.Log("URL request " + uri.AbsoluteUri);
+
+            UnityIO.IORequestCallback onTileFetched = (response) => 
             {
-                int tileX = TileX + x;
-                int tileY = TileY + y;
+                if (response.hasError()) 
+                {
+                    Debug.Log("TileIO Error: " + response.error);
+                    return;
+                }
 
-				var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
-					TileZ, tileX, tileY, ApiKey));
+                if (response.data.Length == 0) 
+                {
+                    Debug.Log("Empty Response");
+                    return;
+                }
 
-				Debug.Log("URL request " + uri.AbsoluteUri);
+                // Adding a tile object to the scene
+                GameObject tilePrefab = Resources.Load("Tile") as GameObject;
 
-                TileAddress tileAddress = new TileAddress(tileX, tileY, TileZ);
+                // Instantiate a prefab running the script TileData.Start()
+                var go = Instantiate(tilePrefab);
 
-                UnityIO.IORequestCallback onTileFetched = (response) => { 
-                    if (response.hasError()) {
-                        Debug.Log("TileIO Error: " + response.error);
-                        return;
-                    }
-                    if (response.data.Length == 0) {
-                        Debug.Log("Empty Response");
-                        return;
-                    }
+                go.name = tileAddress.ToString();
+                go.transform.parent = this.transform;
 
-                    GameObject tilePrefab = Resources.Load("Tile") as GameObject;
+                MapTile tile = go.GetComponent<MapTile>();
 
-                    var go = Instantiate(tilePrefab);
-                    go.name = tileAddress.ToString();
-                    go.transform.parent = this.transform;
+                TileTask task = new TileTask(tileAddress, response.data, tile);
 
-                    MapTile tile = go.GetComponent<MapTile>();
+                task.offsetX = (tileAddress.x - bounds.min.x);
+                task.offsetY = (-tileAddress.y + bounds.min.y);
 
-                    TileTask task = new TileTask(tileAddress, response.data, tile);
-                    task.offsetX = (tileAddress.x - TileX);
-                    task.offsetY = (tileAddress.y - TileY);
+                pendingTasks.Add(task);
 
-                    pendingTasks.Add(task);
-
-                    worker.RunAsync(() =>
+                worker.RunAsync(() =>
                     {
                         task.Start();
                     });
-                };
+            };
 
-                StartCoroutine(tileIO.FetchNetworkData(uri, onTileFetched));
-            }
+            // Starts the HTTP request
+            StartCoroutine(tileIO.FetchNetworkData(uri, onTileFetched));
         }
     }
 
