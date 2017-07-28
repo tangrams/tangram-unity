@@ -16,13 +16,13 @@ public class TileTask
 
     public float OffsetY { get; internal set; }
 
-    public MeshData Data { get; internal set; }
+    public Dictionary<string, MeshData> Data { get; internal set; }
 
     public TileTask(TileAddress address, byte[] response, float offsetX, float offsetY)
     {
         this.address = address;
         this.response = response;
-        this.Data = new MeshData();
+        this.Data = new Dictionary<string, MeshData>();
         this.OffsetX = offsetX;
         this.OffsetY = offsetY;
         ready = false;
@@ -39,6 +39,8 @@ public class TileTask
         foreach (var style in featureStyling)
         {
             var filter = style.Filter;
+            var meshData = new MeshData();
+            Data.Add(style.Name, meshData);
 
             foreach (var layer in tileData.FeatureCollections)
             {
@@ -49,21 +51,21 @@ public class TileTask
                     if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                     {
                         var polygonOptions = style.PolygonOptions(feature, inverseTileScale);
-                        var builder = new PolygonBuilder(Data, polygonOptions);
+                        var builder = new PolygonBuilder(meshData, polygonOptions);
                         feature.HandleGeometry(builder);
                     }
 
                     if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
                     {
                         var polylineOptions = style.PolylineOptions(feature, inverseTileScale);
-                        var builder = new PolylineBuilder(Data, polylineOptions);
+                        var builder = new PolylineBuilder(meshData, polylineOptions);
                         feature.HandleGeometry(builder);
                     }
                 }
             }
-        }
 
-        Data.FlipIndices();
+            meshData.FlipIndices();
+        }
 
         ready = true;
     }

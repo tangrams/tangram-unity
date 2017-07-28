@@ -19,14 +19,21 @@ namespace Mapzen
             internal set;
         }
 
+        public string Name
+        {
+            get;
+            internal set;
+        }
+
         public PolygonBuilder.Options polygonBuilderOptions;
         private PolylineBuilder.Options polylineBuilderOptions;
 
-        public FeatureStyle(IFeatureFilter filter, Material material,
+        public FeatureStyle(IFeatureFilter filter, Material material, string name,
                             PolygonBuilder.Options polygonBuilderOptions,
                             PolylineBuilder.Options polylineBuilderOptions)
         {
             this.Filter = filter;
+            this.Name = name;
             this.Material = material;
             this.polygonBuilderOptions = polygonBuilderOptions;
             this.polylineBuilderOptions = polylineBuilderOptions;

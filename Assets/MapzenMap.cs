@@ -53,23 +53,23 @@ public class MapzenMap : MonoBehaviour
                     Debug.Log("Empty Response");
                     return;
                 }
-
-                // Instantiate a prefab running the script TileData.Start()
-                var go = Instantiate(tilePrefab);
-
-                go.name = tileAddress.ToString();
-                go.transform.parent = this.transform;
-
-                MapTile tile = go.GetComponent<MapTile>();
-
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
                 TileTask task = new TileTask(tileAddress, response.data, offsetX, offsetY);
                 task.Start(featureStyling);
-                tile.CreateUnityMesh(task.Data, offsetX, offsetY);
 
-                tiles.Add(go);
+                foreach (var meshData in task.Data) {
+                    var go = Instantiate(tilePrefab);
+
+                    go.name = meshData.Key;
+                    go.transform.parent = this.transform;
+
+                    MapTile tile = go.GetComponent<MapTile>();
+
+                    tile.CreateUnityMesh(meshData.Value, offsetX, offsetY);
+                    tiles.Add(go);
+                }
             };
 
             // Starts the HTTP request
