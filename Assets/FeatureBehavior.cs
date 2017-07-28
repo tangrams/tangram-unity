@@ -8,7 +8,7 @@ using Mapzen.VectorData.Filters;
 using SimpleJSON;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-public class MapTile : MonoBehaviour
+public class FeatureBehavior : MonoBehaviour
 {
     public void CreateUnityMesh(MeshData meshData, float offsetX, float offsetY)
     {

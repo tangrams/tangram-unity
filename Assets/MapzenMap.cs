@@ -59,16 +59,9 @@ public class MapzenMap : MonoBehaviour
                 TileTask task = new TileTask(tileAddress, response.data, offsetX, offsetY);
                 task.Start(featureStyling);
 
-                foreach (var meshData in task.Data) {
-                    var go = Instantiate(tilePrefab);
-
-                    go.name = meshData.Key;
-                    go.transform.parent = this.transform;
-
-                    MapTile tile = go.GetComponent<MapTile>();
-
-                    tile.CreateUnityMesh(meshData.Value, offsetX, offsetY);
-                    tiles.Add(go);
+                foreach (var gameObject in task.GameObjects) {
+                    gameObject.transform.parent = this.transform;
+                    // tiles.Add(go);
                 }
             };
 

@@ -16,13 +16,13 @@ public class TileTask
 
     public float OffsetY { get; internal set; }
 
-    public Dictionary<string, MeshData> Data { get; internal set; }
+    public List<GameObject> GameObjects { get; internal set; }
 
     public TileTask(TileAddress address, byte[] response, float offsetX, float offsetY)
     {
         this.address = address;
         this.response = response;
-        this.Data = new Dictionary<string, MeshData>();
+        this.GameObjects = new List<GameObject>();
         this.OffsetX = offsetX;
         this.OffsetY = offsetY;
         ready = false;
@@ -39,15 +39,28 @@ public class TileTask
         foreach (var style in featureStyling)
         {
             var filter = style.Filter;
-            var meshData = new MeshData();
-            Data.Add(style.Name, meshData);
+
+            GameObject filterGameObject = new GameObject(style.Name);
+
+            List<GameObject> childs = new List<GameObject>();
 
             foreach (var layer in tileData.FeatureCollections)
             {
-                var filteredFeatures = filter.Filter(layer);
+                List<Feature> filteredFeatures = new List<Feature>(filter.Filter(layer));
+
+                GameObject layerGameObject = null;
+
+                if (filteredFeatures.Count > 0)
+                {
+                    layerGameObject = new GameObject(layer.Name);
+                    layerGameObject.transform.parent = filterGameObject.transform;
+                    childs.Add(layerGameObject);
+                }
 
                 foreach (var feature in filteredFeatures)
                 {
+                    var meshData = new MeshData();
+
                     if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                     {
                         var polygonOptions = style.PolygonOptions(feature, inverseTileScale);
@@ -61,10 +74,32 @@ public class TileTask
                         var builder = new PolylineBuilder(meshData, polylineOptions);
                         feature.HandleGeometry(builder);
                     }
+
+                    meshData.FlipIndices();
+
+                    if (meshData.Vertices.Count > 0)
+                    {
+                        // NOTE: when dispatching task from work threads, implement RunOnMainThread()
+                        // to dispatch the following in main thread
+                        GameObject go = new GameObject();
+
+                        object name;
+                        if (feature.TryGetProperty("name", out name))
+                        {
+                            go.name = (string)name;
+                        }
+
+                        go.transform.parent = layerGameObject.transform;
+                        FeatureBehavior featureBehavior = go.AddComponent<FeatureBehavior>();
+                        featureBehavior.CreateUnityMesh(meshData, OffsetX, OffsetY);
+                    }
                 }
             }
 
-            meshData.FlipIndices();
+            if (childs.Count > 0)
+            {
+                GameObjects.Add(filterGameObject);
+            }
         }
 
         ready = true;
