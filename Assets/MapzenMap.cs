@@ -27,10 +27,21 @@ public class MapzenMap : MonoBehaviour
     [SerializeField]
     private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
 
+    private List<TileTask> tasks = new List<TileTask>();
+
+    private int nTasksForArea = 0;
+
     public void DownloadTiles()
     {
         TileBounds bounds = new TileBounds(Area);
-        GameObject tilePrefab = Resources.Load("Tile") as GameObject;
+
+        tasks.Clear();
+        nTasksForArea = 0;
+
+        foreach (var tileAddress in bounds.TileAddressRange)
+        {
+            nTasksForArea++;
+        }
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -53,20 +64,65 @@ public class MapzenMap : MonoBehaviour
                     Debug.Log("Empty Response");
                     return;
                 }
+
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
                 TileTask task = new TileTask(tileAddress, response.data, offsetX, offsetY);
+
                 task.Start(featureStyling);
 
-                foreach (var gameObject in task.GameObjects) {
-                    gameObject.transform.parent = this.transform;
-                    // tiles.Add(go);
-                }
+                OnTaskReady(task);
             };
 
             // Starts the HTTP request
             StartCoroutine(tileIO.FetchNetworkData(uri, onTileFetched));
+        }
+    }
+
+    void OnTaskReady(TileTask readyTask)
+    {
+        tasks.Add(readyTask);
+
+        if (tasks.Count == nTasksForArea)
+        {
+            List<SceneGroup> groups = new List<SceneGroup>();
+
+            foreach (var task in tasks)
+            {
+                groups.AddRange(task.SceneGroups);
+            }
+
+            tasks.Clear();
+
+            CreateSceneGraph(groups);
+        }
+    }
+
+    private void CreateSceneGraph(List<SceneGroup> sceneGroups)
+    {
+        foreach (var sceneGroup in sceneGroups)
+        {
+            Visit(sceneGroup, this.transform);
+        }
+    }
+
+    private void Visit(SceneGroup group, Transform parent)
+    {
+        var gameObject = new GameObject();
+
+        gameObject.name = group.name;
+        gameObject.transform.parent = parent;
+
+        foreach (var child in group.childs)
+        {
+            Visit(child, gameObject.transform);
+        }
+
+        if (group.meshData != null)
+        {
+            FeatureBehavior featureBehavior = gameObject.AddComponent<FeatureBehavior>();
+            featureBehavior.CreateUnityMesh(group.meshData, 0, 0);
         }
     }
 

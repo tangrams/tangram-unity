@@ -16,13 +16,13 @@ public class TileTask
 
     public float OffsetY { get; internal set; }
 
-    public List<GameObject> GameObjects { get; internal set; }
+    public List<SceneGroup> SceneGroups { get; internal set; }
 
     public TileTask(TileAddress address, byte[] response, float offsetX, float offsetY)
     {
         this.address = address;
         this.response = response;
-        this.GameObjects = new List<GameObject>();
+        this.SceneGroups = new List<SceneGroup>();
         this.OffsetX = offsetX;
         this.OffsetY = offsetY;
         ready = false;
@@ -40,21 +40,18 @@ public class TileTask
         {
             var filter = style.Filter;
 
-            GameObject filterGameObject = new GameObject(style.Name);
-
-            List<GameObject> childs = new List<GameObject>();
+            var filterGroup = new SceneGroup(style.Name, null);
 
             foreach (var layer in tileData.FeatureCollections)
             {
-                List<Feature> filteredFeatures = new List<Feature>(filter.Filter(layer));
+                var filteredFeatures = new List<Feature>(filter.Filter(layer));
 
-                GameObject layerGameObject = null;
+                SceneGroup layerGroup = null;
 
                 if (filteredFeatures.Count > 0)
                 {
-                    layerGameObject = new GameObject(layer.Name);
-                    layerGameObject.transform.parent = filterGameObject.transform;
-                    childs.Add(layerGameObject);
+                    layerGroup = new SceneGroup(layer.Name, null);
+                    filterGroup.childs.Add(layerGroup);
                 }
 
                 foreach (var feature in filteredFeatures)
@@ -79,27 +76,21 @@ public class TileTask
 
                     if (meshData.Vertices.Count > 0)
                     {
-                        // NOTE: when dispatching task from work threads, implement RunOnMainThread()
-                        // to dispatch the following in main thread
-                        GameObject go = new GameObject();
+                        string featureName = "feature";
+                        object nameProperty;
 
-                        object name;
-                        if (feature.TryGetProperty("name", out name))
+                        if (feature.TryGetProperty("name", out nameProperty))
                         {
-                            go.name = (string)name;
+                            featureName = (string)nameProperty;
                         }
 
-                        go.transform.parent = layerGameObject.transform;
-                        FeatureBehavior featureBehavior = go.AddComponent<FeatureBehavior>();
-                        featureBehavior.CreateUnityMesh(meshData, OffsetX, OffsetY);
+                        var featureGroup = new SceneGroup(featureName, meshData);
+                        layerGroup.childs.Add(featureGroup);
                     }
                 }
             }
 
-            if (childs.Count > 0)
-            {
-                GameObjects.Add(filterGameObject);
-            }
+            SceneGroups.Add(filterGroup);
         }
 
         ready = true;
