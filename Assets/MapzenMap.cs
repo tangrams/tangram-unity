@@ -31,6 +31,8 @@ public class MapzenMap : MonoBehaviour
 
     private int nTasksForArea = 0;
 
+    private SceneGroup area = new SceneGroup(SceneGroup.Type.None, "Area");
+
     public void DownloadTiles()
     {
         TileBounds bounds = new TileBounds(Area);
@@ -68,9 +70,13 @@ public class MapzenMap : MonoBehaviour
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
-                TileTask task = new TileTask(tileAddress, response.data, offsetX, offsetY);
+                SceneGroup.Type groupOptions =
+                    SceneGroup.Type.Tile |
+                    SceneGroup.Type.Feature;
 
-                task.Start(featureStyling);
+                TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY);
+
+                task.Start(featureStyling, area);
 
                 OnTaskReady(task);
             };
@@ -86,40 +92,27 @@ public class MapzenMap : MonoBehaviour
 
         if (tasks.Count == nTasksForArea)
         {
-            List<SceneGroup> groups = new List<SceneGroup>();
-
-            foreach (var task in tasks)
-            {
-                groups.AddRange(task.SceneGroups);
-            }
-
             tasks.Clear();
 
-            CreateSceneGraph(groups);
-        }
-    }
-
-    private void CreateSceneGraph(List<SceneGroup> sceneGroups)
-    {
-        foreach (var sceneGroup in sceneGroups)
-        {
-            Visit(sceneGroup, this.transform);
+            Visit(area, null);
         }
     }
 
     private void Visit(SceneGroup group, Transform parent)
     {
-        var gameObject = new GameObject();
+        var gameObject = new GameObject(group.name);
 
-        gameObject.name = group.name;
-        gameObject.transform.parent = parent;
+        if (parent != null)
+        {
+            gameObject.transform.parent = parent;
+        }
 
         foreach (var child in group.childs)
         {
             Visit(child, gameObject.transform);
         }
 
-        if (group.meshData != null)
+        if (group.meshData != null && group.meshData.Vertices.Count > 0)
         {
             FeatureBehavior featureBehavior = gameObject.AddComponent<FeatureBehavior>();
             featureBehavior.CreateUnityMesh(group.meshData, 0, 0);

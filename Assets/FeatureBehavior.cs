@@ -12,6 +12,8 @@ public class FeatureBehavior : MonoBehaviour
 {
     public void CreateUnityMesh(MeshData meshData, float offsetX, float offsetY)
     {
+        meshData.FlipIndices();
+
         var mesh = new Mesh();
 
         mesh.SetVertices(meshData.Vertices);
