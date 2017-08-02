@@ -31,7 +31,7 @@ public class MapzenMap : MonoBehaviour
 
     private int nTasksForArea = 0;
 
-    private SceneGroup area = new SceneGroup(SceneGroup.Type.None, "Area");
+    private SceneGroup area = new SceneGroup(SceneGroup.Type.None, "MapRegion");
 
     public void DownloadTiles()
     {
@@ -71,14 +71,14 @@ public class MapzenMap : MonoBehaviour
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
                 SceneGroup.Type groupOptions =
-                    SceneGroup.Type.Tile |
-                    SceneGroup.Type.Feature;
+                    SceneGroup.Type.Feature | SceneGroup.Type.Tile;
+                // groupOptions = SceneGroup.Type.Tile;
 
                 TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY);
 
                 task.Start(featureStyling, area);
 
-                OnTaskReady(task);
+                OnTaskReady(task, groupOptions);
             };
 
             // Starts the HTTP request
@@ -86,7 +86,7 @@ public class MapzenMap : MonoBehaviour
         }
     }
 
-    void OnTaskReady(TileTask readyTask)
+    void OnTaskReady(TileTask readyTask, SceneGroup.Type groupOptions)
     {
         tasks.Add(readyTask);
 
@@ -94,12 +94,17 @@ public class MapzenMap : MonoBehaviour
         {
             tasks.Clear();
 
-            Visit(area, null);
+            Visit(area, groupOptions, null);
         }
     }
 
-    private void Visit(SceneGroup group, Transform parent)
+    private void Visit(SceneGroup group, SceneGroup.Type groupOptions, Transform parent)
     {
+        if (group.childs.Count == 0 && !SceneGroup.IsLeaf(group.type, groupOptions))
+        {
+            return;
+        }
+
         var gameObject = new GameObject(group.name);
 
         if (parent != null)
@@ -109,7 +114,7 @@ public class MapzenMap : MonoBehaviour
 
         foreach (var child in group.childs)
         {
-            Visit(child, gameObject.transform);
+            Visit(child, groupOptions, gameObject.transform);
         }
 
         if (group.meshData != null && group.meshData.Vertices.Count > 0)

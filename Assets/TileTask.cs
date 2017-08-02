@@ -34,23 +34,22 @@ public class TileTask
         var tileData = new MvtTile(address, response);
 
         SceneGroup leaf = root;
-        SceneGroup parent = root;
 
         float inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
 
-        OnSceneGroupData(SceneGroup.Type.Tile, address.ToString(), ref parent, ref leaf);
+        var tileGroup = OnSceneGroupData(SceneGroup.Type.Tile, "Tile_" + address.ToString(), root, ref leaf);
 
         foreach (var style in featureStyling)
         {
-            OnSceneGroupData(SceneGroup.Type.Filter, style.Name, ref parent, ref leaf);
+            var filterGroup = OnSceneGroupData(SceneGroup.Type.Filter, "Filter_" + style.Name, tileGroup, ref leaf);
 
             foreach (var layer in tileData.FeatureCollections)
             {
-                OnSceneGroupData(SceneGroup.Type.Layer, layer.Name, ref parent, ref leaf);
+                var layerGroup = OnSceneGroupData(SceneGroup.Type.Layer, "Layer_" + layer.Name, filterGroup, ref leaf);
 
                 foreach (var feature in style.Filter.Filter(layer))
                 {
-                    string featureName = "feature";
+                    string featureName = "Feature";
                     object nameProperty;
 
                     if (feature.TryGetProperty("name", out nameProperty))
@@ -58,7 +57,7 @@ public class TileTask
                         featureName = (string)nameProperty;
                     }
 
-                    OnSceneGroupData(SceneGroup.Type.Feature, featureName, ref parent, ref leaf);
+                    OnSceneGroupData(SceneGroup.Type.Feature, featureName, layerGroup, ref leaf);
 
                     if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                     {
@@ -82,20 +81,25 @@ public class TileTask
         ready = true;
     }
 
-    private void OnSceneGroupData(SceneGroup.Type type, string name, ref SceneGroup parent, ref SceneGroup leaf)
+    private SceneGroup OnSceneGroupData(SceneGroup.Type type, string name, SceneGroup parent, ref SceneGroup leaf)
     {
+        SceneGroup group;
+
         if (SceneGroup.Test(type, groupOptions))
         {
-            var group = new SceneGroup(type, name);
+            group = new SceneGroup(type, name);
 
-            if (parent != null)
-                parent.childs.Add(group);
+            parent.childs.Add(group);
 
             if (SceneGroup.IsLeaf(type, groupOptions))
                 leaf = group;
-            else
-                parent = group;
         }
+        else
+        {
+            group = parent;
+        }
+
+        return group;
     }
 
     public bool IsReady()

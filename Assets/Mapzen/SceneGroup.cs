@@ -36,7 +36,7 @@ namespace Mapzen
 
         public static bool IsLeaf(Type type, Type options)
         {
-            return ((int)type ^ (int)options) < (int)type;
+            return ((int)type ^ (int)options) < (int)type || type == Type.None;
         }
     }
 }
