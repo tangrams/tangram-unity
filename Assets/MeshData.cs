@@ -11,6 +11,7 @@ public class MeshData
     }
 
     public List<Vector3> Vertices { get; }
+
     public List<Submesh> Submeshes { get; }
 
     public MeshData()

@@ -49,12 +49,12 @@ public class TileTask
 
                 foreach (var feature in style.Filter.Filter(layer))
                 {
-                    string featureName = "Feature";
-                    object nameProperty;
+                    string featureName = "Feature_";
+                    object identifier;
 
-                    if (feature.TryGetProperty("name", out nameProperty))
+                    if (feature.TryGetProperty("id", out identifier))
                     {
-                        featureName = (string)nameProperty;
+                        featureName += identifier.ToString();
                     }
 
                     OnSceneGroupData(SceneGroup.Type.Feature, featureName, layerGroup, ref leaf);
@@ -83,16 +83,25 @@ public class TileTask
 
     private SceneGroup OnSceneGroupData(SceneGroup.Type type, string name, SceneGroup parent, ref SceneGroup leaf)
     {
-        SceneGroup group;
+        SceneGroup group = null;
 
         if (SceneGroup.Test(type, groupOptions))
         {
-            group = new SceneGroup(type, name);
+            if (parent.childs.ContainsKey(name))
+            {
+                group = parent.childs[name];
+            }
 
-            parent.childs.Add(group);
+            if (group == null)
+            {
+                group = new SceneGroup(type, name);
+                parent.childs[name] = group;
+            }
 
             if (SceneGroup.IsLeaf(type, groupOptions))
+            {
                 leaf = group;
+            }
         }
         else
         {

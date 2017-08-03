@@ -16,14 +16,14 @@ namespace Mapzen
             All = ~None,
         }
 
-        public List<SceneGroup> childs;
+        public Dictionary<string, SceneGroup> childs;
         public MeshData meshData;
         public string name;
         public Type type;
 
         public SceneGroup(Type type, string name)
         {
-            this.childs = new List<SceneGroup>();
+            this.childs = new Dictionary<string, SceneGroup>();
             this.type = type;
             this.name = name;
             this.meshData = new MeshData();
@@ -36,7 +36,7 @@ namespace Mapzen
 
         public static bool IsLeaf(Type type, Type options)
         {
-            return ((int)type ^ (int)options) < (int)type || type == Type.None;
+            return ((int)type ^ (int)options) < (int)type;
         }
     }
 }

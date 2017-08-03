@@ -70,9 +70,7 @@ public class MapzenMap : MonoBehaviour
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
-                SceneGroup.Type groupOptions =
-                    SceneGroup.Type.Feature | SceneGroup.Type.Tile;
-                // groupOptions = SceneGroup.Type.Tile;
+                SceneGroup.Type groupOptions = SceneGroup.Type.Filter;
 
                 TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY);
 
@@ -100,7 +98,7 @@ public class MapzenMap : MonoBehaviour
 
     private void Visit(SceneGroup group, SceneGroup.Type groupOptions, Transform parent)
     {
-        if (group.childs.Count == 0 && !SceneGroup.IsLeaf(group.type, groupOptions))
+        if (group.meshData.Vertices.Count == 0 && group.childs.Count == 0)
         {
             return;
         }
@@ -114,10 +112,10 @@ public class MapzenMap : MonoBehaviour
 
         foreach (var child in group.childs)
         {
-            Visit(child, groupOptions, gameObject.transform);
+            Visit(child.Value, groupOptions, gameObject.transform);
         }
 
-        if (group.meshData != null && group.meshData.Vertices.Count > 0)
+        if (group.meshData.Vertices.Count > 0)
         {
             FeatureBehavior featureBehavior = gameObject.AddComponent<FeatureBehavior>();
             featureBehavior.CreateUnityMesh(group.meshData, 0, 0);
