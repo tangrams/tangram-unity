@@ -38,5 +38,15 @@ namespace Mapzen
         {
             return ((int)type ^ (int)options) < (int)type;
         }
+
+        public string ToString()
+        {
+            if (type == Type.None || type == Type.All)
+            {
+                return name;
+            }
+
+            return type.ToString() + "_" + name;
+        }
     }
 }

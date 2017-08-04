@@ -33,19 +33,19 @@ public class TileTask
 
         SceneGroup leaf = root;
 
-        var tileGroup = OnSceneGroupData(SceneGroup.Type.Tile, "Tile_" + address.ToString(), root, ref leaf);
+        var tileGroup = OnSceneGroupData(SceneGroup.Type.Tile, address.ToString(), root, ref leaf);
 
         foreach (var style in featureStyling)
         {
-            var filterGroup = OnSceneGroupData(SceneGroup.Type.Filter, "Filter_" + style.Name, tileGroup, ref leaf);
+            var filterGroup = OnSceneGroupData(SceneGroup.Type.Filter, style.Name, tileGroup, ref leaf);
 
             foreach (var layer in tileData.FeatureCollections)
             {
-                var layerGroup = OnSceneGroupData(SceneGroup.Type.Layer, "Layer_" + layer.Name, filterGroup, ref leaf);
+                var layerGroup = OnSceneGroupData(SceneGroup.Type.Layer, layer.Name, filterGroup, ref leaf);
 
                 foreach (var feature in style.Filter.Filter(layer))
                 {
-                    string featureName = "Feature_";
+                    string featureName = "";
                     object identifier;
 
                     if (feature.TryGetProperty("id", out identifier))

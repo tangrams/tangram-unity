@@ -14,7 +14,7 @@ public class SceneGraph
 
         if (group.childs.Count > 0)
         {
-            var gameObject = new GameObject(group.name);
+            var gameObject = new GameObject(group.ToString());
 
             if (parent != null)
             {
@@ -33,7 +33,7 @@ public class SceneGraph
             for (int i = 0; i < group.meshData.Meshes.Count; ++i)
             {
                 var meshData = group.meshData.Meshes[i];
-                var gameObject = new GameObject(group.name + "_Part" + i);
+                var gameObject = new GameObject(group.ToString() + "_Part" + i);
 
                 gameObject.transform.parent = parent;
 
