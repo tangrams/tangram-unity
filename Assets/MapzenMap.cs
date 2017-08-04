@@ -38,6 +38,7 @@ public class MapzenMap : MonoBehaviour
         TileBounds bounds = new TileBounds(Area);
 
         tasks.Clear();
+        area.childs.Clear();
         nTasksForArea = 0;
 
         foreach (var tileAddress in bounds.TileAddressRange)
@@ -98,27 +99,39 @@ public class MapzenMap : MonoBehaviour
 
     private void Visit(SceneGroup group, SceneGroup.Type groupOptions, Transform parent)
     {
-        if (group.meshData.Vertices.Count == 0 && group.childs.Count == 0)
+        if (group.meshData.Meshes.Count == 0 && group.childs.Count == 0)
         {
             return;
         }
 
-        var gameObject = new GameObject(group.name);
-
-        if (parent != null)
+        if (group.childs.Count > 0)
         {
-            gameObject.transform.parent = parent;
+            var gameObject = new GameObject(group.name);
+
+            if (parent != null)
+            {
+                gameObject.transform.parent = parent;
+            }
+
+            foreach (var child in group.childs)
+            {
+                Visit(child.Value, groupOptions, gameObject.transform);
+            }
         }
-
-        foreach (var child in group.childs)
+        else
         {
-            Visit(child.Value, groupOptions, gameObject.transform);
-        }
+            group.meshData.FlipIndices();
 
-        if (group.meshData.Vertices.Count > 0)
-        {
-            FeatureBehavior featureBehavior = gameObject.AddComponent<FeatureBehavior>();
-            featureBehavior.CreateUnityMesh(group.meshData, 0, 0);
+            for (int i = 0; i < group.meshData.Meshes.Count; ++i)
+            {
+                var mesh = group.meshData.Meshes[i];
+                var gameObject = new GameObject(group.name + "_Part" + i);
+
+                gameObject.transform.parent = parent;
+
+                FeatureBehavior featureBehavior = gameObject.AddComponent<FeatureBehavior>();
+                featureBehavior.CreateUnityMesh(mesh.Vertices, mesh.Submeshes, 0, 0);
+            }
         }
     }
 

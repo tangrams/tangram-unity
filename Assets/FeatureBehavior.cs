@@ -10,18 +10,16 @@ using SimpleJSON;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class FeatureBehavior : MonoBehaviour
 {
-    public void CreateUnityMesh(MeshData meshData, float offsetX, float offsetY)
+    public void CreateUnityMesh(List<Vector3> vertices, List<MeshData.Submesh> submeshes, float offsetX, float offsetY)
     {
-        meshData.FlipIndices();
-
         var mesh = new Mesh();
 
-        mesh.SetVertices(meshData.Vertices);
+        mesh.SetVertices(vertices);
 
-        mesh.subMeshCount = meshData.Submeshes.Count;
-        for (int i = 0; i < meshData.Submeshes.Count; i++)
+        mesh.subMeshCount = submeshes.Count;
+        for (int i = 0; i < submeshes.Count; i++)
         {
-            mesh.SetTriangles(meshData.Submeshes[i].Indices, i);
+            mesh.SetTriangles(submeshes[i].Indices, i);
         }
 
         mesh.RecalculateNormals();
@@ -29,6 +27,6 @@ public class FeatureBehavior : MonoBehaviour
         transform.Translate(new Vector3(offsetX, 0.0f, offsetY));
 
         GetComponent<MeshFilter>().mesh = mesh;
-        GetComponent<MeshRenderer>().materials = meshData.Submeshes.Select(s => s.Material).ToArray();
+        GetComponent<MeshRenderer>().materials = submeshes.Select(s => s.Material).ToArray();
     }
 }
