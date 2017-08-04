@@ -93,11 +93,11 @@ public class MapzenMap : MonoBehaviour
         {
             tasks.Clear();
 
-            Visit(area, groupOptions, null);
+            CreateSceneGraph(area, groupOptions, null);
         }
     }
 
-    private void Visit(SceneGroup group, SceneGroup.Type groupOptions, Transform parent)
+    private void CreateSceneGraph(SceneGroup group, SceneGroup.Type groupOptions, Transform parent)
     {
         if (group.meshData.Meshes.Count == 0 && group.childs.Count == 0)
         {
@@ -115,7 +115,7 @@ public class MapzenMap : MonoBehaviour
 
             foreach (var child in group.childs)
             {
-                Visit(child.Value, groupOptions, gameObject.transform);
+                CreateSceneGraph(child.Value, groupOptions, gameObject.transform);
             }
         }
         else
@@ -130,7 +130,7 @@ public class MapzenMap : MonoBehaviour
                 gameObject.transform.parent = parent;
 
                 FeatureBehavior featureBehavior = gameObject.AddComponent<FeatureBehavior>();
-                featureBehavior.CreateUnityMesh(mesh.Vertices, mesh.Submeshes, 0, 0);
+                featureBehavior.CreateUnityMesh(mesh.Vertices, mesh.Submeshes);
             }
         }
     }

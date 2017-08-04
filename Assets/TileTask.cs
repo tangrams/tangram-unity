@@ -12,10 +12,8 @@ public class TileTask
     private byte[] response;
     private bool ready;
     private SceneGroup.Type groupOptions;
-
-    public float OffsetX { get; internal set; }
-
-    public float OffsetY { get; internal set; }
+    private float inverseTileScale;
+    private Matrix4x4 transform;
 
     public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY)
     {
@@ -23,8 +21,8 @@ public class TileTask
         this.response = response;
         this.ready = false;
         this.groupOptions = groupOptions;
-        this.OffsetX = offsetX;
-        this.OffsetY = offsetY;
+        this.inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
+        this.transform = Matrix4x4.Translate(new Vector3(offsetX, 0.0f, offsetY));
     }
 
     public void Start(List<FeatureStyle> featureStyling, SceneGroup root)
@@ -34,8 +32,6 @@ public class TileTask
         var tileData = new MvtTile(address, response);
 
         SceneGroup leaf = root;
-
-        float inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
 
         var tileGroup = OnSceneGroupData(SceneGroup.Type.Tile, "Tile_" + address.ToString(), root, ref leaf);
 
@@ -62,7 +58,7 @@ public class TileTask
                     if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                     {
                         var polygonOptions = style.PolygonOptions(feature, inverseTileScale);
-                        var builder = new PolygonBuilder(leaf.meshData, polygonOptions);
+                        var builder = new PolygonBuilder(leaf.meshData, polygonOptions, transform);
 
                         feature.HandleGeometry(builder);
                     }
@@ -70,7 +66,7 @@ public class TileTask
                     if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
                     {
                         var polylineOptions = style.PolylineOptions(feature, inverseTileScale);
-                        var builder = new PolylineBuilder(leaf.meshData, polylineOptions);
+                        var builder = new PolylineBuilder(leaf.meshData, polylineOptions, transform);
 
                         feature.HandleGeometry(builder);
                     }

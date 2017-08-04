@@ -21,7 +21,7 @@ namespace Mapzen
             public float MiterLimit;
         }
 
-        public PolylineBuilder(MeshData outputMeshData, Options options)
+        public PolylineBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)
         {
             this.options = options;
 
@@ -31,7 +31,7 @@ namespace Mapzen
             polygonOptions.MinHeight = options.MinHeight;
             polygonOptions.MaxHeight = options.MaxHeight;
 
-            polygonBuilder = new PolygonBuilder(outputMeshData, polygonOptions);
+            polygonBuilder = new PolygonBuilder(outputMeshData, polygonOptions, transform);
             polyline = new List<Vector2>();
         }
 
