@@ -93,45 +93,7 @@ public class MapzenMap : MonoBehaviour
         {
             tasks.Clear();
 
-            CreateSceneGraph(area, groupOptions, null);
-        }
-    }
-
-    private void CreateSceneGraph(SceneGroup group, SceneGroup.Type groupOptions, Transform parent)
-    {
-        if (group.meshData.Meshes.Count == 0 && group.childs.Count == 0)
-        {
-            return;
-        }
-
-        if (group.childs.Count > 0)
-        {
-            var gameObject = new GameObject(group.name);
-
-            if (parent != null)
-            {
-                gameObject.transform.parent = parent;
-            }
-
-            foreach (var child in group.childs)
-            {
-                CreateSceneGraph(child.Value, groupOptions, gameObject.transform);
-            }
-        }
-        else
-        {
-            group.meshData.FlipIndices();
-
-            for (int i = 0; i < group.meshData.Meshes.Count; ++i)
-            {
-                var mesh = group.meshData.Meshes[i];
-                var gameObject = new GameObject(group.name + "_Part" + i);
-
-                gameObject.transform.parent = parent;
-
-                FeatureBehavior featureBehavior = gameObject.AddComponent<FeatureBehavior>();
-                featureBehavior.CreateUnityMesh(mesh.Vertices, mesh.Submeshes);
-            }
+            SceneGraph.Generate(area, groupOptions, null);
         }
     }
 
