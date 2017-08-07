@@ -16,6 +16,27 @@ public class TileDataEditor
             return;
         }
 
+        // Group options
+        {
+            GUILayout.Label("Group by:");
+            var types = Enum.GetValues(typeof(SceneGroup.Type));
+
+            foreach (SceneGroup.Type type in types)
+            {
+                if (type == SceneGroup.Type.All || type == SceneGroup.Type.None)
+                {
+                    continue;
+                }
+
+                bool isSet = SceneGroup.Test(type, mapzenMap.GroupOptions);
+                isSet = EditorGUILayout.Toggle(type.ToString(), isSet);
+
+                mapzenMap.GroupOptions = isSet ?
+                    mapzenMap.GroupOptions | type :
+                    mapzenMap.GroupOptions & ~type;
+            }
+        }
+
         if (GUILayout.Button("Download"))
         {
             ClearTiles(mapzenMap);
