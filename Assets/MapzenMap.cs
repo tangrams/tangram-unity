@@ -78,7 +78,7 @@ public class MapzenMap : MonoBehaviour
 
                 task.Start(featureStyling, area);
 
-                OnTaskReady(task, groupOptions);
+                OnTaskReady(task);
             };
 
             // Starts the HTTP request
@@ -86,7 +86,7 @@ public class MapzenMap : MonoBehaviour
         }
     }
 
-    void OnTaskReady(TileTask readyTask, SceneGroup.Type groupOptions)
+    void OnTaskReady(TileTask readyTask)
     {
         tasks.Add(readyTask);
 
@@ -94,7 +94,7 @@ public class MapzenMap : MonoBehaviour
         {
             tasks.Clear();
 
-            SceneGraph.Generate(area, groupOptions, null);
+            SceneGraph.Generate(area, null);
         }
     }
 
