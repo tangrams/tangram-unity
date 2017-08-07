@@ -38,6 +38,7 @@ public class MeshData
 
         MeshBucket bucket = null;
 
+        // Check whether the last available bucket is valid for use given the maximum vertex count
         if (Meshes.Count > 0)
         {
             var last = Meshes[Meshes.Count - 1];
@@ -47,6 +48,7 @@ public class MeshData
             }
         }
 
+        // No bucket were found, instantiate a new one
         if (bucket == null)
         {
             bucket = new MeshBucket();

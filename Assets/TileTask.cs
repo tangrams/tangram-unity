@@ -31,6 +31,7 @@ public class TileTask
         // var tileData = new GeoJsonTile(address, response);
         var tileData = new MvtTile(address, response);
 
+        // The leaf currently used (will hold the mesh data for the currently matched group)
         SceneGroup leaf = root;
 
         var tileGroup = OnSceneGroupData(SceneGroup.Type.Tile, address.ToString(), root, ref leaf);
@@ -88,12 +89,14 @@ public class TileTask
                 group = parent.childs[name];
             }
 
+            // No group found for this idenfier
             if (group == null)
             {
                 group = new SceneGroup(type, name);
                 parent.childs[name] = group;
             }
 
+            // Update the leaf
             if (SceneGroup.IsLeaf(type, groupOptions))
             {
                 leaf = group;

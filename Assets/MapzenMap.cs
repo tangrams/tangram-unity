@@ -27,6 +27,9 @@ public class MapzenMap : MonoBehaviour
     [SerializeField]
     private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
 
+    [SerializeField]
+    private SceneGroup.Type groupOptions;
+
     private List<TileTask> tasks = new List<TileTask>();
 
     private int nTasksForArea = 0;
@@ -71,8 +74,6 @@ public class MapzenMap : MonoBehaviour
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
-                SceneGroup.Type groupOptions = SceneGroup.Type.Filter;
-
                 TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY);
 
                 task.Start(featureStyling, area);
@@ -99,12 +100,8 @@ public class MapzenMap : MonoBehaviour
 
     public List<GameObject> Tiles
     {
-        get
-        {
-            return tiles;
-        }
+        get { return tiles; }
     }
-
 
     public List<FeatureStyle> FeatureStyling
     {
@@ -113,13 +110,13 @@ public class MapzenMap : MonoBehaviour
 
     public string ExportPath
     {
-        get
-        {
-            return exportPath;
-        }
-        set
-        {
-            exportPath = value;
-        }
+        get { return exportPath; }
+        set { exportPath = value; }
+    }
+
+    public SceneGroup.Type GroupOptions
+    {
+        get { return groupOptions; }
+        set { groupOptions = value; }
     }
 }

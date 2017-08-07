@@ -16,9 +16,12 @@ namespace Mapzen
             All = ~None,
         }
 
+        // Childs of this scene group, identifier by their name
         public Dictionary<string, SceneGroup> childs;
-        public MeshData meshData;
+        // A name identifer
         public string name;
+        // The mesh data, may be empty
+        public MeshData meshData;
         public Type type;
 
         public SceneGroup(Type type, string name)
@@ -29,17 +32,27 @@ namespace Mapzen
             this.meshData = new MeshData();
         }
 
+        /// <summary>
+        /// Tests whether this group is enabled in the group type options.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <param name="options">The group type options.</param>
         public static bool Test(Type type, Type options)
         {
             return ((int)type & (int)options) == (int)type;
         }
 
+        /// <summary>
+        /// Whether this group is the deepest group type in the hierarchy of group type options.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <param name="options">The group type options.</param>
         public static bool IsLeaf(Type type, Type options)
         {
             return ((int)type ^ (int)options) < (int)type;
         }
 
-        public string ToString()
+        public override string ToString()
         {
             if (type == Type.None || type == Type.All)
             {
