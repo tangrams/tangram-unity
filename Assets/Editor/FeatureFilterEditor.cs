@@ -39,7 +39,7 @@ public class FeatureFilterEditor
         EditorGUILayout.BeginHorizontal();
         {
             selectedLayer = EditorGUILayout.Popup("Default layer:",
-                    selectedLayer, defaultLayers.ToArray());
+                selectedLayer, defaultLayers.ToArray());
 
             if (GUILayout.Button(addLayerButtonContent, buttonWidth))
             {

@@ -7,9 +7,6 @@ public class PolygonBuilderEditor
 {
     private bool show = false;
     private PolygonBuilder.Options options;
-    private string maxHeight;
-
-    private static GUILayoutOption layoutWidth = GUILayout.Width(200);
 
     public PolygonBuilderEditor()
     {
@@ -17,8 +14,6 @@ public class PolygonBuilderEditor
 
         options.Extrude = true;
         options.MaxHeight = 0.0f;
-
-        maxHeight = options.MaxHeight.ToString();
     }
 
     public PolygonBuilder.Options OnInspectorGUI()
@@ -29,17 +24,12 @@ public class PolygonBuilderEditor
             return options;
         }
 
-        GUILayout.BeginHorizontal();
-        {
-            GUILayout.Label("Max Height: ");
-            EditorUtil.FloatField(ref maxHeight, ref options.MaxHeight, layoutWidth);
-        }
-        GUILayout.EndHorizontal();
+        options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
 
         GUILayout.BeginHorizontal();
         {
             GUILayout.Label("Extrude: ");
-            options.Extrude = GUILayout.Toggle(options.Extrude, "Extrude", layoutWidth);
+            options.Extrude = GUILayout.Toggle(options.Extrude, "Extrude");
         }
         GUILayout.EndHorizontal();
 
