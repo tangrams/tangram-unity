@@ -8,11 +8,24 @@ public class TileDataEditor
 {
     private bool show = false;
 
+    private void LoadPreferences()
+    {
+        show = EditorPrefs.GetBool("TileDataEditor.show");
+    }
+
+    private void SavePreferences()
+    {
+        EditorPrefs.SetBool("TileDataEditor.show", show);
+    }
+
     public void OnInspectorGUI(MapzenMap mapzenMap)
     {
+        LoadPreferences();
+
         show = EditorGUILayout.Foldout(show, "Tile data");
         if (!show)
         {
+            SavePreferences();
             return;
         }
 
@@ -54,6 +67,8 @@ public class TileDataEditor
         {
             ClearTiles(mapzenMap);
         }
+
+        SavePreferences();
     }
 
     public void ClearTiles(MapzenMap mapzenMap)

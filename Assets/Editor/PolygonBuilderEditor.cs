@@ -16,11 +16,23 @@ public class PolygonBuilderEditor
         options.MaxHeight = 0.0f;
     }
 
+    private void LoadPreferences()
+    {
+        show = EditorPrefs.GetBool("PolygonBuilderEditor.show");
+    }
+
+    private void SavePreferences()
+    {
+        EditorPrefs.SetBool("PolygonBuilderEditor.show", show);
+    }
+
     public PolygonBuilder.Options OnInspectorGUI()
     {
+        LoadPreferences();
         show = EditorGUILayout.Foldout(show, "Polygon builder options");
         if (!show)
         {
+            SavePreferences();
             return options;
         }
 
@@ -32,6 +44,8 @@ public class PolygonBuilderEditor
             options.Extrude = GUILayout.Toggle(options.Extrude, "Extrude");
         }
         GUILayout.EndHorizontal();
+
+        SavePreferences();
 
         return options;
     }
