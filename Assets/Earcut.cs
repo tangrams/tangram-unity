@@ -5,11 +5,11 @@ using System.Diagnostics;
 public class Earcut
 {
     private const string LibraryName =
-#if (UNITY_IOS || UNITY_WEBGL)
+    #if (UNITY_IOS || UNITY_WEBGL)
         "__Internal";
-#else
+    #else
         "Earcut";
-#endif
+    #endif
 
     [DllImport(LibraryName, EntryPoint = "CreateTesselationContext")]
     private static extern uint CreateTesselationContext();
@@ -28,9 +28,9 @@ public class Earcut
 
     private uint contextId;
 
-    public int[] indices { get; internal set; }
+    public int[] Indices { get; internal set; }
 
-    public float[] vertices { get; internal set; }
+    public float[] Vertices { get; internal set; }
 
     public Earcut()
     {
@@ -51,11 +51,11 @@ public class Earcut
         pointsBufferHandle.Free();
         ringsBufferHandle.Free();
 
-        indices = new int[nIndices];
-        vertices = new float[nVertices * 2];
+        Indices = new int[nIndices];
+        Vertices = new float[nVertices * 2];
 
-        GCHandle indicesBufferHandle = GCHandle.Alloc(indices, GCHandleType.Pinned);
-        GCHandle verticesBufferHandle = GCHandle.Alloc(vertices, GCHandleType.Pinned);
+        GCHandle indicesBufferHandle = GCHandle.Alloc(Indices, GCHandleType.Pinned);
+        GCHandle verticesBufferHandle = GCHandle.Alloc(Vertices, GCHandleType.Pinned);
 
         GetIndices(contextId, indicesBufferHandle.AddrOfPinnedObject());
         GetVertices(contextId, verticesBufferHandle.AddrOfPinnedObject());

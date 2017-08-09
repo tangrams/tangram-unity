@@ -106,14 +106,14 @@ namespace Mapzen
 
             earcut.Tesselate(coordinates.ToArray(), rings.ToArray());
 
-            var vertices = new List<Vector3>(earcut.vertices.Length / 2);
+            var vertices = new List<Vector3>(earcut.Vertices.Length / 2);
 
-            for (int i = 0; i < earcut.vertices.Length; i += 2)
+            for (int i = 0; i < earcut.Vertices.Length; i += 2)
             {
-                vertices.Add(new Vector3(earcut.vertices[i], options.MaxHeight, earcut.vertices[i + 1]));
+                vertices.Add(new Vector3(earcut.Vertices[i], options.MaxHeight, earcut.Vertices[i + 1]));
             }
 
-            outputMeshData.AddElements(vertices, earcut.indices, options.Material);
+            outputMeshData.AddElements(vertices, earcut.Indices, options.Material);
 
             earcut.Release();
         }
