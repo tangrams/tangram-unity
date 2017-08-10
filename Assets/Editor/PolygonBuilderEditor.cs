@@ -8,6 +8,14 @@ public class PolygonBuilderEditor
     private bool show = false;
     private PolygonBuilder.Options options;
 
+    public PolygonBuilder.Options Options
+    {
+        get
+        {
+            return options;
+        }
+    }
+
     public PolygonBuilderEditor()
     {
         options = new PolygonBuilder.Options();

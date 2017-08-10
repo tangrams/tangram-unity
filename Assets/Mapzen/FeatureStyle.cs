@@ -5,18 +5,19 @@ using UnityEngine;
 
 namespace Mapzen
 {
+    [Serializable]
     public class FeatureStyle
     {
-        public IFeatureFilter Filter
+        public FeatureFilter Filter
         {
             get;
-            internal set;
+            set;
         }
 
         public Material Material
         {
             get;
-            internal set;
+            set;
         }
 
         public string Name

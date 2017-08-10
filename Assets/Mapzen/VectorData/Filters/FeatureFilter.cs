@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Mapzen.VectorData.Filters
 {
+    [Serializable]
     public class FeatureFilter : IFeatureFilter
     {
         public IFeatureMatcher Matcher { get; set; }

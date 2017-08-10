@@ -11,6 +11,7 @@ namespace Mapzen
         private List<Vector2> polyline;
         private Options options;
 
+        [Serializable]
         public struct Options
         {
             public Material Material;

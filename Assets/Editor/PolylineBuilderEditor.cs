@@ -8,6 +8,14 @@ public class PolylineBuilderEditor
     private bool show = false;
     private PolylineBuilder.Options options;
 
+    public PolylineBuilder.Options Options
+    {
+        get
+        {
+            return options;
+        }
+    }
+
     public PolylineBuilderEditor()
     {
         options = new PolylineBuilder.Options();
