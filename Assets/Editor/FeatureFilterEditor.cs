@@ -8,7 +8,6 @@ using System;
 public class FeatureFilterEditor
 {
     private bool show = false;
-    private IFeatureFilter filter;
 
     private static GUILayoutOption buttonWidth = GUILayout.Width(50.0f);
     private static GUIContent addLayerButtonContent =
@@ -18,7 +17,6 @@ public class FeatureFilterEditor
 
     private string customFeatureCollection = "";
     private int selectedLayer;
-    private List<string> layers = new List<string>();
     private List<string> defaultLayers = new List<string>(new string[]
         {
             "boundaries",
@@ -33,7 +31,7 @@ public class FeatureFilterEditor
         });
 
 
-    public IFeatureFilter OnInspectorGUI()
+    public FeatureFilter OnInspectorGUI(FeatureFilter filter)
     {
         // Default layers
         EditorGUILayout.BeginHorizontal();
@@ -43,7 +41,7 @@ public class FeatureFilterEditor
 
             if (GUILayout.Button(addLayerButtonContent, buttonWidth))
             {
-                layers.Add(defaultLayers[selectedLayer]);
+                filter.CollectionNameSet.Add(defaultLayers[selectedLayer]);
             }
         }
         EditorGUILayout.EndHorizontal();
@@ -57,7 +55,7 @@ public class FeatureFilterEditor
             if (GUILayout.Button(addLayerButtonContent, buttonWidth)
                 && customFeatureCollection.Length > 0)
             {
-                layers.Add(customFeatureCollection);
+                filter.CollectionNameSet.Add(customFeatureCollection);
             }
         }
         EditorGUILayout.EndHorizontal();
@@ -65,23 +63,23 @@ public class FeatureFilterEditor
         GUILayout.Space(10);
 
         // Show currently create filters
-        if (layers.Count > 0)
+        if (filter.CollectionNameSet.Count > 0)
         {
             GUILayout.Label("Filter layers:");
 
-            for (int i = layers.Count - 1; i >= 0; i--)
+            for (int i = filter.CollectionNameSet.Count - 1; i >= 0; i--)
             {
                 EditorGUILayout.BeginHorizontal();
-                string layer = layers[i];
+                string layer = filter.CollectionNameSet[i];
                 GUILayout.TextField(layer);
                 if (GUILayout.Button(removeLayerButtonContent, buttonWidth))
                 {
-                    layers.RemoveAt(i);
+                    filter.CollectionNameSet.RemoveAt(i);
                 }
                 EditorGUILayout.EndHorizontal();
             }
         }
 
-        return new FeatureFilter().TakeAllFromCollections(layers.ToArray());
+        return filter;
     }
 }

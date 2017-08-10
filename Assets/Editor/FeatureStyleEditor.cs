@@ -10,39 +10,52 @@ public class FeatureStyleEditor
     private PolylineBuilderEditor polylineBuilderEditor;
     private PolygonBuilderEditor polygonBuilderEditor;
     private FeatureFilterEditor featureFilterEditor;
-    private Material featureMaterial;
     private string featureStyleName = "";
 
     private bool show = true;
+    private Dictionary<string, bool> showStyle;
 
     public FeatureStyleEditor()
     {
         polygonBuilderEditor = new PolygonBuilderEditor();
         polylineBuilderEditor = new PolylineBuilderEditor();
         featureFilterEditor = new FeatureFilterEditor();
+
+        showStyle = new Dictionary<string, bool>();
     }
 
-    public FeatureStyle OnInspectorGUI(MapzenMap mapzenMap)
+    private void LoadPreferences(MapzenMap mapzenMap)
     {
-        FeatureStyle featureStyle = null;
+        show = EditorPrefs.GetBool("FeatureStyleEditor.show");
+
+        foreach (var featureStyling in mapzenMap.FeatureStyling)
+        {
+            showStyle[featureStyling.Name] =
+                EditorPrefs.GetBool("FeatureStyleEditor.showStyle" + featureStyling.Name);
+        }
+    }
+
+    private void SavePreferences(MapzenMap mapzenMap)
+    {
+        EditorPrefs.SetBool("FeatureStyleEditor.show", show);
+
+        foreach (var featureStyling in mapzenMap.FeatureStyling)
+        {
+            EditorPrefs.SetBool("FeatureStyleEditor.showStyle" + featureStyling.Name,
+                showStyle[featureStyling.Name]);
+        }
+    }
+
+    public void OnInspectorGUI(MapzenMap mapzenMap)
+    {
+        LoadPreferences(mapzenMap);
 
         show = EditorGUILayout.Foldout(show, "Feature collection filtering");
         if (!show)
         {
-            return featureStyle;
+            SavePreferences(mapzenMap);
+            return;
         }
-
-        // Material associated with the filter
-        EditorGUILayout.BeginHorizontal();
-        {
-            GUILayout.Label("Filter material:");
-            featureMaterial = EditorGUILayout.ObjectField(featureMaterial, typeof(Material)) as Material;
-        }
-        EditorGUILayout.EndHorizontal();
-
-        var featureFilter = featureFilterEditor.OnInspectorGUI();
-        var polygonOptions = polygonBuilderEditor.OnInspectorGUI();
-        var polylineOptions = polylineBuilderEditor.OnInspectorGUI();
 
         EditorGUILayout.BeginHorizontal();
         {
@@ -51,41 +64,45 @@ public class FeatureStyleEditor
         }
         EditorGUILayout.EndHorizontal();
 
-        if (GUILayout.Button("Create Filter")
-            && featureMaterial != null
-            && featureFilter != null)
+        if (GUILayout.Button("Create Filter"))
         {
-            featureStyle = new FeatureStyle(featureFilter, featureMaterial, featureStyleName,
-                polygonOptions, polylineOptions);
+            var defaultMaterial = new Material(Shader.Find("Diffuse"));
+            var defaultPolygonBuilderOptions = polygonBuilderEditor.Options;
+            var defaultPolylineBuilderOptions = polylineBuilderEditor.Options;
+            var defaultFilter = new FeatureFilter();
+
+            var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
+                                   defaultPolygonBuilderOptions, defaultPolylineBuilderOptions);
 
             mapzenMap.FeatureStyling.Add(featureStyle);
+
+            showStyle[featureStyle.Name] = false;
         }
 
-        GUILayout.Space(10);
-
-        // Show available filters
         if (mapzenMap.FeatureStyling.Count > 0)
         {
-            GUILayout.Label("Filters:");
-
             foreach (var featureStyling in mapzenMap.FeatureStyling)
             {
-                FeatureFilter filter = featureStyling.Filter as FeatureFilter;
-                EditorGUILayout.BeginHorizontal();
-                foreach (var layer in filter.CollectionNameSet)
-                {
-                    GUILayout.TextField(layer);
-                }
-                GUILayout.TextField(featureStyling.Material.name);
-                EditorGUILayout.EndHorizontal();
-            }
+                showStyle[featureStyling.Name] = EditorGUILayout.Foldout(showStyle[featureStyling.Name],
+                    featureStyling.Name);
 
-            if (GUILayout.Button("Remove filters"))
-            {
-                mapzenMap.FeatureStyling.Clear();
+                if (!showStyle[featureStyling.Name])
+                {
+                    continue;
+                }
+
+                var filter = featureFilterEditor.OnInspectorGUI(featureStyling.Filter);
+                var material = EditorGUILayout.ObjectField(featureStyling.Material, typeof(Material)) as Material;
+
+                featureStyling.Filter = filter;
+                featureStyling.Material = material;
+                featureStyling.PolygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI();
+                featureStyling.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI();
+
+                // TODO: add interface for filter matcher
             }
         }
 
-        return featureStyle;
+        SavePreferences(mapzenMap);
     }
 }
