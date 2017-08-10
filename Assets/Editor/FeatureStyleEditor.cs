@@ -79,27 +79,31 @@ public class FeatureStyleEditor
             showStyle[featureStyle.Name] = false;
         }
 
-        if (mapzenMap.FeatureStyling.Count > 0)
+        for (int i = mapzenMap.FeatureStyling.Count - 1; i >= 0; i--)
         {
-            foreach (var featureStyling in mapzenMap.FeatureStyling)
+            var featureStyling = mapzenMap.FeatureStyling[i];
+
+            showStyle[featureStyling.Name] = EditorGUILayout.Foldout(showStyle[featureStyling.Name],
+                featureStyling.Name);
+
+            if (!showStyle[featureStyling.Name])
             {
-                showStyle[featureStyling.Name] = EditorGUILayout.Foldout(showStyle[featureStyling.Name],
-                    featureStyling.Name);
+                continue;
+            }
 
-                if (!showStyle[featureStyling.Name])
-                {
-                    continue;
-                }
+            var filter = featureFilterEditor.OnInspectorGUI(featureStyling.Filter);
+            var material = EditorGUILayout.ObjectField(featureStyling.Material, typeof(Material)) as Material;
 
-                var filter = featureFilterEditor.OnInspectorGUI(featureStyling.Filter);
-                var material = EditorGUILayout.ObjectField(featureStyling.Material, typeof(Material)) as Material;
+            featureStyling.Filter = filter;
+            featureStyling.Material = material;
+            featureStyling.PolygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI();
+            featureStyling.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI();
 
-                featureStyling.Filter = filter;
-                featureStyling.Material = material;
-                featureStyling.PolygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI();
-                featureStyling.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI();
+            // TODO: add interface for filter matcher
 
-                // TODO: add interface for filter matcher
+            if (GUILayout.Button("Remove Filter"))
+            {
+                mapzenMap.FeatureStyling.RemoveAt(i);
             }
         }
 
