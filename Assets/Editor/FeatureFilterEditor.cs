@@ -49,8 +49,7 @@ public class FeatureFilterEditor
         // Custom layer entry
         EditorGUILayout.BeginHorizontal();
         {
-            GUILayout.Label("Custom layer:");
-            customFeatureCollection = GUILayout.TextField(customFeatureCollection);
+            customFeatureCollection = EditorGUILayout.TextField("Custom layer:", customFeatureCollection);
 
             if (GUILayout.Button(addLayerButtonContent, buttonWidth)
                 && customFeatureCollection.Length > 0)
@@ -60,18 +59,15 @@ public class FeatureFilterEditor
         }
         EditorGUILayout.EndHorizontal();
 
-        GUILayout.Space(10);
-
         // Show currently create filters
         if (filter.CollectionNameSet.Count > 0)
         {
-            GUILayout.Label("Filter layers:");
-
             for (int i = filter.CollectionNameSet.Count - 1; i >= 0; i--)
             {
                 EditorGUILayout.BeginHorizontal();
                 string layer = filter.CollectionNameSet[i];
-                GUILayout.TextField(layer);
+                EditorGUILayout.TextField(layer);
+
                 if (GUILayout.Button(removeLayerButtonContent, buttonWidth))
                 {
                     filter.CollectionNameSet.RemoveAt(i);

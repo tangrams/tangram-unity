@@ -10,8 +10,10 @@ public class FeatureStyleEditor
     private PolylineBuilderEditor polylineBuilderEditor;
     private PolygonBuilderEditor polygonBuilderEditor;
     private FeatureFilterEditor featureFilterEditor;
+    private static GUILayoutOption buttonWidth = GUILayout.Width(50.0f);
+    private static GUIContent addFilterButtonContent =
+        new GUIContent("+", "Create filter");
     private string featureStyleName = "";
-
     private bool show = true;
     private Dictionary<string, bool> showStyle;
 
@@ -50,7 +52,7 @@ public class FeatureStyleEditor
     {
         LoadPreferences(mapzenMap);
 
-        show = EditorGUILayout.Foldout(show, "Feature collection filtering");
+        show = EditorGUILayout.Foldout(show, "Filtering and styling");
         if (!show)
         {
             SavePreferences(mapzenMap);
@@ -59,25 +61,24 @@ public class FeatureStyleEditor
 
         EditorGUILayout.BeginHorizontal();
         {
-            GUILayout.Label("Filter name:");
-            featureStyleName = GUILayout.TextField(featureStyleName);
+            featureStyleName = EditorGUILayout.TextField("Name: ", featureStyleName);
+
+            if (GUILayout.Button(addFilterButtonContent, buttonWidth))
+            {
+                var defaultMaterial = new Material(Shader.Find("Diffuse"));
+                var defaultPolygonBuilderOptions = polygonBuilderEditor.Options;
+                var defaultPolylineBuilderOptions = polylineBuilderEditor.Options;
+                var defaultFilter = new FeatureFilter();
+
+                var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
+                                       defaultPolygonBuilderOptions, defaultPolylineBuilderOptions);
+
+                mapzenMap.FeatureStyling.Add(featureStyle);
+
+                showStyle[featureStyle.Name] = false;
+            }
         }
         EditorGUILayout.EndHorizontal();
-
-        if (GUILayout.Button("Create Filter"))
-        {
-            var defaultMaterial = new Material(Shader.Find("Diffuse"));
-            var defaultPolygonBuilderOptions = polygonBuilderEditor.Options;
-            var defaultPolylineBuilderOptions = polylineBuilderEditor.Options;
-            var defaultFilter = new FeatureFilter();
-
-            var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
-                                   defaultPolygonBuilderOptions, defaultPolylineBuilderOptions);
-
-            mapzenMap.FeatureStyling.Add(featureStyle);
-
-            showStyle[featureStyle.Name] = false;
-        }
 
         for (int i = mapzenMap.FeatureStyling.Count - 1; i >= 0; i--)
         {

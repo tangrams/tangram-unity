@@ -48,13 +48,7 @@ public class PolylineBuilderEditor
 
         options.Width = EditorGUILayout.FloatField("Width: ", options.Width);
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
-
-        GUILayout.BeginHorizontal();
-        {
-            GUILayout.Label("Extrude: ");
-            options.Extrude = GUILayout.Toggle(options.Extrude, "Extrude");
-        }
-        GUILayout.EndHorizontal();
+        options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
 
         SavePreferences();
 
