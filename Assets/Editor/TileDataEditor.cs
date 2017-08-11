@@ -8,8 +8,6 @@ public class TileDataEditor
 {
     private bool show = true;
 
-    private static GUILayoutOption buttonWidth = GUILayout.Width(100.0f);
-
     private void LoadPreferences()
     {
         show = EditorPrefs.GetBool("TileDataEditor.show");
@@ -18,6 +16,16 @@ public class TileDataEditor
     private void SavePreferences()
     {
         EditorPrefs.SetBool("TileDataEditor.show", show);
+    }
+
+    private void SceneGroupToggle(MapzenMap mapzenMap, SceneGroup.Type type)
+    {
+        bool isSet = SceneGroup.Test(type, mapzenMap.GroupOptions);
+        isSet = EditorGUILayout.Toggle(type.ToString(), isSet);
+
+        mapzenMap.GroupOptions = isSet ?
+            mapzenMap.GroupOptions | type :
+            mapzenMap.GroupOptions & ~type;
     }
 
     public void OnInspectorGUI(MapzenMap mapzenMap)

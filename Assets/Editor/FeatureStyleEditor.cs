@@ -92,6 +92,8 @@ public class FeatureStyleEditor
                 continue;
             }
 
+            EditorGUI.indentLevel++;
+
             var filter = featureFilterEditor.OnInspectorGUI(featureStyling.Filter);
             var material = EditorGUILayout.ObjectField(featureStyling.Material, typeof(Material)) as Material;
 
@@ -106,6 +108,11 @@ public class FeatureStyleEditor
             {
                 mapzenMap.FeatureStyling.RemoveAt(i);
             }
+
+            // Separator
+            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+
+            EditorGUI.indentLevel--;
         }
 
         SavePreferences(mapzenMap);
