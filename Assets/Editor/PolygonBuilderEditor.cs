@@ -6,22 +6,22 @@ using System;
 public class PolygonBuilderEditor
 {
     private bool show = false;
-    private PolygonBuilder.Options options;
+    private PolygonBuilder.Options defaultOptions;
 
-    public PolygonBuilder.Options Options
+    public PolygonBuilder.Options DefaultOptions
     {
         get
         {
-            return options;
+            return defaultOptions;
         }
     }
 
     public PolygonBuilderEditor()
     {
-        options = new PolygonBuilder.Options();
+        defaultOptions = new PolygonBuilder.Options();
 
-        options.Extrude = true;
-        options.MaxHeight = 0.0f;
+        defaultOptions.Extrude = true;
+        defaultOptions.MaxHeight = 0.0f;
     }
 
     private void LoadPreferences()
@@ -34,7 +34,7 @@ public class PolygonBuilderEditor
         EditorPrefs.SetBool("PolygonBuilderEditor.show", show);
     }
 
-    public PolygonBuilder.Options OnInspectorGUI()
+    public PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options)
     {
         LoadPreferences();
         show = EditorGUILayout.Foldout(show, "Polygon builder options");

@@ -66,8 +66,8 @@ public class FeatureStyleEditor
             if (GUILayout.Button(addFilterButtonContent, buttonWidth))
             {
                 var defaultMaterial = new Material(Shader.Find("Diffuse"));
-                var defaultPolygonBuilderOptions = polygonBuilderEditor.Options;
-                var defaultPolylineBuilderOptions = polylineBuilderEditor.Options;
+                var defaultPolygonBuilderOptions = polygonBuilderEditor.DefaultOptions;
+                var defaultPolylineBuilderOptions = polylineBuilderEditor.DefaultOptions;
                 var defaultFilter = new FeatureFilter();
 
                 var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
@@ -94,13 +94,15 @@ public class FeatureStyleEditor
 
             EditorGUI.indentLevel++;
 
+            var polygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(featureStyling.PolygonBuilderOptions);
+            var polylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions);
             var filter = featureFilterEditor.OnInspectorGUI(featureStyling.Filter);
             var material = EditorGUILayout.ObjectField(featureStyling.Material, typeof(Material)) as Material;
 
             featureStyling.Filter = filter;
             featureStyling.Material = material;
-            featureStyling.PolygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI();
-            featureStyling.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI();
+            featureStyling.PolygonBuilderOptions = polygonBuilderOptions;
+            featureStyling.PolylineBuilderOptions = polylineBuilderOptions;
 
             // TODO: add interface for filter matcher
 
@@ -109,10 +111,10 @@ public class FeatureStyleEditor
                 mapzenMap.FeatureStyling.RemoveAt(i);
             }
 
+            EditorGUI.indentLevel--;
+
             // Separator
             EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-
-            EditorGUI.indentLevel--;
         }
 
         SavePreferences(mapzenMap);

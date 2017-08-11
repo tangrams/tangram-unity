@@ -65,9 +65,7 @@ public class FeatureFilterEditor
             for (int i = filter.CollectionNameSet.Count - 1; i >= 0; i--)
             {
                 EditorGUILayout.BeginHorizontal();
-                string layer = filter.CollectionNameSet[i];
-                EditorGUILayout.TextField(layer);
-
+                EditorGUILayout.TextField(filter.CollectionNameSet[i]);
                 if (GUILayout.Button(removeLayerButtonContent, buttonWidth))
                 {
                     filter.CollectionNameSet.RemoveAt(i);

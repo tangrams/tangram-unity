@@ -6,24 +6,24 @@ using System;
 public class PolylineBuilderEditor
 {
     private bool show = false;
-    private PolylineBuilder.Options options;
+    private PolylineBuilder.Options defaultOptions;
 
-    public PolylineBuilder.Options Options
+    public PolylineBuilder.Options DefaultOptions
     {
         get
         {
-            return options;
+            return defaultOptions;
         }
     }
 
     public PolylineBuilderEditor()
     {
-        options = new PolylineBuilder.Options();
+        defaultOptions = new PolylineBuilder.Options();
 
-        options.Extrude = true;
-        options.MaxHeight = 3.0f;
-        options.MiterLimit = 3.0f;
-        options.Width = 15.0f;
+        defaultOptions.Extrude = true;
+        defaultOptions.MaxHeight = 3.0f;
+        defaultOptions.MiterLimit = 3.0f;
+        defaultOptions.Width = 15.0f;
     }
 
     private void LoadPreferences()
@@ -36,7 +36,7 @@ public class PolylineBuilderEditor
         EditorPrefs.SetBool("PolylineBuilderEditor.show", show);
     }
 
-    public PolylineBuilder.Options OnInspectorGUI()
+    public PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options)
     {
         LoadPreferences();
         show = EditorGUILayout.Foldout(show, "Polyline builder options");

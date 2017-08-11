@@ -6,7 +6,9 @@ using System;
 
 public class TileDataEditor
 {
-    private bool show = true;
+    private bool show = false;
+
+    private static GUILayoutOption buttonWidth = GUILayout.Width(100.0f);
 
     private void LoadPreferences()
     {
