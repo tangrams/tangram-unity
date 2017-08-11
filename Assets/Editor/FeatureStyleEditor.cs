@@ -79,6 +79,8 @@ public class FeatureStyleEditor
         }
         EditorGUILayout.EndHorizontal();
 
+        EditorGUI.indentLevel++;
+
         for (int i = mapzenMap.FeatureStyling.Count - 1; i >= 0; i--)
         {
             var featureStyling = mapzenMap.FeatureStyling[i];
@@ -121,6 +123,8 @@ public class FeatureStyleEditor
             // Separator
             EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
         }
+
+        EditorGUI.indentLevel--;
 
         SavePreferences(mapzenMap);
     }

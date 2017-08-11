@@ -44,8 +44,6 @@ public class FeatureFilterEditor
             return filter;
         }
 
-        EditorGUI.indentLevel++;
-
         // Default layers
         EditorGUILayout.BeginHorizontal();
         {
@@ -92,8 +90,6 @@ public class FeatureFilterEditor
                 EditorGUILayout.EndHorizontal();
             }
         }
-
-        EditorGUI.indentLevel--;
 
         SavePreferences();
 
