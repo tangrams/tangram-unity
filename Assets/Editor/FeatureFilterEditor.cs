@@ -8,13 +8,6 @@ using System;
 public class FeatureFilterEditor
 {
     private bool show = false;
-
-    private static GUILayoutOption buttonWidth = GUILayout.Width(50.0f);
-    private static GUIContent addLayerButtonContent =
-        new GUIContent("+", "Add layer collection");
-    private static GUIContent removeLayerButtonContent =
-        new GUIContent("-", "Remove layer collection");
-
     private string customFeatureCollection = "";
     private int selectedLayer;
     private List<string> defaultLayers = new List<string>(new string[]
@@ -39,10 +32,12 @@ public class FeatureFilterEditor
             selectedLayer = EditorGUILayout.Popup("Default layer:",
                 selectedLayer, defaultLayers.ToArray());
 
-            if (GUILayout.Button(addLayerButtonContent, buttonWidth))
+            EditorStyle.SetColor(EditorStyle.AddButtonColor);
+            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
             {
                 filter.CollectionNameSet.Add(defaultLayers[selectedLayer]);
             }
+            EditorStyle.ResetColor();
         }
         EditorGUILayout.EndHorizontal();
 
@@ -51,11 +46,13 @@ public class FeatureFilterEditor
         {
             customFeatureCollection = EditorGUILayout.TextField("Custom layer:", customFeatureCollection);
 
-            if (GUILayout.Button(addLayerButtonContent, buttonWidth)
+            EditorStyle.SetColor(EditorStyle.AddButtonColor);
+            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth)
                 && customFeatureCollection.Length > 0)
             {
                 filter.CollectionNameSet.Add(customFeatureCollection);
             }
+            EditorStyle.ResetColor();
         }
         EditorGUILayout.EndHorizontal();
 
@@ -66,10 +63,12 @@ public class FeatureFilterEditor
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.TextField(filter.CollectionNameSet[i]);
-                if (GUILayout.Button(removeLayerButtonContent, buttonWidth))
+                EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
+                if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
                 {
                     filter.CollectionNameSet.RemoveAt(i);
                 }
+                EditorStyle.ResetColor();
                 EditorGUILayout.EndHorizontal();
             }
         }

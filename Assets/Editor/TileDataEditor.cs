@@ -60,21 +60,20 @@ public class TileDataEditor
             EditorGUI.indentLevel--;
         }
 
+        mapzenMap.RegionName = EditorGUILayout.TextField("Region name:",
+            mapzenMap.RegionName);
 
-        mapzenMap.RegionName = EditorGUILayout.TextField("Region name:", mapzenMap.RegionName);
-
-        // TODO: Fix export
-        /*
         {
             EditorGUILayout.BeginHorizontal();
-            mapzenMap.ExportPath = EditorGUILayout.TextField("Export path:", mapzenMap.ExportPath);
+            mapzenMap.ExportPath = EditorGUILayout.TextField("Export path:",
+                mapzenMap.ExportPath);
             if (GUILayout.Button("Export", buttonWidth))
             {
-                ExportGameObjects(mapzenMap);
+                // TODO: Fix export
+                // ExportGameObjects(mapzenMap);
             }
             EditorGUILayout.EndHorizontal();
         }
-        */
 
         SavePreferences();
     }

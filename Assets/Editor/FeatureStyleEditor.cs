@@ -10,9 +10,6 @@ public class FeatureStyleEditor
     private PolylineBuilderEditor polylineBuilderEditor;
     private PolygonBuilderEditor polygonBuilderEditor;
     private FeatureFilterEditor featureFilterEditor;
-    private static GUILayoutOption buttonWidth = GUILayout.Width(50.0f);
-    private static GUIContent addFilterButtonContent =
-        new GUIContent("+", "Create filter");
     private string featureStyleName = "";
     private bool show = true;
     private Dictionary<string, bool> showStyle;
@@ -63,7 +60,8 @@ public class FeatureStyleEditor
         {
             featureStyleName = EditorGUILayout.TextField("Style name: ", featureStyleName);
 
-            if (GUILayout.Button(addFilterButtonContent, buttonWidth))
+            EditorStyle.SetColor(EditorStyle.AddButtonColor);
+            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
             {
                 var defaultMaterial = new Material(Shader.Find("Diffuse"));
                 var defaultPolygonBuilderOptions = polygonBuilderEditor.DefaultOptions;
@@ -77,6 +75,7 @@ public class FeatureStyleEditor
 
                 showStyle[featureStyle.Name] = false;
             }
+            EditorStyle.ResetColor();
         }
         EditorGUILayout.EndHorizontal();
 
@@ -84,8 +83,18 @@ public class FeatureStyleEditor
         {
             var featureStyling = mapzenMap.FeatureStyling[i];
 
-            showStyle[featureStyling.Name] = EditorGUILayout.Foldout(showStyle[featureStyling.Name],
-                featureStyling.Name);
+            EditorGUILayout.BeginHorizontal();
+            {
+                showStyle[featureStyling.Name] = EditorGUILayout.Foldout(showStyle[featureStyling.Name],
+                    featureStyling.Name);
+                EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
+                if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
+                {
+                    mapzenMap.FeatureStyling.RemoveAt(i);
+                }
+                EditorStyle.ResetColor();
+            }
+            EditorGUILayout.EndHorizontal();
 
             if (!showStyle[featureStyling.Name])
             {
@@ -106,10 +115,6 @@ public class FeatureStyleEditor
 
             // TODO: add interface for filter matcher
 
-            if (GUILayout.Button("Remove Filter"))
-            {
-                mapzenMap.FeatureStyling.RemoveAt(i);
-            }
 
             EditorGUI.indentLevel--;
 

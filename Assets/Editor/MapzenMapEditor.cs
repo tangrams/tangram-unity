@@ -22,12 +22,11 @@ public class MapzenMapEditor : Editor
 
         base.OnInspectorGUI();
 
-        var defaultColor = GUI.color;
-        GUI.color = Color.green;
+        EditorStyle.SetColor(EditorStyle.DownloadButtonColor);
         if (GUILayout.Button("Download"))
         {
             mapzenMap.DownloadTiles();
         }
-        GUI.color = defaultColor;
+        EditorStyle.ResetColor();
     }
 }
