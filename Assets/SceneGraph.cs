@@ -2,6 +2,7 @@
 using System.Linq;
 using Mapzen;
 using UnityEngine;
+using UnityEditor;
 
 public class SceneGraph
 {
@@ -20,6 +21,7 @@ public class SceneGraph
         if (group.childs.Count > 0)
         {
             var gameObject = new GameObject(group.ToString());
+            gameObject.isStatic = group.isStatic;
 
             if (parent != null)
             {
@@ -40,6 +42,7 @@ public class SceneGraph
                 var gameObject = new GameObject(group.ToString());
                 gameObject.transform.parent = parent;
                 parent = gameObject.transform;
+                gameObject.isStatic = group.isStatic;
             }
 
             // Create one game object per mesh object 'bucket', each bucket is ensured to
@@ -48,6 +51,7 @@ public class SceneGraph
             {
                 var meshBucket = group.meshData.Meshes[i];
                 var gameObject = new GameObject(group.ToString());
+                gameObject.isStatic = group.isStatic;
 
                 if (group.meshData.Meshes.Count > 1)
                 {
@@ -70,9 +74,16 @@ public class SceneGraph
                 var materials = meshBucket.Submeshes.Select(s => s.Material).ToArray();
                 var meshFilterComponent = gameObject.AddComponent<MeshFilter>();
                 var meshRendererComponent = gameObject.AddComponent<MeshRenderer>();
-
-                meshFilterComponent.mesh = mesh;
                 meshRendererComponent.materials = materials;
+                meshFilterComponent.mesh = mesh;
+
+                if (group.hasCollider)
+                {
+                    var meshColliderComponent = gameObject.AddComponent<MeshCollider>();
+                    meshColliderComponent.sharedMesh = mesh;
+                }
+
+
             }
         }
     }

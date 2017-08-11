@@ -14,6 +14,8 @@ public class TileTask
     private SceneGroup.Type groupOptions;
     private float inverseTileScale;
     private Matrix4x4 transform;
+    private bool isStaticGameObject = true;
+    private bool hasCollider = true;
 
     public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY)
     {
@@ -38,6 +40,9 @@ public class TileTask
 
         foreach (var style in featureStyling)
         {
+            isStaticGameObject = style.IsStatic;
+            hasCollider = style.HasCollider;
+
             var filterGroup = OnSceneGroupData(SceneGroup.Type.Filter, style.Name, tileGroup, ref leaf);
 
             foreach (var layer in tileData.FeatureCollections)
@@ -92,7 +97,7 @@ public class TileTask
             // No group found for this idenfier
             if (group == null)
             {
-                group = new SceneGroup(type, name);
+                group = new SceneGroup(type, name, isStaticGameObject);
                 parent.childs[name] = group;
             }
 
@@ -100,6 +105,7 @@ public class TileTask
             if (SceneGroup.IsLeaf(type, groupOptions))
             {
                 leaf = group;
+                leaf.hasCollider = hasCollider;
             }
         }
         else
