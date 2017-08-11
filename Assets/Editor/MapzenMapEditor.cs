@@ -21,5 +21,13 @@ public class MapzenMapEditor : Editor
         tileDataEditor.OnInspectorGUI(mapzenMap);
 
         base.OnInspectorGUI();
+
+        var defaultColor = GUI.color;
+        GUI.color = Color.green;
+        if (GUILayout.Button("Download"))
+        {
+            mapzenMap.DownloadTiles();
+        }
+        GUI.color = defaultColor;
     }
 }

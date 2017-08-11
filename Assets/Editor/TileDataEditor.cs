@@ -60,19 +60,11 @@ public class TileDataEditor
             EditorGUI.indentLevel--;
         }
 
-        {
-            EditorGUILayout.BeginHorizontal();
-            mapzenMap.RegionName = EditorGUILayout.TextField("Region name:", mapzenMap.RegionName);
-            var defaultColor = GUI.color;
-            GUI.color = Color.green;
-            if (GUILayout.Button("Download", buttonWidth))
-            {
-                mapzenMap.DownloadTiles();
-            }
-            GUI.color = defaultColor;
-            EditorGUILayout.EndHorizontal();
-        }
 
+        mapzenMap.RegionName = EditorGUILayout.TextField("Region name:", mapzenMap.RegionName);
+
+        // TODO: Fix export
+        /*
         {
             EditorGUILayout.BeginHorizontal();
             mapzenMap.ExportPath = EditorGUILayout.TextField("Export path:", mapzenMap.ExportPath);
@@ -82,6 +74,7 @@ public class TileDataEditor
             }
             EditorGUILayout.EndHorizontal();
         }
+        */
 
         SavePreferences();
     }

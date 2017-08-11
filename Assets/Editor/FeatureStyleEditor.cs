@@ -61,7 +61,7 @@ public class FeatureStyleEditor
 
         EditorGUILayout.BeginHorizontal();
         {
-            featureStyleName = EditorGUILayout.TextField("Name: ", featureStyleName);
+            featureStyleName = EditorGUILayout.TextField("Style name: ", featureStyleName);
 
             if (GUILayout.Button(addFilterButtonContent, buttonWidth))
             {
