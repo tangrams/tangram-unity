@@ -106,7 +106,7 @@ public class FeatureStyleEditor
             var polygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(featureStyling.PolygonBuilderOptions);
             var polylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions);
             var filter = featureFilterEditor.OnInspectorGUI(featureStyling.Filter);
-            var material = EditorGUILayout.ObjectField(featureStyling.Material, typeof(Material)) as Material;
+            var material = EditorGUILayout.ObjectField("Material:", featureStyling.Material, typeof(Material)) as Material;
 
             featureStyling.Filter = filter;
             featureStyling.Material = material;

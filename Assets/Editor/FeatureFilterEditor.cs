@@ -23,9 +23,29 @@ public class FeatureFilterEditor
             "water"
         });
 
+    private void LoadPreferences()
+    {
+        show = EditorPrefs.GetBool("FeatureFilterEditor.show");
+    }
+
+    private void SavePreferences()
+    {
+        EditorPrefs.SetBool("FeatureFilterEditor.show", show);
+    }
 
     public FeatureFilter OnInspectorGUI(FeatureFilter filter)
     {
+        LoadPreferences();
+
+        show = EditorGUILayout.Foldout(show, "Filter");
+        if (!show)
+        {
+            SavePreferences();
+            return filter;
+        }
+
+        EditorGUI.indentLevel++;
+
         // Default layers
         EditorGUILayout.BeginHorizontal();
         {
@@ -72,6 +92,10 @@ public class FeatureFilterEditor
                 EditorGUILayout.EndHorizontal();
             }
         }
+
+        EditorGUI.indentLevel--;
+
+        SavePreferences();
 
         return filter;
     }
