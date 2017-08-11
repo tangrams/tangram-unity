@@ -69,6 +69,8 @@ public class SceneGraph
                     mesh.SetTriangles(meshBucket.Submeshes[s].Indices, s);
                 }
                 mesh.RecalculateNormals();
+                // Generate default uvs for this mesh
+                Unwrapping.GenerateSecondaryUVSet(mesh);
 
                 // Associate the mesh filter and mesh renderer components with this game object
                 var materials = meshBucket.Submeshes.Select(s => s.Material).ToArray();
