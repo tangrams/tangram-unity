@@ -21,28 +21,36 @@ public class MapzenMap : MonoBehaviour
 
     private UnityIO tileIO = new UnityIO();
 
+    [HideInInspector]
     [SerializeField]
     private string exportPath = "Assets/Generated";
 
+    [HideInInspector]
     [SerializeField]
     private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
 
+    [HideInInspector]
     [SerializeField]
     private SceneGroup.Type groupOptions;
+
+    [HideInInspector]
+    [SerializeField]
+    private string regionName = "";
 
     private List<TileTask> tasks = new List<TileTask>();
 
     private int nTasksForArea = 0;
 
-    private SceneGroup area = new SceneGroup(SceneGroup.Type.None, "MapRegion");
+    private SceneGroup regionMap;
 
     public void DownloadTiles()
     {
         TileBounds bounds = new TileBounds(Area);
 
         tasks.Clear();
-        area.childs.Clear();
         nTasksForArea = 0;
+
+        regionMap = new SceneGroup(SceneGroup.Type.None, regionName);
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -76,7 +84,7 @@ public class MapzenMap : MonoBehaviour
 
                 TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY);
 
-                task.Start(featureStyling, area);
+                task.Start(featureStyling, regionMap);
 
                 OnTaskReady(task);
             };
@@ -94,7 +102,7 @@ public class MapzenMap : MonoBehaviour
         {
             tasks.Clear();
 
-            SceneGraph.Generate(area, null);
+            SceneGraph.Generate(regionMap, null);
         }
     }
 
@@ -118,5 +126,11 @@ public class MapzenMap : MonoBehaviour
     {
         get { return groupOptions; }
         set { groupOptions = value; }
+    }
+
+    public String RegionName
+    {
+        get { return regionName; }
+        set { regionName = value; }
     }
 }
