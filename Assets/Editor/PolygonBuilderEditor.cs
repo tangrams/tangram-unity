@@ -24,30 +24,30 @@ public class PolygonBuilderEditor
         defaultOptions.MaxHeight = 0.0f;
     }
 
-    private void LoadPreferences()
+    private void LoadPreferences(string name)
     {
-        show = EditorPrefs.GetBool("PolygonBuilderEditor.show");
+        show = EditorPrefs.GetBool("PolygonBuilderEditor.show" + name);
     }
 
-    private void SavePreferences()
+    private void SavePreferences(string name)
     {
-        EditorPrefs.SetBool("PolygonBuilderEditor.show", show);
+        EditorPrefs.SetBool("PolygonBuilderEditor.show" + name, show);
     }
 
-    public PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options)
+    public PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options, string name)
     {
-        LoadPreferences();
+        LoadPreferences(name);
         show = EditorGUILayout.Foldout(show, "Polygon builder options");
         if (!show)
         {
-            SavePreferences();
+            SavePreferences(name);
             return options;
         }
 
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
         options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
 
-        SavePreferences();
+        SavePreferences(name);
 
         return options;
     }

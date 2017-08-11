@@ -23,24 +23,24 @@ public class FeatureFilterEditor
             "water"
         });
 
-    private void LoadPreferences()
+    private void LoadPreferences(string name)
     {
-        show = EditorPrefs.GetBool("FeatureFilterEditor.show");
+        show = EditorPrefs.GetBool("FeatureFilterEditor.show" + name);
     }
 
-    private void SavePreferences()
+    private void SavePreferences(string name)
     {
-        EditorPrefs.SetBool("FeatureFilterEditor.show", show);
+        EditorPrefs.SetBool("FeatureFilterEditor.show" + name, show);
     }
 
-    public FeatureFilter OnInspectorGUI(FeatureFilter filter)
+    public FeatureFilter OnInspectorGUI(FeatureFilter filter, string name)
     {
-        LoadPreferences();
+        LoadPreferences(name);
 
         show = EditorGUILayout.Foldout(show, "Filter");
         if (!show)
         {
-            SavePreferences();
+            SavePreferences(name);
             return filter;
         }
 
@@ -91,7 +91,7 @@ public class FeatureFilterEditor
             }
         }
 
-        SavePreferences();
+        SavePreferences(name);
 
         return filter;
     }

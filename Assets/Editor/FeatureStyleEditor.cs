@@ -105,9 +105,9 @@ public class FeatureStyleEditor
 
             EditorGUI.indentLevel++;
 
-            var polygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(featureStyling.PolygonBuilderOptions);
-            var polylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions);
-            var filter = featureFilterEditor.OnInspectorGUI(featureStyling.Filter);
+            var polygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(featureStyling.PolygonBuilderOptions, featureStyling.Name);
+            var polylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions, featureStyling.Name);
+            var filter = featureFilterEditor.OnInspectorGUI(featureStyling.Filter, featureStyling.Name);
             var material = EditorGUILayout.ObjectField("Material:", featureStyling.Material, typeof(Material)) as Material;
 
             featureStyling.Filter = filter;

@@ -26,23 +26,23 @@ public class PolylineBuilderEditor
         defaultOptions.Width = 15.0f;
     }
 
-    private void LoadPreferences()
+    private void LoadPreferences(string name)
     {
-        show = EditorPrefs.GetBool("PolylineBuilderEditor.show");
+        show = EditorPrefs.GetBool("PolylineBuilderEditor.show" + name);
     }
 
-    private void SavePreferences()
+    private void SavePreferences(string name)
     {
-        EditorPrefs.SetBool("PolylineBuilderEditor.show", show);
+        EditorPrefs.SetBool("PolylineBuilderEditor.show" + name, show);
     }
 
-    public PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options)
+    public PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options, string name)
     {
-        LoadPreferences();
+        LoadPreferences(name);
         show = EditorGUILayout.Foldout(show, "Polyline builder options");
         if (!show)
         {
-            SavePreferences();
+            SavePreferences(name);
             return options;
         }
 
@@ -50,7 +50,7 @@ public class PolylineBuilderEditor
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
         options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
 
-        SavePreferences();
+        SavePreferences(name);
 
         return options;
     }
