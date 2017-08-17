@@ -7,6 +7,7 @@ using System;
 public class TileDataEditor
 {
     private bool show = false;
+    private float meshScale = 1.0f;
 
     private static GUILayoutOption buttonWidth = GUILayout.Width(100.0f);
 
@@ -59,6 +60,11 @@ public class TileDataEditor
 
             EditorGUI.indentLevel--;
         }
+
+        // Region Scale Ratio
+        // Defines the ratio of unity unit to world mercator units
+        mapzenMap.RegionScaleRatio = EditorGUILayout.FloatField("Region Scale Ratio:",
+            mapzenMap.RegionScaleRatio);
 
         mapzenMap.RegionName = EditorGUILayout.TextField("Region name:",
             mapzenMap.RegionName);

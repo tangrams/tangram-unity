@@ -17,14 +17,15 @@ public class TileTask
     private bool isStaticGameObject = true;
     private bool hasCollider = true;
 
-    public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY)
+    public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY, float regionScaleRatio)
     {
         this.address = address;
         this.response = response;
         this.ready = false;
         this.groupOptions = groupOptions;
         this.inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
-        this.transform = Matrix4x4.Translate(new Vector3(offsetX, 0.0f, offsetY));
+        float val = (float)address.GetSizeMercatorMeters() * regionScaleRatio;
+        this.transform = Matrix4x4.Translate(new Vector3(offsetX * val, 0.0f, offsetY * val)) * Matrix4x4.Scale(new Vector3(val, val, val));
     }
 
     public void Start(List<FeatureStyle> featureStyling, SceneGroup root)

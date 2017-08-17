@@ -37,6 +37,10 @@ public class MapzenMap : MonoBehaviour
     [SerializeField]
     private string regionName = "";
 
+    [HideInInspector]
+    [SerializeField]
+    private float regionScaleRatio = 1.0f;
+
     private List<TileTask> tasks = new List<TileTask>();
 
     private int nTasksForArea = 0;
@@ -82,7 +86,7 @@ public class MapzenMap : MonoBehaviour
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
-                TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY);
+                TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY, regionScaleRatio);
 
                 task.Start(featureStyling, regionMap);
 
@@ -132,5 +136,11 @@ public class MapzenMap : MonoBehaviour
     {
         get { return regionName; }
         set { regionName = value; }
+    }
+
+    public float RegionScaleRatio
+    {
+        get { return regionScaleRatio; }
+        set { regionScaleRatio = value; }
     }
 }
