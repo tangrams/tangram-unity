@@ -3,6 +3,7 @@ using UnityEditor;
 using Mapzen;
 using Mapzen.VectorData.Filters;
 using System.Collections.Generic;
+using System.Linq;
 using System;
 
 public class FeatureStyleEditor
@@ -31,8 +32,7 @@ public class FeatureStyleEditor
 
         foreach (var featureStyling in mapzenMap.FeatureStyling)
         {
-            bool foldout = EditorPrefs.GetBool("FeatureStyleEditor.showStyle" + featureStyling.Name);
-            showStyle.Add(featureStyling.Name, foldout);
+            showStyle[featureStyling.Name] = EditorPrefs.GetBool("FeatureStyleEditor.showStyle" + featureStyling.Name);
         }
     }
 
@@ -65,9 +65,15 @@ public class FeatureStyleEditor
             EditorStyle.SetColor(EditorStyle.AddButtonColor);
             if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
             {
+                var queryStyleName = mapzenMap.FeatureStyling.Where(style => style.Name == featureStyleName);
+
                 if (featureStyleName.Length == 0)
                 {
                     Debug.LogError("The style name can't be empty");
+                }
+                else if (queryStyleName.Count() > 0)
+                {
+                    Debug.LogError("Style with name " + featureStyleName + " already exists");
                 }
                 else
                 {
