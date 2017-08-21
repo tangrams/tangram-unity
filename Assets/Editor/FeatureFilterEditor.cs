@@ -65,10 +65,16 @@ public class FeatureFilterEditor
             customFeatureCollection = EditorGUILayout.TextField("Custom layer:", customFeatureCollection);
 
             EditorStyle.SetColor(EditorStyle.AddButtonColor);
-            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth)
-                && customFeatureCollection.Length > 0)
+            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
             {
-                filter.CollectionNameSet.Add(customFeatureCollection);
+                if (customFeatureCollection.Length == 0)
+                {
+                    Debug.LogError("Custom layer name can't be empty");
+                }
+                else
+                {
+                    filter.CollectionNameSet.Add(customFeatureCollection);
+                }
             }
             EditorStyle.ResetColor();
         }

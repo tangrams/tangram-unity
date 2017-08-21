@@ -22,11 +22,54 @@ public class MapzenMapEditor : Editor
 
         base.OnInspectorGUI();
 
-        EditorStyle.SetColor(EditorStyle.DownloadButtonColor);
+        bool valid = IsValid();
+
+        EditorStyle.SetColor(valid ?
+            EditorStyle.DownloadButtonEnabledColor :
+            EditorStyle.DownloadButtonDisabledColor);
+
         if (GUILayout.Button("Download"))
         {
-            mapzenMap.DownloadTiles();
+            if (valid)
+            {
+                LogWarnings();
+
+                mapzenMap.DownloadTiles();
+            }
+            else
+            {
+                LogErrors();
+            }
         }
         EditorStyle.ResetColor();
+    }
+
+    private bool IsValid()
+    {
+        return mapzenMap.RegionName.Length > 0 && mapzenMap.FeatureStyling.Count > 0;
+    }
+
+    private void LogWarnings()
+    {
+        foreach (var style in mapzenMap.FeatureStyling)
+        {
+            if (style.Filter.CollectionNameSet.Count == 0)
+            {
+                Debug.LogWarning("The style " + style.Name + " has a filter selecting no layer");
+            }
+        }
+    }
+
+    private void LogErrors()
+    {
+        if (mapzenMap.RegionName.Length == 0)
+        {
+            Debug.LogError("Make sure to give a region name");
+        }
+
+        if (mapzenMap.FeatureStyling.Count == 0)
+        {
+            Debug.LogError("Make sure to create at least one style");
+        }
     }
 }

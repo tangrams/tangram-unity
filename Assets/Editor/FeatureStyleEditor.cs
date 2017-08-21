@@ -65,17 +65,24 @@ public class FeatureStyleEditor
             EditorStyle.SetColor(EditorStyle.AddButtonColor);
             if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
             {
-                var defaultMaterial = new Material(Shader.Find("Diffuse"));
-                var defaultPolygonBuilderOptions = polygonBuilderEditor.DefaultOptions;
-                var defaultPolylineBuilderOptions = polylineBuilderEditor.DefaultOptions;
-                var defaultFilter = new FeatureFilter();
+                if (featureStyleName.Length == 0)
+                {
+                    Debug.LogError("The style name can't be empty");
+                }
+                else
+                {
+                    var defaultMaterial = new Material(Shader.Find("Diffuse"));
+                    var defaultPolygonBuilderOptions = polygonBuilderEditor.DefaultOptions;
+                    var defaultPolylineBuilderOptions = polylineBuilderEditor.DefaultOptions;
+                    var defaultFilter = new FeatureFilter();
 
-                var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
-                                       defaultPolygonBuilderOptions, defaultPolylineBuilderOptions);
+                    var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
+                                           defaultPolygonBuilderOptions, defaultPolylineBuilderOptions);
 
-                mapzenMap.FeatureStyling.Add(featureStyle);
+                    mapzenMap.FeatureStyling.Add(featureStyle);
 
-                showStyle[featureStyle.Name] = false;
+                    showStyle[featureStyle.Name] = false;
+                }
             }
             EditorStyle.ResetColor();
         }

@@ -63,8 +63,8 @@ public class TileDataEditor
         mapzenMap.RegionName = EditorGUILayout.TextField("Region name:",
             mapzenMap.RegionName);
 
+        EditorGUILayout.BeginHorizontal();
         {
-            EditorGUILayout.BeginHorizontal();
             mapzenMap.ExportPath = EditorGUILayout.TextField("Export path:",
                 mapzenMap.ExportPath);
             if (GUILayout.Button("Export", buttonWidth))
@@ -72,8 +72,8 @@ public class TileDataEditor
                 // TODO: Fix export
                 // ExportGameObjects(mapzenMap);
             }
-            EditorGUILayout.EndHorizontal();
         }
+        EditorGUILayout.EndHorizontal();
 
         SavePreferences();
     }

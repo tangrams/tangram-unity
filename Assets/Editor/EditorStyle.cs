@@ -6,7 +6,9 @@ public class EditorStyle
 {
     public static Color AddButtonColor = new Color(0.8f, 0.8f, 0.8f);
 
-    public static Color DownloadButtonColor = new Color(0.35f, 0.80f, 0.30f);
+    public static Color DownloadButtonEnabledColor = new Color(0.35f, 0.80f, 0.30f);
+
+    public static Color DownloadButtonDisabledColor = new Color(0.45f, 0.45f, 0.45f);
 
     public static Color RemoveButtonColor = new Color(0.5f, 0.5f, 0.5f);
 
