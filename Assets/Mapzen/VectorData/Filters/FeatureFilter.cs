@@ -7,9 +7,9 @@ namespace Mapzen.VectorData.Filters
     [Serializable]
     public class FeatureFilter : IFeatureFilter
     {
-        public IFeatureMatcher Matcher { get; set; }
+        public IFeatureMatcher Matcher;
 
-        public List<string> CollectionNameSet { get; set; }
+        public List<string> CollectionNameSet;
 
         public FeatureFilter()
         {

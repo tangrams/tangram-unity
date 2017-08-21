@@ -8,35 +8,11 @@ namespace Mapzen
     [Serializable]
     public class FeatureStyle
     {
-        public FeatureFilter Filter
-        {
-            get;
-            set;
-        }
-
-        public Material Material
-        {
-            get;
-            set;
-        }
-
-        public string Name
-        {
-            get;
-            internal set;
-        }
-
-        public PolygonBuilder.Options PolygonBuilderOptions
-        {
-            get;
-            set;
-        }
-
-        public PolylineBuilder.Options PolylineBuilderOptions
-        {
-            get;
-            set;
-        }
+        public FeatureFilter Filter;
+        public Material Material;
+        public string Name;
+        public PolygonBuilder.Options PolygonBuilderOptions;
+        public PolylineBuilder.Options PolylineBuilderOptions;
 
         public FeatureStyle(FeatureFilter filter, Material material, string name,
                             PolygonBuilder.Options polygonBuilderOptions,
