@@ -27,10 +27,12 @@ public class FeatureStyleEditor
     {
         show = EditorPrefs.GetBool("FeatureStyleEditor.show");
 
+        showStyle.Clear();
+
         foreach (var featureStyling in mapzenMap.FeatureStyling)
         {
-            showStyle[featureStyling.Name] =
-                EditorPrefs.GetBool("FeatureStyleEditor.showStyle" + featureStyling.Name);
+            bool foldout = EditorPrefs.GetBool("FeatureStyleEditor.showStyle" + featureStyling.Name);
+            showStyle.Add(featureStyling.Name, foldout);
         }
     }
 
@@ -87,8 +89,14 @@ public class FeatureStyleEditor
 
             EditorGUILayout.BeginHorizontal();
             {
-                showStyle[featureStyling.Name] = EditorGUILayout.Foldout(showStyle[featureStyling.Name],
-                    featureStyling.Name);
+                bool foldout = false;
+                if (showStyle.ContainsKey(featureStyling.Name))
+                {
+                    foldout = showStyle[featureStyling.Name];
+                }
+
+                showStyle[featureStyling.Name] = EditorGUILayout.Foldout(foldout, featureStyling.Name);
+
                 EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
                 if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
                 {
