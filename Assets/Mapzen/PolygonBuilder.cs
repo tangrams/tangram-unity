@@ -14,8 +14,9 @@ namespace Mapzen
             public float MaxHeight;
         }
 
-        public PolygonBuilder(MeshData outputMeshData, Options options)
+        public PolygonBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)
         {
+            this.transform = transform;
             this.outputMeshData = outputMeshData;
             this.options = options;
             this.coordinates = new List<float>();
@@ -26,18 +27,19 @@ namespace Mapzen
             this.extrusionIndices = new List<int>();
         }
 
-        MeshData outputMeshData;
-        Options options;
+        private Matrix4x4 transform;
+        private MeshData outputMeshData;
+        private Options options;
 
         // Values for the tesselator.
-        List<float> coordinates;
-        List<int> rings;
-        int pointsInRing;
+        private List<float> coordinates;
+        private List<int> rings;
+        private int pointsInRing;
 
         // Values for extrusions.
-        Point lastPoint;
-        List<Vector3> extrusionVertices;
-        List<int> extrusionIndices;
+        private Point lastPoint;
+        private List<Vector3> extrusionVertices;
+        private List<int> extrusionIndices;
 
         public void OnPoint(Point point)
         {
@@ -50,10 +52,20 @@ namespace Mapzen
 
                 var indexOffset = extrusionVertices.Count;
 
-                extrusionVertices.Add(new Vector3(p0.X, options.MaxHeight, p0.Y));
-                extrusionVertices.Add(new Vector3(p1.X, options.MaxHeight, p1.Y));
-                extrusionVertices.Add(new Vector3(p0.X, options.MinHeight, p0.Y));
-                extrusionVertices.Add(new Vector3(p1.X, options.MinHeight, p1.Y));
+                var v0 = new Vector3(p0.X, options.MaxHeight, p0.Y);
+                var v1 = new Vector3(p1.X, options.MaxHeight, p1.Y);
+                var v2 = new Vector3(p0.X, options.MinHeight, p0.Y);
+                var v3 = new Vector3(p1.X, options.MinHeight, p1.Y);
+
+                v0 = this.transform.MultiplyPoint(v0);
+                v1 = this.transform.MultiplyPoint(v1);
+                v2 = this.transform.MultiplyPoint(v2);
+                v3 = this.transform.MultiplyPoint(v3);
+
+                extrusionVertices.Add(v0);
+                extrusionVertices.Add(v1);
+                extrusionVertices.Add(v2);
+                extrusionVertices.Add(v3);
 
                 extrusionIndices.Add(indexOffset + 1);
                 extrusionIndices.Add(indexOffset + 3);
@@ -110,7 +122,11 @@ namespace Mapzen
 
             for (int i = 0; i < earcut.Vertices.Length; i += 2)
             {
-                vertices.Add(new Vector3(earcut.Vertices[i], options.MaxHeight, earcut.Vertices[i + 1]));
+                var v = new Vector3(earcut.Vertices[i], options.MaxHeight, earcut.Vertices[i + 1]);
+
+                v = this.transform.MultiplyPoint(v);
+
+                vertices.Add(v);
             }
 
             outputMeshData.AddElements(vertices, earcut.Indices, options.Material);

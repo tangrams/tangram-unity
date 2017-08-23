@@ -11,6 +11,7 @@ public class FeatureStyleEditor
     private PolygonBuilderEditor polygonBuilderEditor;
     private FeatureFilterEditor featureFilterEditor;
     private Material featureMaterial;
+    private string featureStyleName = "";
 
     private bool show = true;
 
@@ -43,11 +44,18 @@ public class FeatureStyleEditor
         var polygonOptions = polygonBuilderEditor.OnInspectorGUI();
         var polylineOptions = polylineBuilderEditor.OnInspectorGUI();
 
+        EditorGUILayout.BeginHorizontal();
+        {
+            GUILayout.Label("Filter name:");
+            featureStyleName = GUILayout.TextField(featureStyleName);
+        }
+        EditorGUILayout.EndHorizontal();
+
         if (GUILayout.Button("Create Filter")
             && featureMaterial != null
             && featureFilter != null)
         {
-            featureStyle = new FeatureStyle(featureFilter, featureMaterial,
+            featureStyle = new FeatureStyle(featureFilter, featureMaterial, featureStyleName,
                 polygonOptions, polylineOptions);
 
             mapzenMap.FeatureStyling.Add(featureStyle);

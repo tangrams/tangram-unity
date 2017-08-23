@@ -27,10 +27,27 @@ public class MapzenMap : MonoBehaviour
     [SerializeField]
     private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
 
+    [SerializeField]
+    private SceneGroup.Type groupOptions;
+
+    private List<TileTask> tasks = new List<TileTask>();
+
+    private int nTasksForArea = 0;
+
+    private SceneGroup area = new SceneGroup(SceneGroup.Type.None, "MapRegion");
+
     public void DownloadTiles()
     {
         TileBounds bounds = new TileBounds(Area);
-        GameObject tilePrefab = Resources.Load("Tile") as GameObject;
+
+        tasks.Clear();
+        area.childs.Clear();
+        nTasksForArea = 0;
+
+        foreach (var tileAddress in bounds.TileAddressRange)
+        {
+            nTasksForArea++;
+        }
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -54,22 +71,14 @@ public class MapzenMap : MonoBehaviour
                     return;
                 }
 
-                // Instantiate a prefab running the script TileData.Start()
-                var go = Instantiate(tilePrefab);
-
-                go.name = tileAddress.ToString();
-                go.transform.parent = this.transform;
-
-                MapTile tile = go.GetComponent<MapTile>();
-
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
-                TileTask task = new TileTask(tileAddress, response.data, offsetX, offsetY);
-                task.Start(featureStyling);
-                tile.CreateUnityMesh(task.Data, offsetX, offsetY);
+                TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY);
 
-                tiles.Add(go);
+                task.Start(featureStyling, area);
+
+                OnTaskReady(task);
             };
 
             // Starts the HTTP request
@@ -77,14 +86,22 @@ public class MapzenMap : MonoBehaviour
         }
     }
 
-    public List<GameObject> Tiles
+    void OnTaskReady(TileTask readyTask)
     {
-        get
+        tasks.Add(readyTask);
+
+        if (tasks.Count == nTasksForArea)
         {
-            return tiles;
+            tasks.Clear();
+
+            SceneGraph.Generate(area, null);
         }
     }
 
+    public List<GameObject> Tiles
+    {
+        get { return tiles; }
+    }
 
     public List<FeatureStyle> FeatureStyling
     {
@@ -93,13 +110,13 @@ public class MapzenMap : MonoBehaviour
 
     public string ExportPath
     {
-        get
-        {
-            return exportPath;
-        }
-        set
-        {
-            exportPath = value;
-        }
+        get { return exportPath; }
+        set { exportPath = value; }
+    }
+
+    public SceneGroup.Type GroupOptions
+    {
+        get { return groupOptions; }
+        set { groupOptions = value; }
     }
 }
