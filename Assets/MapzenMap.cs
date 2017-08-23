@@ -29,10 +29,6 @@ public class MapzenMap : MonoBehaviour
 
     [HideInInspector]
     [SerializeField]
-    private string exportPath = "Assets/Generated";
-
-    [HideInInspector]
-    [SerializeField]
     private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
 
     [HideInInspector]
@@ -116,12 +112,6 @@ public class MapzenMap : MonoBehaviour
     public List<FeatureStyle> FeatureStyling
     {
         get { return featureStyling; }
-    }
-
-    public string ExportPath
-    {
-        get { return exportPath; }
-        set { exportPath = value; }
     }
 
     public SceneGroup.Type GroupOptions
