@@ -33,7 +33,7 @@ public class FeatureFilterEditor
         EditorPrefs.SetBool("FeatureFilterEditor.show" + name, show);
     }
 
-    public FeatureFilter OnInspectorGUI(FeatureFilter filter, string name)
+    public void OnInspectorGUI(FeatureFilter filter, string name)
     {
         LoadPreferences(name);
 
@@ -41,7 +41,7 @@ public class FeatureFilterEditor
         if (!show)
         {
             SavePreferences(name);
-            return filter;
+            return;
         }
 
         // Default layers
@@ -98,7 +98,5 @@ public class FeatureFilterEditor
         }
 
         SavePreferences(name);
-
-        return filter;
     }
 }

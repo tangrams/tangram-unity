@@ -126,18 +126,12 @@ public class FeatureStyleEditor
 
             EditorGUI.indentLevel++;
 
-            var polygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(featureStyling.PolygonBuilderOptions, featureStyling.Name);
-            var polylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions, featureStyling.Name);
-            var filter = featureFilterEditor.OnInspectorGUI(featureStyling.Filter, featureStyling.Name);
-            var material = EditorGUILayout.ObjectField("Material:", featureStyling.Material, typeof(Material)) as Material;
-
-            featureStyling.Filter = filter;
-            featureStyling.Material = material;
-            featureStyling.PolygonBuilderOptions = polygonBuilderOptions;
-            featureStyling.PolylineBuilderOptions = polylineBuilderOptions;
+            featureStyling.PolygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(featureStyling.PolygonBuilderOptions, featureStyling.Name);
+            featureStyling.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions, featureStyling.Name);
+            featureFilterEditor.OnInspectorGUI(featureStyling.Filter, featureStyling.Name);
+            featureStyling.Material = EditorGUILayout.ObjectField("Material:", featureStyling.Material, typeof(Material)) as Material;
 
             // TODO: add interface for filter matcher
-
 
             EditorGUI.indentLevel--;
 
