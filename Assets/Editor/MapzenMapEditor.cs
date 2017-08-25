@@ -51,13 +51,13 @@ public class MapzenMapEditor : Editor
 
     private void LogWarnings()
     {
-        foreach (var style in mapzenMap.FeatureStyling)
+        /*foreach (var style in mapzenMap.FeatureStyling)
         {
             if (style.Filter.CollectionNameSet.Count == 0)
             {
                 Debug.LogWarning("The style " + style.Name + " has a filter selecting no layer");
             }
-        }
+        }*/
     }
 
     private void LogErrors()

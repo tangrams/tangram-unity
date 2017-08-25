@@ -8,22 +8,21 @@ using System;
 
 public class FeatureStyleEditor
 {
-    private PolylineBuilderEditor polylineBuilderEditor;
-    private PolygonBuilderEditor polygonBuilderEditor;
     private FeatureFilterEditor featureFilterEditor;
+    private LayerStyleEditor layerStyleEditor;
     private string featureStyleName = "";
     private bool show = true;
     private Dictionary<string, bool> showStyle;
 
     public FeatureStyleEditor()
     {
-        polygonBuilderEditor = new PolygonBuilderEditor();
-        polylineBuilderEditor = new PolylineBuilderEditor();
         featureFilterEditor = new FeatureFilterEditor();
+        layerStyleEditor = new LayerStyleEditor();
 
         showStyle = new Dictionary<string, bool>();
     }
 
+    /*
     private void LoadPreferences(MapzenMap mapzenMap)
     {
         show = EditorPrefs.GetBool("FeatureStyleEditor.show");
@@ -45,16 +44,16 @@ public class FeatureStyleEditor
             EditorPrefs.SetBool("FeatureStyleEditor.showStyle" + featureStyling.Name,
                 showStyle[featureStyling.Name]);
         }
-    }
+    }*/
 
     public void OnInspectorGUI(MapzenMap mapzenMap)
     {
-        LoadPreferences(mapzenMap);
+        // LoadPreferences(mapzenMap);
 
         show = EditorGUILayout.Foldout(show, "Filtering and styling");
         if (!show)
         {
-            SavePreferences(mapzenMap);
+            // SavePreferences(mapzenMap);
             return;
         }
 
@@ -77,6 +76,7 @@ public class FeatureStyleEditor
                 }
                 else
                 {
+                    /*
                     var defaultMaterial = new Material(Shader.Find("Diffuse"));
                     var defaultPolygonBuilderOptions = polygonBuilderEditor.DefaultOptions;
                     var defaultPolylineBuilderOptions = polylineBuilderEditor.DefaultOptions;
@@ -84,7 +84,9 @@ public class FeatureStyleEditor
 
                     var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
                                            defaultPolygonBuilderOptions, defaultPolylineBuilderOptions);
+                    */
 
+                    var featureStyle = new FeatureStyle(featureStyleName);
                     mapzenMap.FeatureStyling.Add(featureStyle);
 
                     showStyle[featureStyle.Name] = false;
@@ -126,10 +128,10 @@ public class FeatureStyleEditor
 
             EditorGUI.indentLevel++;
 
-            featureStyling.PolygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(featureStyling.PolygonBuilderOptions, featureStyling.Name);
-            featureStyling.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions, featureStyling.Name);
-            featureFilterEditor.OnInspectorGUI(featureStyling.Filter, featureStyling.Name);
-            featureStyling.Material = EditorGUILayout.ObjectField("Material:", featureStyling.Material, typeof(Material)) as Material;
+            // featureStyling.PolygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(featureStyling.PolygonBuilderOptions, featureStyling.Name);
+            // featureStyling.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions, featureStyling.Name);
+            // featureFilterEditor.OnInspectorGUI(featureStyling.Filter, featureStyling.Name);
+            // featureStyling.Material = EditorGUILayout.ObjectField("Material:", featureStyling.Material, typeof(Material)) as Material;
 
             // TODO: add interface for filter matcher
 
@@ -141,6 +143,6 @@ public class FeatureStyleEditor
 
         EditorGUI.indentLevel--;
 
-        SavePreferences(mapzenMap);
+        // SavePreferences(mapzenMap);
     }
 }
