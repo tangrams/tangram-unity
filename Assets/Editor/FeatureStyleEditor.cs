@@ -8,52 +8,54 @@ using System;
 
 public class FeatureStyleEditor
 {
-    private FeatureFilterEditor featureFilterEditor;
-    private LayerStyleEditor layerStyleEditor;
-    private string featureStyleName = "";
-    private bool show = true;
-    private Dictionary<string, bool> showStyle;
-
-    public FeatureStyleEditor()
+    private class FeatureStyleEditorPrefs
     {
-        featureFilterEditor = new FeatureFilterEditor();
-        layerStyleEditor = new LayerStyleEditor();
+        public static string Key = "FeatureStyleEditor";
+        public bool show = true;
+        public Dictionary<string, bool> showStyle;
 
-        showStyle = new Dictionary<string, bool>();
-    }
-
-    /*
-    private void LoadPreferences(MapzenMap mapzenMap)
-    {
-        show = EditorPrefs.GetBool("FeatureStyleEditor.show");
-
-        showStyle.Clear();
-
-        foreach (var featureStyling in mapzenMap.FeatureStyling)
+        public FeatureStyleEditorPrefs()
         {
-            showStyle[featureStyling.Name] = EditorPrefs.GetBool("FeatureStyleEditor.showStyle" + featureStyling.Name);
+            showStyle = new Dictionary<string, bool>();
         }
     }
 
-    private void SavePreferences(MapzenMap mapzenMap)
+    private static string featureStyleName = "";
+
+    private static FeatureStyleEditorPrefs LoadPreferences(MapzenMap mapzenMap)
     {
-        EditorPrefs.SetBool("FeatureStyleEditor.show", show);
+        FeatureStyleEditorPrefs preferences = new FeatureStyleEditorPrefs();
+
+        preferences.show = EditorPrefs.GetBool(FeatureStyleEditorPrefs.Key + ".show");
 
         foreach (var featureStyling in mapzenMap.FeatureStyling)
         {
-            EditorPrefs.SetBool("FeatureStyleEditor.showStyle" + featureStyling.Name,
-                showStyle[featureStyling.Name]);
+            preferences.showStyle[featureStyling.Name] =
+                EditorPrefs.GetBool(FeatureStyleEditorPrefs.Key + ".showStyle." + featureStyling.Name);
         }
-    }*/
 
-    public void OnInspectorGUI(MapzenMap mapzenMap)
+        return preferences;
+    }
+
+    private static void SavePreferences(FeatureStyleEditorPrefs preferences)
     {
-        // LoadPreferences(mapzenMap);
+        EditorPrefs.SetBool(FeatureStyleEditorPrefs.Key + ".show", preferences.show);
 
-        show = EditorGUILayout.Foldout(show, "Filtering and styling");
-        if (!show)
+        foreach (var featureStyleName in preferences.showStyle.Keys)
         {
-            // SavePreferences(mapzenMap);
+            EditorPrefs.SetBool(FeatureStyleEditorPrefs.Key + ".showStyle." + featureStyleName,
+                preferences.showStyle[featureStyleName]);
+        }
+    }
+
+    public static void OnInspectorGUI(MapzenMap mapzenMap)
+    {
+        var prefs = LoadPreferences(mapzenMap);
+
+        prefs.show = EditorGUILayout.Foldout(prefs.show, "Filtering and styling");
+        if (!prefs.show)
+        {
+            SavePreferences(prefs);
             return;
         }
 
@@ -89,7 +91,7 @@ public class FeatureStyleEditor
                     var featureStyle = new FeatureStyle(featureStyleName);
                     mapzenMap.FeatureStyling.Add(featureStyle);
 
-                    showStyle[featureStyle.Name] = false;
+                    prefs.showStyle[featureStyle.Name] = false;
                 }
             }
             EditorStyle.ResetColor();
@@ -104,13 +106,8 @@ public class FeatureStyleEditor
 
             EditorGUILayout.BeginHorizontal();
             {
-                bool foldout = false;
-                if (showStyle.ContainsKey(featureStyling.Name))
-                {
-                    foldout = showStyle[featureStyling.Name];
-                }
-
-                showStyle[featureStyling.Name] = EditorGUILayout.Foldout(foldout, featureStyling.Name);
+                prefs.showStyle[featureStyling.Name] =
+                    EditorGUILayout.Foldout(prefs.showStyle[featureStyling.Name], featureStyling.Name);
 
                 EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
                 if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
@@ -121,7 +118,7 @@ public class FeatureStyleEditor
             }
             EditorGUILayout.EndHorizontal();
 
-            if (!showStyle[featureStyling.Name])
+            if (!prefs.showStyle[featureStyling.Name])
             {
                 continue;
             }
@@ -143,6 +140,6 @@ public class FeatureStyleEditor
 
         EditorGUI.indentLevel--;
 
-        // SavePreferences(mapzenMap);
+        SavePreferences(prefs);
     }
 }
