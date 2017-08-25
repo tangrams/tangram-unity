@@ -98,7 +98,7 @@ namespace Mapzen
             {
                 this.name = name;
                 this.layerStyles = new List<LayerStyle>();
-                filter = new FeatureFilter();
+                this.filter = new FeatureFilter();
             }
 
             public void AddLayerStyle(LayerStyle layerStyle)

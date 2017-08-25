@@ -40,13 +40,13 @@ public class FilterStyleEditor
 
     public static void OnInspectorGUI(FeatureStyle.FilterStyle filterStyle)
     {
-        var prefs = LoadPreferences(filterStyle.Name);
+        var prefs = FilterStyleEditor.LoadPreferences(filterStyle.Name);
 
         prefs.show = EditorGUILayout.Foldout(prefs.show, filterStyle.Name);
 
         if (!prefs.show)
         {
-            SavePreferences(prefs, filterStyle.Name);
+            FilterStyleEditor.SavePreferences(prefs, filterStyle.Name);
             return;
         }
 
@@ -103,6 +103,6 @@ public class FilterStyleEditor
             }
         }
 
-        SavePreferences(prefs, filterStyle.Name);
+        FilterStyleEditor.SavePreferences(prefs, filterStyle.Name);
     }
 }

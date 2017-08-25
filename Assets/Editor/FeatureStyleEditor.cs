@@ -12,15 +12,16 @@ public class FeatureStyleEditor
     {
         public bool show = true;
         public Dictionary<string, bool> showStyle;
+        public Dictionary<string, string> filterStyleName;
 
         public FeatureStyleEditorPrefs()
         {
             showStyle = new Dictionary<string, bool>();
+            filterStyleName = new Dictionary<string, string>();
         }
     }
 
     private static string featureStyleName = "";
-    private static string filterStyleName = "";
 
     private static FeatureStyleEditorPrefs LoadPreferences(MapzenMap mapzenMap)
     {
@@ -30,8 +31,10 @@ public class FeatureStyleEditor
 
         foreach (var featureStyling in mapzenMap.FeatureStyling)
         {
-            preferences.showStyle[featureStyling.Name] =
-                EditorPrefs.GetBool(typeof(FeatureStyleEditor).Name + ".showStyle." + featureStyling.Name);
+            string prefKey = typeof(FeatureStyleEditor).Name + ".showStyle." + featureStyling.Name;
+            preferences.showStyle[featureStyling.Name] = EditorPrefs.GetBool(prefKey);
+            prefKey = typeof(FeatureStyleEditor).Name + ".filterStyleName." + featureStyling.Name;
+            preferences.filterStyleName.Add(featureStyling.Name, EditorPrefs.GetString(), prefKey);
         }
 
         return preferences;
@@ -43,8 +46,10 @@ public class FeatureStyleEditor
 
         foreach (var featureStyleName in preferences.showStyle.Keys)
         {
-            EditorPrefs.SetBool(typeof(FeatureStyleEditor).Name + ".showStyle." + featureStyleName,
-                preferences.showStyle[featureStyleName]);
+            string prefKey = typeof(FeatureStyleEditor).Name + ".showStyle." + featureStyleName;
+            EditorPrefs.SetBool(prefKey, preferences.showStyle[featureStyleName]);
+            prefKey = typeof(FeatureStyleEditor).Name + ".filterStyleName." + featureStyleName;
+            EditorPrefs.SetString(prefKey, preferences.filterStyleName[featureStyleName]);
         }
     }
 
@@ -76,10 +81,11 @@ public class FeatureStyleEditor
             mapzenMap.FeatureStyling.Add(featureStyle);
 
             prefs.showStyle[featureStyle.Name] = false;
+            prefs.filterStyleName[featureStyle.Name] = ""; 
         }
     }
 
-    private static void AddFilter(FeatureStyleEditorPrefs prefs, FeatureStyle featureStyling)
+    private static void AddFilter(FeatureStyleEditorPrefs prefs, FeatureStyle featureStyling, string filterStyleName)
     {
         var queryFilterStyleName = featureStyling.FilterStyles.Where(filterStyle => filterStyle.Name == filterStyleName);
 
@@ -100,12 +106,12 @@ public class FeatureStyleEditor
 
     public static void OnInspectorGUI(MapzenMap mapzenMap, string panelName)
     {
-        var prefs = LoadPreferences(mapzenMap);
+        var prefs = FeatureStyleEditor.LoadPreferences(mapzenMap);
 
         prefs.show = EditorGUILayout.Foldout(prefs.show, panelName);
         if (!prefs.show)
         {
-            SavePreferences(prefs);
+            FeatureStyleEditor.SavePreferences(prefs);
             return;
         }
 
@@ -149,12 +155,13 @@ public class FeatureStyleEditor
 
             EditorGUILayout.BeginHorizontal();
             {
-                filterStyleName = EditorGUILayout.TextField("Filter name: ", filterStyleName);
+                prefs.filterStyleName[featureStyling.Name] = 
+                    EditorGUILayout.TextField("Filter name: ", prefs.filterStyleName[featureStyling.Name]);
 
                 EditorStyle.SetColor(EditorStyle.AddButtonColor);
                 if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
                 {
-                    FeatureStyleEditor.AddFilter(prefs, featureStyling);
+                    FeatureStyleEditor.AddFilter(prefs, featureStyling, prefs.filterStyleName[featureStyling.Name]);
                 }
                 EditorStyle.ResetColor();
             }
@@ -180,6 +187,6 @@ public class FeatureStyleEditor
 
         EditorGUI.indentLevel--;
 
-        SavePreferences(prefs);
+        FeatureStyleEditor.SavePreferences(prefs);
     }
 }
