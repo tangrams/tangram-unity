@@ -86,6 +86,7 @@ namespace Mapzen
             public FeatureFilter Filter
             {
                 get { return filter; }
+                set { filter = value; }
             }
 
             public string Name
@@ -93,11 +94,11 @@ namespace Mapzen
                 get { return name; }
             }
 
-            public FilterStyle(string name, FeatureFilter filter)
+            public FilterStyle(string name)
             {
-                this.filter = filter;
                 this.name = name;
                 this.layerStyles = new List<LayerStyle>();
+                filter = new FeatureFilter();
             }
 
             public void AddLayerStyle(LayerStyle layerStyle)

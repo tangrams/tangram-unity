@@ -10,7 +10,6 @@ public class FeatureStyleEditor
 {
     private class FeatureStyleEditorPrefs
     {
-        public static string Key = "FeatureStyleEditor";
         public bool show = true;
         public Dictionary<string, bool> showStyle;
 
@@ -21,17 +20,18 @@ public class FeatureStyleEditor
     }
 
     private static string featureStyleName = "";
+    private static string filterStyleName = "";
 
     private static FeatureStyleEditorPrefs LoadPreferences(MapzenMap mapzenMap)
     {
         FeatureStyleEditorPrefs preferences = new FeatureStyleEditorPrefs();
 
-        preferences.show = EditorPrefs.GetBool(FeatureStyleEditorPrefs.Key + ".show");
+        preferences.show = EditorPrefs.GetBool(typeof(FeatureStyleEditor).Name + ".show");
 
         foreach (var featureStyling in mapzenMap.FeatureStyling)
         {
             preferences.showStyle[featureStyling.Name] =
-                EditorPrefs.GetBool(FeatureStyleEditorPrefs.Key + ".showStyle." + featureStyling.Name);
+                EditorPrefs.GetBool(typeof(FeatureStyleEditor).Name + ".showStyle." + featureStyling.Name);
         }
 
         return preferences;
@@ -39,12 +39,62 @@ public class FeatureStyleEditor
 
     private static void SavePreferences(FeatureStyleEditorPrefs preferences)
     {
-        EditorPrefs.SetBool(FeatureStyleEditorPrefs.Key + ".show", preferences.show);
+        EditorPrefs.SetBool(typeof(FeatureStyleEditor).Name + ".show", preferences.show);
 
         foreach (var featureStyleName in preferences.showStyle.Keys)
         {
-            EditorPrefs.SetBool(FeatureStyleEditorPrefs.Key + ".showStyle." + featureStyleName,
+            EditorPrefs.SetBool(typeof(FeatureStyleEditor).Name + ".showStyle." + featureStyleName,
                 preferences.showStyle[featureStyleName]);
+        }
+    }
+
+    private static void AddStyle(FeatureStyleEditorPrefs prefs, MapzenMap mapzenMap)
+    {
+        var queryStyleName = mapzenMap.FeatureStyling.Where(style => style.Name == featureStyleName);
+
+        if (featureStyleName.Length == 0)
+        {
+            Debug.LogError("The style name can't be empty");
+        }
+        else if (queryStyleName.Count() > 0)
+        {
+            Debug.LogError("Style with name " + featureStyleName + " already exists");
+        }
+        else
+        {
+            /*
+            var defaultMaterial = new Material(Shader.Find("Diffuse"));
+            var defaultPolygonBuilderOptions = polygonBuilderEditor.DefaultOptions;
+            var defaultPolylineBuilderOptions = polylineBuilderEditor.DefaultOptions;
+            var defaultFilter = new FeatureFilter();
+
+            var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
+                                   defaultPolygonBuilderOptions, defaultPolylineBuilderOptions);
+            */
+
+            var featureStyle = new FeatureStyle(featureStyleName);
+            mapzenMap.FeatureStyling.Add(featureStyle);
+
+            prefs.showStyle[featureStyle.Name] = false;
+        }
+    }
+
+    private static void AddFilter(FeatureStyleEditorPrefs prefs, FeatureStyle featureStyling)
+    {
+        var queryFilterStyleName = featureStyling.FilterStyles.Where(filterStyle => filterStyle.Name == filterStyleName);
+
+        if (filterStyleName.Length == 0)
+        {
+            Debug.LogError("The filter name can't be empty");
+        }
+        else if (queryFilterStyleName.Count() > 0)
+        {
+            Debug.LogError("Filter with name " + filterStyleName + " already exists");
+        }
+        else
+        {
+            var filterStyle = new FeatureStyle.FilterStyle(filterStyleName);
+            featureStyling.AddFilterStyle(filterStyle);
         }
     }
 
@@ -66,33 +116,7 @@ public class FeatureStyleEditor
             EditorStyle.SetColor(EditorStyle.AddButtonColor);
             if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
             {
-                var queryStyleName = mapzenMap.FeatureStyling.Where(style => style.Name == featureStyleName);
-
-                if (featureStyleName.Length == 0)
-                {
-                    Debug.LogError("The style name can't be empty");
-                }
-                else if (queryStyleName.Count() > 0)
-                {
-                    Debug.LogError("Style with name " + featureStyleName + " already exists");
-                }
-                else
-                {
-                    /*
-                    var defaultMaterial = new Material(Shader.Find("Diffuse"));
-                    var defaultPolygonBuilderOptions = polygonBuilderEditor.DefaultOptions;
-                    var defaultPolylineBuilderOptions = polylineBuilderEditor.DefaultOptions;
-                    var defaultFilter = new FeatureFilter();
-
-                    var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
-                                           defaultPolygonBuilderOptions, defaultPolylineBuilderOptions);
-                    */
-
-                    var featureStyle = new FeatureStyle(featureStyleName);
-                    mapzenMap.FeatureStyling.Add(featureStyle);
-
-                    prefs.showStyle[featureStyle.Name] = false;
-                }
+                FeatureStyleEditor.AddStyle(prefs, mapzenMap);
             }
             EditorStyle.ResetColor();
         }
@@ -123,6 +147,19 @@ public class FeatureStyleEditor
                 continue;
             }
 
+            EditorGUILayout.BeginHorizontal();
+            {
+                filterStyleName = EditorGUILayout.TextField("Filter name: ", filterStyleName);
+
+                EditorStyle.SetColor(EditorStyle.AddButtonColor);
+                if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
+                {
+                    FeatureStyleEditor.AddFilter(prefs, featureStyling);
+                }
+                EditorStyle.ResetColor();
+            }
+            EditorGUILayout.EndHorizontal();
+
             EditorGUI.indentLevel++;
 
             foreach (var filterStyle in featureStyling.FilterStyles)
@@ -134,8 +171,6 @@ public class FeatureStyleEditor
             // featureStyling.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions, featureStyling.Name);
             // featureFilterEditor.OnInspectorGUI(featureStyling.Filter, featureStyling.Name);
             // featureStyling.Material = EditorGUILayout.ObjectField("Material:", featureStyling.Material, typeof(Material)) as Material;
-
-            // TODO: add interface for filter matcher
 
             EditorGUI.indentLevel--;
 
