@@ -50,6 +50,7 @@ public class MapzenMapEditor : Editor
 
     private void LogWarnings()
     {
+        // TODO: iterate over the style and check their consistency
         /*foreach (var style in mapzenMap.FeatureStyling)
         {
             if (style.Filter.CollectionNameSet.Count == 0)

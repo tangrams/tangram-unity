@@ -9,18 +9,38 @@ public class FilterStyleEditor
     private class FitlerStyleEditorPrefs
     {
         public bool show = false;
+        public Dictionary<string, bool> showLayer;
+
+        public FitlerStyleEditorPrefs()
+        {
+            this.showLayer = new Dictionary<string, bool>();
+        }
     }
 
-    private static FitlerStyleEditorPrefs LoadPreferences(string panelName)
+    private static FitlerStyleEditorPrefs LoadPreferences(FeatureStyle.FilterStyle filterStyle)
     {
         FitlerStyleEditorPrefs preferences = new FitlerStyleEditorPrefs();
-        preferences.show = EditorPrefs.GetBool(typeof(FilterStyleEditor).Name + ".show." + panelName);
+        preferences.show = EditorPrefs.GetBool(typeof(FilterStyleEditor).Name + ".show." + filterStyle.Name);
+
+        foreach (var layerStyling in filterStyle.LayerStyles)
+        {
+            string prefKey = typeof(FilterStyleEditor).Name + "." + filterStyle.Name + ".show." + layerStyling.LayerName;
+            string dicKey = filterStyle.Name + layerStyling.LayerName;
+            preferences.showLayer[dicKey] = EditorPrefs.GetBool(prefKey);
+        }
         return preferences;
     }
 
-    private static void SavePreferences(FitlerStyleEditorPrefs prefs, string panelName)
+    private static void SavePreferences(FitlerStyleEditorPrefs prefs, FeatureStyle.FilterStyle filterStyle)
     {
-        EditorPrefs.SetBool(typeof(FilterStyleEditor).Name + ".show." + panelName, prefs.show);
+        EditorPrefs.SetBool(typeof(FilterStyleEditor).Name + ".show." + filterStyle.Name, prefs.show);
+
+        foreach (var layerStyling in filterStyle.LayerStyles)
+        {
+            string prefKey = typeof(FilterStyleEditor).Name + "." + filterStyle.Name + ".show." + layerStyling.LayerName;
+            string dicKey = filterStyle.Name + layerStyling.LayerName;
+            EditorPrefs.SetBool(prefKey, prefs.showLayer[dicKey]);
+        }
     }
 
     private static string customFeatureCollection = "";
@@ -38,7 +58,7 @@ public class FilterStyleEditor
             "water"
         });
 
-    private static void AddLayerStyleLayout(FeatureStyle.FilterStyle filterStyle, string name)
+    private static void AddLayerStyleLayout(FitlerStyleEditorPrefs prefs, FeatureStyle.FilterStyle filterStyle, string name)
     {
         EditorStyle.SetColor(EditorStyle.AddButtonColor);
         if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
@@ -49,7 +69,11 @@ public class FilterStyleEditor
             }
             else
             {
-                filterStyle.Filter.CollectionNameSet.Add(defaultLayers[selectedLayer]);
+                // TODO: restrict adding several times the same layer
+                var layerStyle = new FeatureStyle.LayerStyle(name);
+                filterStyle.AddLayerStyle(layerStyle);
+                filterStyle.Filter.CollectionNameSet.Add(name);
+                prefs.showLayer[filterStyle.Name + name] = false;
             }
         }
         EditorStyle.ResetColor();
@@ -57,13 +81,13 @@ public class FilterStyleEditor
 
     public static void OnInspectorGUI(FeatureStyle.FilterStyle filterStyle)
     {
-        var prefs = FilterStyleEditor.LoadPreferences(filterStyle.Name);
+        var prefs = FilterStyleEditor.LoadPreferences(filterStyle);
 
         prefs.show = EditorGUILayout.Foldout(prefs.show, filterStyle.Name);
 
         if (!prefs.show)
         {
-            FilterStyleEditor.SavePreferences(prefs, filterStyle.Name);
+            FilterStyleEditor.SavePreferences(prefs, filterStyle);
             return;
         }
 
@@ -71,7 +95,7 @@ public class FilterStyleEditor
         EditorGUILayout.BeginHorizontal();
         {
             selectedLayer = EditorGUILayout.Popup("Default layer:", selectedLayer, defaultLayers.ToArray());
-            FilterStyleEditor.AddLayerStyleLayout(filterStyle, defaultLayers[selectedLayer]);
+            FilterStyleEditor.AddLayerStyleLayout(prefs, filterStyle, defaultLayers[selectedLayer]);
         }
         EditorGUILayout.EndHorizontal();
 
@@ -79,16 +103,42 @@ public class FilterStyleEditor
         EditorGUILayout.BeginHorizontal();
         {
             customFeatureCollection = EditorGUILayout.TextField("Custom layer:", customFeatureCollection);
-            FilterStyleEditor.AddLayerStyleLayout(filterStyle, customFeatureCollection);
+            FilterStyleEditor.AddLayerStyleLayout(prefs, filterStyle, customFeatureCollection);
         }
         EditorGUILayout.EndHorizontal();
 
-        // Show currently create filters
-        if (filterStyle.Filter.CollectionNameSet.Count > 0)
+        for (int i = filterStyle.LayerStyles.Count - 1; i >= 0; i--)
         {
-            for (int i = filterStyle.Filter.CollectionNameSet.Count - 1; i >= 0; i--)
+            var layerStyle = filterStyle.LayerStyles[i];
+
+            bool showLayer = false;
+
+            EditorGUILayout.BeginHorizontal();
             {
-                EditorGUILayout.BeginHorizontal();
+                string prefShowKey = filterStyle.Name + layerStyle.LayerName;
+                showLayer = EditorGUILayout.Foldout(prefs.showLayer[prefShowKey], filterStyle.Name);
+                prefs.showLayer[prefShowKey] = showLayer;
+
+                EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
+                if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
+                {
+                    filterStyle.LayerStyles.RemoveAt(i);
+                }
+                EditorStyle.ResetColor();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (!showLayer)
+            {
+                continue;
+            }
+
+            LayerStyleEditor.OnInspectorGUI(layerStyle);
+
+            // TODO: Matchers
+
+            /*EditorGUILayout.BeginHorizontal();
+            {
                 EditorGUILayout.TextField(filterStyle.Filter.CollectionNameSet[i]);
                 EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
                 if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
@@ -96,10 +146,11 @@ public class FilterStyleEditor
                     filterStyle.Filter.CollectionNameSet.RemoveAt(i);
                 }
                 EditorStyle.ResetColor();
-                EditorGUILayout.EndHorizontal();
             }
+            EditorGUILayout.EndHorizontal();*/
         }
 
-        FilterStyleEditor.SavePreferences(prefs, filterStyle.Name);
+
+        FilterStyleEditor.SavePreferences(prefs, filterStyle);
     }
 }

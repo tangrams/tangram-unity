@@ -16,8 +16,8 @@ public class FeatureStyleEditor
 
         public FeatureStyleEditorPrefs()
         {
-            showStyle = new Dictionary<string, bool>();
-            filterStyleName = new Dictionary<string, string>();
+            this.showStyle = new Dictionary<string, bool>();
+            this.filterStyleName = new Dictionary<string, string>();
         }
     }
 
@@ -133,11 +133,12 @@ public class FeatureStyleEditor
         for (int i = mapzenMap.FeatureStyling.Count - 1; i >= 0; i--)
         {
             var featureStyling = mapzenMap.FeatureStyling[i];
+            bool showFeatureStyle = false;
 
             EditorGUILayout.BeginHorizontal();
             {
-                prefs.showStyle[featureStyling.Name] =
-                    EditorGUILayout.Foldout(prefs.showStyle[featureStyling.Name], featureStyling.Name);
+                showFeatureStyle = EditorGUILayout.Foldout(prefs.showStyle[featureStyling.Name], featureStyling.Name);
+                prefs.showStyle[featureStyling.Name] = showFeatureStyle;
 
                 EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
                 if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
@@ -148,7 +149,7 @@ public class FeatureStyleEditor
             }
             EditorGUILayout.EndHorizontal();
 
-            if (!prefs.showStyle[featureStyling.Name])
+            if (!showFeatureStyle)
             {
                 continue;
             }
