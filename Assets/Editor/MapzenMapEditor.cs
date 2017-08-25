@@ -15,7 +15,7 @@ public class MapzenMapEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        FeatureStyleEditor.OnInspectorGUI(mapzenMap);
+        FeatureStyleEditor.OnInspectorGUI(mapzenMap, "Filtering and styling");
 
         tileDataEditor.OnInspectorGUI(mapzenMap);
 

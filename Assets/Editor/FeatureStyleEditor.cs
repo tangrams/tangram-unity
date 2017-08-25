@@ -48,11 +48,11 @@ public class FeatureStyleEditor
         }
     }
 
-    public static void OnInspectorGUI(MapzenMap mapzenMap)
+    public static void OnInspectorGUI(MapzenMap mapzenMap, string panelName)
     {
         var prefs = LoadPreferences(mapzenMap);
 
-        prefs.show = EditorGUILayout.Foldout(prefs.show, "Filtering and styling");
+        prefs.show = EditorGUILayout.Foldout(prefs.show, panelName);
         if (!prefs.show)
         {
             SavePreferences(prefs);
@@ -124,6 +124,11 @@ public class FeatureStyleEditor
             }
 
             EditorGUI.indentLevel++;
+
+            foreach (var filterStyle in featureStyling.FilterStyles)
+            {
+                FilterStyleEditor.OnInspectorGUI(filterStyle);
+            }
 
             // featureStyling.PolygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(featureStyling.PolygonBuilderOptions, featureStyling.Name);
             // featureStyling.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions, featureStyling.Name);
