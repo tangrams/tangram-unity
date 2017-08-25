@@ -8,17 +8,8 @@ using System;
 public class FeatureFilterEditor
 {
     private bool show = false;
-    private IFeatureFilter filter;
-
-    private static GUILayoutOption buttonWidth = GUILayout.Width(50.0f);
-    private static GUIContent addLayerButtonContent =
-        new GUIContent("+", "Add layer collection");
-    private static GUIContent removeLayerButtonContent =
-        new GUIContent("-", "Remove layer collection");
-
     private string customFeatureCollection = "";
     private int selectedLayer;
-    private List<string> layers = new List<string>();
     private List<string> defaultLayers = new List<string>(new string[]
         {
             "boundaries",
@@ -32,56 +23,82 @@ public class FeatureFilterEditor
             "water"
         });
 
-
-    public IFeatureFilter OnInspectorGUI()
+    private void LoadPreferences(string name)
     {
+        show = EditorPrefs.GetBool("FeatureFilterEditor.show" + name);
+    }
+
+    private void SavePreferences(string name)
+    {
+        EditorPrefs.SetBool("FeatureFilterEditor.show" + name, show);
+    }
+
+    public FeatureFilter OnInspectorGUI(FeatureFilter filter, string name)
+    {
+        LoadPreferences(name);
+
+        show = EditorGUILayout.Foldout(show, "Filter");
+        if (!show)
+        {
+            SavePreferences(name);
+            return filter;
+        }
+
         // Default layers
         EditorGUILayout.BeginHorizontal();
         {
             selectedLayer = EditorGUILayout.Popup("Default layer:",
-                    selectedLayer, defaultLayers.ToArray());
+                selectedLayer, defaultLayers.ToArray());
 
-            if (GUILayout.Button(addLayerButtonContent, buttonWidth))
+            EditorStyle.SetColor(EditorStyle.AddButtonColor);
+            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
             {
-                layers.Add(defaultLayers[selectedLayer]);
+                filter.CollectionNameSet.Add(defaultLayers[selectedLayer]);
             }
+            EditorStyle.ResetColor();
         }
         EditorGUILayout.EndHorizontal();
 
         // Custom layer entry
         EditorGUILayout.BeginHorizontal();
         {
-            GUILayout.Label("Custom layer:");
-            customFeatureCollection = GUILayout.TextField(customFeatureCollection);
+            customFeatureCollection = EditorGUILayout.TextField("Custom layer:", customFeatureCollection);
 
-            if (GUILayout.Button(addLayerButtonContent, buttonWidth)
-                && customFeatureCollection.Length > 0)
+            EditorStyle.SetColor(EditorStyle.AddButtonColor);
+            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
             {
-                layers.Add(customFeatureCollection);
+                if (customFeatureCollection.Length == 0)
+                {
+                    Debug.LogError("Custom layer name can't be empty");
+                }
+                else
+                {
+                    filter.CollectionNameSet.Add(customFeatureCollection);
+                }
             }
+            EditorStyle.ResetColor();
         }
         EditorGUILayout.EndHorizontal();
 
-        GUILayout.Space(10);
-
         // Show currently create filters
-        if (layers.Count > 0)
+        if (filter.CollectionNameSet.Count > 0)
         {
-            GUILayout.Label("Filter layers:");
-
-            for (int i = layers.Count - 1; i >= 0; i--)
+            for (int i = filter.CollectionNameSet.Count - 1; i >= 0; i--)
             {
                 EditorGUILayout.BeginHorizontal();
-                string layer = layers[i];
-                GUILayout.TextField(layer);
-                if (GUILayout.Button(removeLayerButtonContent, buttonWidth))
+                EditorGUILayout.TextField(filter.CollectionNameSet[i]);
+                EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
+                if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
                 {
-                    layers.RemoveAt(i);
+                    filter.CollectionNameSet.RemoveAt(i);
                 }
+                EditorStyle.ResetColor();
                 EditorGUILayout.EndHorizontal();
             }
         }
 
-        return new FeatureFilter().TakeAllFromCollections(layers.ToArray());
+        SavePreferences(name);
+
+        return filter;
     }
 }

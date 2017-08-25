@@ -58,7 +58,7 @@ public class TileTask
 
                     if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                     {
-                        var polygonOptions = style.PolygonOptions(feature, inverseTileScale);
+                        var polygonOptions = style.GetPolygonOptions(feature, inverseTileScale);
                         var builder = new PolygonBuilder(leaf.meshData, polygonOptions, transform);
 
                         feature.HandleGeometry(builder);
@@ -66,7 +66,7 @@ public class TileTask
 
                     if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
                     {
-                        var polylineOptions = style.PolylineOptions(feature, inverseTileScale);
+                        var polylineOptions = style.GetPolylineOptions(feature, inverseTileScale);
                         var builder = new PolylineBuilder(leaf.meshData, polylineOptions, transform);
 
                         feature.HandleGeometry(builder);

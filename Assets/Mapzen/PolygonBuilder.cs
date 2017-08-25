@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using Mapzen.VectorData;
 using UnityEngine;
+using System;
 
 namespace Mapzen
 {
     public class PolygonBuilder : IGeometryHandler
     {
+        [Serializable]
         public struct Options
         {
             public Material Material;

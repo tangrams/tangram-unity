@@ -5,43 +5,29 @@ using UnityEngine;
 
 namespace Mapzen
 {
+    [Serializable]
     public class FeatureStyle
     {
-        public IFeatureFilter Filter
-        {
-            get;
-            internal set;
-        }
+        public FeatureFilter Filter;
+        public Material Material;
+        public string Name;
+        public PolygonBuilder.Options PolygonBuilderOptions;
+        public PolylineBuilder.Options PolylineBuilderOptions;
 
-        public Material Material
-        {
-            get;
-            internal set;
-        }
-
-        public string Name
-        {
-            get;
-            internal set;
-        }
-
-        public PolygonBuilder.Options polygonBuilderOptions;
-        private PolylineBuilder.Options polylineBuilderOptions;
-
-        public FeatureStyle(IFeatureFilter filter, Material material, string name,
+        public FeatureStyle(FeatureFilter filter, Material material, string name,
                             PolygonBuilder.Options polygonBuilderOptions,
                             PolylineBuilder.Options polylineBuilderOptions)
         {
             this.Filter = filter;
             this.Name = name;
             this.Material = material;
-            this.polygonBuilderOptions = polygonBuilderOptions;
-            this.polylineBuilderOptions = polylineBuilderOptions;
+            this.PolygonBuilderOptions = polygonBuilderOptions;
+            this.PolylineBuilderOptions = polylineBuilderOptions;
         }
 
-        public PolygonBuilder.Options PolygonOptions(Feature feature, float inverseTileScale)
+        public PolygonBuilder.Options GetPolygonOptions(Feature feature, float inverseTileScale)
         {
-            var options = polygonBuilderOptions;
+            var options = PolygonBuilderOptions;
 
             options.Material = this.Material;
 
@@ -61,9 +47,9 @@ namespace Mapzen
             return options;
         }
 
-        public PolylineBuilder.Options PolylineOptions(Feature feature, float inverseTileScale)
+        public PolylineBuilder.Options GetPolylineOptions(Feature feature, float inverseTileScale)
         {
-            var options = polylineBuilderOptions;
+            var options = PolylineBuilderOptions;
 
             options.Material = this.Material;
             options.Width *= inverseTileScale;

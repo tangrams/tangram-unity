@@ -8,61 +8,74 @@ public class TileDataEditor
 {
     private bool show = false;
 
+    private static GUILayoutOption buttonWidth = GUILayout.Width(100.0f);
+
+    private void LoadPreferences()
+    {
+        show = EditorPrefs.GetBool("TileDataEditor.show");
+    }
+
+    private void SavePreferences()
+    {
+        EditorPrefs.SetBool("TileDataEditor.show", show);
+    }
+
+    private void SceneGroupToggle(MapzenMap mapzenMap, SceneGroup.Type type)
+    {
+        bool isSet = SceneGroup.Test(type, mapzenMap.GroupOptions);
+        isSet = EditorGUILayout.Toggle(type.ToString(), isSet);
+
+        mapzenMap.GroupOptions = isSet ?
+            mapzenMap.GroupOptions | type :
+            mapzenMap.GroupOptions & ~type;
+    }
+
     public void OnInspectorGUI(MapzenMap mapzenMap)
     {
+        LoadPreferences();
+
         show = EditorGUILayout.Foldout(show, "Tile data");
         if (!show)
         {
+            SavePreferences();
             return;
         }
 
         // Group options
         {
             GUILayout.Label("Group by:");
-            var types = Enum.GetValues(typeof(SceneGroup.Type));
 
-            foreach (SceneGroup.Type type in types)
+            EditorGUI.indentLevel++;
+
+            EditorGUILayout.BeginHorizontal();
+            SceneGroupToggle(mapzenMap, SceneGroup.Type.Feature);
+            SceneGroupToggle(mapzenMap, SceneGroup.Type.Filter);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            SceneGroupToggle(mapzenMap, SceneGroup.Type.Layer);
+            SceneGroupToggle(mapzenMap, SceneGroup.Type.Tile);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUI.indentLevel--;
+        }
+
+        mapzenMap.RegionName = EditorGUILayout.TextField("Region name:",
+            mapzenMap.RegionName);
+
+        EditorGUILayout.BeginHorizontal();
+        {
+            mapzenMap.ExportPath = EditorGUILayout.TextField("Export path:",
+                mapzenMap.ExportPath);
+            if (GUILayout.Button("Export", buttonWidth))
             {
-                if (type == SceneGroup.Type.All || type == SceneGroup.Type.None)
-                {
-                    continue;
-                }
-
-                bool isSet = SceneGroup.Test(type, mapzenMap.GroupOptions);
-                isSet = EditorGUILayout.Toggle(type.ToString(), isSet);
-
-                mapzenMap.GroupOptions = isSet ?
-                    mapzenMap.GroupOptions | type :
-                    mapzenMap.GroupOptions & ~type;
+                // TODO: Fix export
+                // ExportGameObjects(mapzenMap);
             }
         }
+        EditorGUILayout.EndHorizontal();
 
-        if (GUILayout.Button("Download"))
-        {
-            ClearTiles(mapzenMap);
-            mapzenMap.DownloadTiles();
-        }
-
-        GUILayout.Label("Export path:");
-        mapzenMap.ExportPath = GUILayout.TextField(mapzenMap.ExportPath);
-        if (GUILayout.Button("Export"))
-        {
-            ExportGameObjects(mapzenMap);
-        }
-
-        if (GUILayout.Button("Clear"))
-        {
-            ClearTiles(mapzenMap);
-        }
-    }
-
-    public void ClearTiles(MapzenMap mapzenMap)
-    {
-        for (int i = 0; i < mapzenMap.Tiles.Count; ++i)
-        {
-            GameObject.DestroyImmediate(mapzenMap.Tiles[i]);
-        }
-        mapzenMap.Tiles.Clear();
+        SavePreferences();
     }
 
     private void ExportGameObjects(MapzenMap mapzenMap)

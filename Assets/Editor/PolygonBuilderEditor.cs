@@ -6,42 +6,48 @@ using System;
 public class PolygonBuilderEditor
 {
     private bool show = false;
-    private PolygonBuilder.Options options;
-    private string maxHeight;
+    private PolygonBuilder.Options defaultOptions;
 
-    private static GUILayoutOption layoutWidth = GUILayout.Width(200);
+    public PolygonBuilder.Options DefaultOptions
+    {
+        get
+        {
+            return defaultOptions;
+        }
+    }
 
     public PolygonBuilderEditor()
     {
-        options = new PolygonBuilder.Options();
+        defaultOptions = new PolygonBuilder.Options();
 
-        options.Extrude = true;
-        options.MaxHeight = 0.0f;
-
-        maxHeight = options.MaxHeight.ToString();
+        defaultOptions.Extrude = true;
+        defaultOptions.MaxHeight = 0.0f;
     }
 
-    public PolygonBuilder.Options OnInspectorGUI()
+    private void LoadPreferences(string name)
     {
+        show = EditorPrefs.GetBool("PolygonBuilderEditor.show" + name);
+    }
+
+    private void SavePreferences(string name)
+    {
+        EditorPrefs.SetBool("PolygonBuilderEditor.show" + name, show);
+    }
+
+    public PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options, string name)
+    {
+        LoadPreferences(name);
         show = EditorGUILayout.Foldout(show, "Polygon builder options");
         if (!show)
         {
+            SavePreferences(name);
             return options;
         }
 
-        GUILayout.BeginHorizontal();
-        {
-            GUILayout.Label("Max Height: ");
-            EditorUtil.FloatField(ref maxHeight, ref options.MaxHeight, layoutWidth);
-        }
-        GUILayout.EndHorizontal();
+        options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
+        options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
 
-        GUILayout.BeginHorizontal();
-        {
-            GUILayout.Label("Extrude: ");
-            options.Extrude = GUILayout.Toggle(options.Extrude, "Extrude", layoutWidth);
-        }
-        GUILayout.EndHorizontal();
+        SavePreferences(name);
 
         return options;
     }

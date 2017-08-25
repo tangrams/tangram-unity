@@ -6,53 +6,51 @@ using System;
 public class PolylineBuilderEditor
 {
     private bool show = false;
-    private PolylineBuilder.Options options;
-    private string maxHeight;
-    private string width;
+    private PolylineBuilder.Options defaultOptions;
 
-    private static GUILayoutOption layoutWidth = GUILayout.Width(200);
+    public PolylineBuilder.Options DefaultOptions
+    {
+        get
+        {
+            return defaultOptions;
+        }
+    }
 
     public PolylineBuilderEditor()
     {
-        options = new PolylineBuilder.Options();
+        defaultOptions = new PolylineBuilder.Options();
 
-        options.Extrude = true;
-        options.MaxHeight = 3.0f;
-        options.MiterLimit = 3.0f;
-        options.Width = 15.0f;
-
-        maxHeight = options.MaxHeight.ToString();
-        width = options.Width.ToString();
+        defaultOptions.Extrude = true;
+        defaultOptions.MaxHeight = 3.0f;
+        defaultOptions.MiterLimit = 3.0f;
+        defaultOptions.Width = 15.0f;
     }
 
-    public PolylineBuilder.Options OnInspectorGUI()
+    private void LoadPreferences(string name)
     {
+        show = EditorPrefs.GetBool("PolylineBuilderEditor.show" + name);
+    }
+
+    private void SavePreferences(string name)
+    {
+        EditorPrefs.SetBool("PolylineBuilderEditor.show" + name, show);
+    }
+
+    public PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options, string name)
+    {
+        LoadPreferences(name);
         show = EditorGUILayout.Foldout(show, "Polyline builder options");
         if (!show)
         {
+            SavePreferences(name);
             return options;
         }
 
-        GUILayout.BeginHorizontal();
-        {
-            GUILayout.Label("Width ");
-            EditorUtil.FloatField(ref width, ref options.Width, layoutWidth);
-        }
-        GUILayout.EndHorizontal();
+        options.Width = EditorGUILayout.FloatField("Width: ", options.Width);
+        options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
+        options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
 
-        GUILayout.BeginHorizontal();
-        {
-            GUILayout.Label("Max Height: ");
-            EditorUtil.FloatField(ref maxHeight, ref options.MaxHeight, layoutWidth);
-        }
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-        {
-            GUILayout.Label("Extrude: ");
-            options.Extrude = GUILayout.Toggle(options.Extrude, "Extrude", layoutWidth);
-        }
-        GUILayout.EndHorizontal();
+        SavePreferences(name);
 
         return options;
     }
