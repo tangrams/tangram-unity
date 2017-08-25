@@ -34,7 +34,7 @@ public class FeatureStyleEditor
             string prefKey = typeof(FeatureStyleEditor).Name + ".showStyle." + featureStyling.Name;
             preferences.showStyle[featureStyling.Name] = EditorPrefs.GetBool(prefKey);
             prefKey = typeof(FeatureStyleEditor).Name + ".filterStyleName." + featureStyling.Name;
-            preferences.filterStyleName.Add(featureStyling.Name, EditorPrefs.GetString(), prefKey);
+            preferences.filterStyleName.Add(featureStyling.Name, EditorPrefs.GetString(prefKey));
         }
 
         return preferences;

@@ -38,6 +38,23 @@ public class FilterStyleEditor
             "water"
         });
 
+    private static void AddLayerStyleLayout(FeatureStyle.FilterStyle filterStyle, string name)
+    {
+        EditorStyle.SetColor(EditorStyle.AddButtonColor);
+        if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
+        {
+            if (name.Length == 0)
+            {
+                Debug.LogError("Layer name can't be empty");
+            }
+            else
+            {
+                filterStyle.Filter.CollectionNameSet.Add(defaultLayers[selectedLayer]);
+            }
+        }
+        EditorStyle.ResetColor();
+    }
+
     public static void OnInspectorGUI(FeatureStyle.FilterStyle filterStyle)
     {
         var prefs = FilterStyleEditor.LoadPreferences(filterStyle.Name);
@@ -53,15 +70,8 @@ public class FilterStyleEditor
         // Default layers
         EditorGUILayout.BeginHorizontal();
         {
-            selectedLayer = EditorGUILayout.Popup("Default layer:",
-                selectedLayer, defaultLayers.ToArray());
-
-            EditorStyle.SetColor(EditorStyle.AddButtonColor);
-            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
-            {
-                filterStyle.Filter.CollectionNameSet.Add(defaultLayers[selectedLayer]);
-            }
-            EditorStyle.ResetColor();
+            selectedLayer = EditorGUILayout.Popup("Default layer:", selectedLayer, defaultLayers.ToArray());
+            FilterStyleEditor.AddLayerStyleLayout(filterStyle, defaultLayers[selectedLayer]);
         }
         EditorGUILayout.EndHorizontal();
 
@@ -69,20 +79,7 @@ public class FilterStyleEditor
         EditorGUILayout.BeginHorizontal();
         {
             customFeatureCollection = EditorGUILayout.TextField("Custom layer:", customFeatureCollection);
-
-            EditorStyle.SetColor(EditorStyle.AddButtonColor);
-            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
-            {
-                if (customFeatureCollection.Length == 0)
-                {
-                    Debug.LogError("Custom layer name can't be empty");
-                }
-                else
-                {
-                    filterStyle.Filter.CollectionNameSet.Add(customFeatureCollection);
-                }
-            }
-            EditorStyle.ResetColor();
+            FilterStyleEditor.AddLayerStyleLayout(filterStyle, customFeatureCollection);
         }
         EditorGUILayout.EndHorizontal();
 
