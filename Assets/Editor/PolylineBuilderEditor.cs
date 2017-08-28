@@ -5,44 +5,42 @@ using System;
 
 public class PolylineBuilderEditor
 {
-    private bool show = false;
-    private PolylineBuilder.Options defaultOptions;
-
-    public PolylineBuilder.Options DefaultOptions
+    private class PolylineBuilderEditorPrefs
     {
-        get
-        {
-            return defaultOptions;
-        }
+        public bool show = false;
     }
 
-    public PolylineBuilderEditor()
+    public static PolylineBuilder.Options DefaultOptions()
     {
-        defaultOptions = new PolylineBuilder.Options();
+        var defaultOptions = new PolylineBuilder.Options();
 
         defaultOptions.Extrude = true;
         defaultOptions.MaxHeight = 3.0f;
         defaultOptions.MiterLimit = 3.0f;
         defaultOptions.Width = 15.0f;
+
+        return defaultOptions;
     }
 
-    private void LoadPreferences(string name)
+    private static PolylineBuilderEditorPrefs LoadPreferences(string name)
     {
-        show = EditorPrefs.GetBool("PolylineBuilderEditor.show" + name);
+        var prefs = new PolylineBuilderEditorPrefs();
+        prefs.show = EditorPrefs.GetBool("PolylineBuilderEditor.show" + name);
+        return prefs;
     }
 
-    private void SavePreferences(string name)
+    private static void SavePreferences(PolylineBuilderEditorPrefs prefs, string name)
     {
-        EditorPrefs.SetBool("PolylineBuilderEditor.show" + name, show);
+        EditorPrefs.SetBool("PolylineBuilderEditor.show" + name, prefs.show);
     }
 
-    public PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options, string name)
+    public static PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options, string name)
     {
-        LoadPreferences(name);
-        show = EditorGUILayout.Foldout(show, "Polyline builder options");
-        if (!show)
+        var prefs = PolylineBuilderEditor.LoadPreferences(name);
+        prefs.show = EditorGUILayout.Foldout(prefs.show, "Polyline builder options");
+        if (!prefs.show)
         {
-            SavePreferences(name);
+            PolylineBuilderEditor.SavePreferences(prefs, name);
             return options;
         }
 
@@ -50,7 +48,7 @@ public class PolylineBuilderEditor
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
         options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
 
-        SavePreferences(name);
+        PolylineBuilderEditor.SavePreferences(prefs, name);
 
         return options;
     }

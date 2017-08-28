@@ -67,16 +67,6 @@ public class FeatureStyleEditor
         }
         else
         {
-            /*
-            var defaultMaterial = new Material(Shader.Find("Diffuse"));
-            var defaultPolygonBuilderOptions = polygonBuilderEditor.DefaultOptions;
-            var defaultPolylineBuilderOptions = polylineBuilderEditor.DefaultOptions;
-            var defaultFilter = new FeatureFilter();
-
-            var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
-                                   defaultPolygonBuilderOptions, defaultPolylineBuilderOptions);
-            */
-
             var featureStyle = new FeatureStyle(featureStyleName);
             mapzenMap.FeatureStyling.Add(featureStyle);
 
@@ -174,11 +164,6 @@ public class FeatureStyleEditor
             {
                 FilterStyleEditor.OnInspectorGUI(filterStyle);
             }
-
-            // featureStyling.PolygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(featureStyling.PolygonBuilderOptions, featureStyling.Name);
-            // featureStyling.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions, featureStyling.Name);
-            // featureFilterEditor.OnInspectorGUI(featureStyling.Filter, featureStyling.Name);
-            // featureStyling.Material = EditorGUILayout.ObjectField("Material:", featureStyling.Material, typeof(Material)) as Material;
 
             EditorGUI.indentLevel--;
 

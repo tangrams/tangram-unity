@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Mapzen;
 using UnityEditor;
@@ -62,17 +63,29 @@ public class FilterStyleEditor
     {
         EditorStyle.SetColor(EditorStyle.AddButtonColor);
         if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
-        {
+        {   
+            var queryLayer = filterStyle.LayerStyles.Where(layerStyle => name == layerStyle.LayerName);
+
             if (name.Length == 0)
             {
                 Debug.LogError("Layer name can't be empty");
             }
+            else if (queryLayer.Count() > 0)
+            {
+                Debug.LogError("A layer with name " + name + " already exists");
+            }
             else
             {
-                // TODO: restrict adding several times the same layer
                 var layerStyle = new FeatureStyle.LayerStyle(name);
+
+                // Default configuration for the layer
+                layerStyle.PolygonBuilderOptions = PolygonBuilderEditor.DefaultOptions();
+                layerStyle.PolylineBuilderOptions = PolylineBuilderEditor.DefaultOptions();
+                layerStyle.Material = new Material(Shader.Find("Diffuse"));
+
                 filterStyle.AddLayerStyle(layerStyle);
                 filterStyle.Filter.CollectionNameSet.Add(name);
+
                 prefs.showLayer[filterStyle.Name + name] = false;
             }
         }
@@ -116,7 +129,7 @@ public class FilterStyleEditor
             EditorGUILayout.BeginHorizontal();
             {
                 string prefShowKey = filterStyle.Name + layerStyle.LayerName;
-                showLayer = EditorGUILayout.Foldout(prefs.showLayer[prefShowKey], filterStyle.Name);
+                showLayer = EditorGUILayout.Foldout(prefs.showLayer[prefShowKey], layerStyle.LayerName);
                 prefs.showLayer[prefShowKey] = showLayer;
 
                 EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
@@ -133,23 +146,10 @@ public class FilterStyleEditor
                 continue;
             }
 
-            LayerStyleEditor.OnInspectorGUI(layerStyle);
+            LayerStyleEditor.OnInspectorGUI(layerStyle, "");
 
             // TODO: Matchers
-
-            /*EditorGUILayout.BeginHorizontal();
-            {
-                EditorGUILayout.TextField(filterStyle.Filter.CollectionNameSet[i]);
-                EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
-                if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
-                {
-                    filterStyle.Filter.CollectionNameSet.RemoveAt(i);
-                }
-                EditorStyle.ResetColor();
-            }
-            EditorGUILayout.EndHorizontal();*/
         }
-
 
         FilterStyleEditor.SavePreferences(prefs, filterStyle);
     }

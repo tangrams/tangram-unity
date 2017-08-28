@@ -30,6 +30,8 @@ namespace Mapzen
             public LayerStyle(string layerName)
             {
                 this.layerName = layerName;
+                this.EnablePolygonBuilder = true;
+                this.EnablePolylineBuilder = true;
             }
 
             public PolygonBuilder.Options GetPolygonOptions(Feature feature, float inverseTileScale)
@@ -129,17 +131,9 @@ namespace Mapzen
             this.name = name;
         }
 
-        public bool AddFilterStyle(FilterStyle filterStyle)
+        public void AddFilterStyle(FilterStyle filterStyle)
         {
-            var queryFilterStyleName = filterStyles.Where(fs => fs.Name == filterStyle.Name);
-
-            if (queryFilterStyleName.Count() > 0)
-            {
-                return false;
-            }
-
             filterStyles.Add(filterStyle);
-            return true;
         }
     }
 }

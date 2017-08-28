@@ -5,49 +5,47 @@ using System;
 
 public class PolygonBuilderEditor
 {
-    private bool show = false;
-    private PolygonBuilder.Options defaultOptions;
-
-    public PolygonBuilder.Options DefaultOptions
+    private class PolygonBuilderEditorPrefs
     {
-        get
-        {
-            return defaultOptions;
-        }
+        public bool show = false;
     }
 
-    public PolygonBuilderEditor()
+    public static PolygonBuilder.Options DefaultOptions()
     {
-        defaultOptions = new PolygonBuilder.Options();
+        var defaultOptions = new PolygonBuilder.Options();
 
         defaultOptions.Extrude = true;
         defaultOptions.MaxHeight = 0.0f;
+
+        return defaultOptions;
     }
 
-    private void LoadPreferences(string name)
+    private static PolygonBuilderEditorPrefs LoadPreferences(string name)
     {
-        show = EditorPrefs.GetBool("PolygonBuilderEditor.show" + name);
+        var prefs = new PolygonBuilderEditorPrefs();
+        prefs.show = EditorPrefs.GetBool("PolygonBuilderEditor.show" + name);
+        return prefs;
     }
 
-    private void SavePreferences(string name)
+    private static void SavePreferences(PolygonBuilderEditorPrefs prefs, string name)
     {
-        EditorPrefs.SetBool("PolygonBuilderEditor.show" + name, show);
+        EditorPrefs.SetBool("PolygonBuilderEditor.show" + name, prefs.show);
     }
 
-    public PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options, string name)
+    public static PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options, string name)
     {
-        LoadPreferences(name);
-        show = EditorGUILayout.Foldout(show, "Polygon builder options");
-        if (!show)
+        var prefs = PolygonBuilderEditor.LoadPreferences(name);
+        prefs.show = EditorGUILayout.Foldout(prefs.show, "Polygon builder options");
+        if (!prefs.show)
         {
-            SavePreferences(name);
+            PolygonBuilderEditor.SavePreferences(prefs, name);
             return options;
         }
 
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
         options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
 
-        SavePreferences(name);
+        PolygonBuilderEditor.SavePreferences(prefs, name);
 
         return options;
     }
