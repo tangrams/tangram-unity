@@ -31,9 +31,9 @@ public class FeatureStyleEditor
 
         foreach (var featureStyling in mapzenMap.FeatureStyling)
         {
-            string prefKey = typeof(FeatureStyleEditor).Name + ".showStyle." + featureStyling.Name;
+            string prefKey = typeof(FeatureStyleEditor).Name + '.' + featureStyling.Name + ".showStyle";
             preferences.showStyle[featureStyling.Name] = EditorPrefs.GetBool(prefKey);
-            prefKey = typeof(FeatureStyleEditor).Name + ".filterStyleName." + featureStyling.Name;
+            prefKey = typeof(FeatureStyleEditor).Name + '.' + featureStyling.Name + ".filterStyleName";
             preferences.filterStyleName.Add(featureStyling.Name, EditorPrefs.GetString(prefKey));
         }
 
@@ -46,9 +46,9 @@ public class FeatureStyleEditor
 
         foreach (var featureStyleName in preferences.showStyle.Keys)
         {
-            string prefKey = typeof(FeatureStyleEditor).Name + ".showStyle." + featureStyleName;
+            string prefKey = typeof(FeatureStyleEditor).Name + '.' + featureStyleName + ".showStyle";
             EditorPrefs.SetBool(prefKey, preferences.showStyle[featureStyleName]);
-            prefKey = typeof(FeatureStyleEditor).Name + ".filterStyleName." + featureStyleName;
+            prefKey = typeof(FeatureStyleEditor).Name + '.' + featureStyleName + ".filterStyleName";
             EditorPrefs.SetString(prefKey, preferences.filterStyleName[featureStyleName]);
         }
     }
@@ -160,15 +160,16 @@ public class FeatureStyleEditor
 
             EditorGUI.indentLevel++;
 
-            foreach (var filterStyle in featureStyling.FilterStyles)
+            for (int j = featureStyling.FilterStyles.Count - 1; j >= 0; j--)
             {
-                FilterStyleEditor.OnInspectorGUI(filterStyle);
+                var filterStyle = featureStyling.FilterStyles[j];
+                if (!FilterStyleEditor.OnInspectorGUI(filterStyle, featureStyling.Name))
+                {
+                    featureStyling.FilterStyles.RemoveAt(j);
+                }
             }
 
             EditorGUI.indentLevel--;
-
-            // Separator
-            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
         }
 
         EditorGUI.indentLevel--;

@@ -11,8 +11,13 @@ public class LayerStyleEditor
 
     public static void OnInspectorGUI(FeatureStyle.LayerStyle layerStyle, string panelName)
     {
-        layerStyle.Material = EditorGUILayout.ObjectField("Material:", layerStyle.Material, typeof(Material)) as Material;
+        EditorGUI.indentLevel++;
+
         layerStyle.PolygonBuilderOptions = PolygonBuilderEditor.OnInspectorGUI(layerStyle.PolygonBuilderOptions, "");
         layerStyle.PolylineBuilderOptions = PolylineBuilderEditor.OnInspectorGUI(layerStyle.PolylineBuilderOptions, "");
+
+        EditorGUI.indentLevel--;
+
+        layerStyle.Material = EditorGUILayout.ObjectField("Material:", layerStyle.Material, typeof(Material)) as Material;
     }
 }

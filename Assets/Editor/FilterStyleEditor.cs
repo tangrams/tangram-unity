@@ -18,27 +18,27 @@ public class FilterStyleEditor
         }
     }
 
-    private static FitlerStyleEditorPrefs LoadPreferences(FeatureStyle.FilterStyle filterStyle)
+    private static FitlerStyleEditorPrefs LoadPreferences(FeatureStyle.FilterStyle filterStyle, string panelName)
     {
         FitlerStyleEditorPrefs preferences = new FitlerStyleEditorPrefs();
-        preferences.show = EditorPrefs.GetBool(typeof(FilterStyleEditor).Name + ".show." + filterStyle.Name);
+        preferences.show = EditorPrefs.GetBool(panelName + '.' + filterStyle.Name + ".show");
 
         foreach (var layerStyling in filterStyle.LayerStyles)
         {
-            string prefKey = typeof(FilterStyleEditor).Name + "." + filterStyle.Name + ".show." + layerStyling.LayerName;
+            string prefKey = panelName + '.' + filterStyle.Name + '.' + layerStyling.LayerName + ".show";
             string dicKey = filterStyle.Name + layerStyling.LayerName;
             preferences.showLayer[dicKey] = EditorPrefs.GetBool(prefKey);
         }
         return preferences;
     }
 
-    private static void SavePreferences(FitlerStyleEditorPrefs prefs, FeatureStyle.FilterStyle filterStyle)
+    private static void SavePreferences(FitlerStyleEditorPrefs prefs, FeatureStyle.FilterStyle filterStyle, string panelName)
     {
-        EditorPrefs.SetBool(typeof(FilterStyleEditor).Name + ".show." + filterStyle.Name, prefs.show);
+        EditorPrefs.SetBool(panelName + '.' + filterStyle.Name + ".show", prefs.show);
 
         foreach (var layerStyling in filterStyle.LayerStyles)
         {
-            string prefKey = typeof(FilterStyleEditor).Name + "." + filterStyle.Name + ".show." + layerStyling.LayerName;
+            string prefKey = panelName + '.' + filterStyle.Name + '.' + layerStyling.LayerName + ".show";
             string dicKey = filterStyle.Name + layerStyling.LayerName;
             EditorPrefs.SetBool(prefKey, prefs.showLayer[dicKey]);
         }
@@ -92,16 +92,27 @@ public class FilterStyleEditor
         EditorStyle.ResetColor();
     }
 
-    public static void OnInspectorGUI(FeatureStyle.FilterStyle filterStyle)
+    public static bool OnInspectorGUI(FeatureStyle.FilterStyle filterStyle, string panelName)
     {
-        var prefs = FilterStyleEditor.LoadPreferences(filterStyle);
+        var prefs = FilterStyleEditor.LoadPreferences(filterStyle, panelName);
 
-        prefs.show = EditorGUILayout.Foldout(prefs.show, filterStyle.Name);
+        EditorGUILayout.BeginHorizontal();
+        {
+            prefs.show = EditorGUILayout.Foldout(prefs.show, filterStyle.Name);
+
+            EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
+            if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
+            {
+                return false;
+            }
+            EditorStyle.ResetColor();
+        }
+        EditorGUILayout.EndHorizontal();
 
         if (!prefs.show)
         {
-            FilterStyleEditor.SavePreferences(prefs, filterStyle);
-            return;
+            FilterStyleEditor.SavePreferences(prefs, filterStyle, panelName);
+            return true;
         }
 
         // Default layers
@@ -126,6 +137,8 @@ public class FilterStyleEditor
 
             bool showLayer = false;
 
+            EditorGUI.indentLevel++;
+
             EditorGUILayout.BeginHorizontal();
             {
                 string prefShowKey = filterStyle.Name + layerStyle.LayerName;
@@ -135,6 +148,7 @@ public class FilterStyleEditor
                 EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
                 if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
                 {
+                    filterStyle.Filter.CollectionNameSet.Remove(layerStyle.LayerName);
                     filterStyle.LayerStyles.RemoveAt(i);
                 }
                 EditorStyle.ResetColor();
@@ -143,14 +157,19 @@ public class FilterStyleEditor
 
             if (!showLayer)
             {
+                EditorGUI.indentLevel--;
                 continue;
             }
 
             LayerStyleEditor.OnInspectorGUI(layerStyle, "");
 
+            EditorGUI.indentLevel--;
+
             // TODO: Matchers
         }
 
-        FilterStyleEditor.SavePreferences(prefs, filterStyle);
+        FilterStyleEditor.SavePreferences(prefs, filterStyle, panelName);
+
+        return true;
     }
 }
