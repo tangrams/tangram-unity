@@ -3,11 +3,16 @@ using UnityEditor;
 using Mapzen;
 using System;
 
-public class PolylineBuilderEditor
+[Serializable]
+public class PolylineBuilderEditor : EditorBase
 {
-    private class PolylineBuilderEditorPrefs
+    [SerializeField]
+    private bool show;
+
+    public PolylineBuilderEditor()
+        : base()
     {
-        public bool show = false;
+        this.show = false;
     }
 
     public static PolylineBuilder.Options DefaultOptions()
@@ -23,25 +28,25 @@ public class PolylineBuilderEditor
         return defaultOptions;
     }
 
-    private static PolylineBuilderEditorPrefs LoadPreferences(string name)
+    private void LoadPreferences()
     {
-        var prefs = new PolylineBuilderEditorPrefs();
-        prefs.show = EditorPrefs.GetBool(name + '.' + typeof(PolylineBuilderEditor).Name + ".show");
-        return prefs;
+        show = EditorPrefs.GetBool(guid + ".show");
     }
 
-    private static void SavePreferences(PolylineBuilderEditorPrefs prefs, string name)
+    private void SavePreferences()
     {
-        EditorPrefs.SetBool(name + '.' + typeof(PolylineBuilderEditor).Name + ".show", prefs.show);
+        EditorPrefs.SetBool(guid + ".show", show);
     }
 
-    public static PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options, string panelName)
+    public PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options)
     {
-        var prefs = PolylineBuilderEditor.LoadPreferences(panelName);
-        prefs.show = EditorGUILayout.Foldout(prefs.show, "Polyline builder options");
-        if (!prefs.show)
+        LoadPreferences();
+
+        show = EditorGUILayout.Foldout(show, "Polyline builder options");
+
+        if (!show)
         {
-            PolylineBuilderEditor.SavePreferences(prefs, panelName);
+            SavePreferences();
             return options;
         }
 
@@ -50,7 +55,7 @@ public class PolylineBuilderEditor
         options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
         options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
 
-        PolylineBuilderEditor.SavePreferences(prefs, panelName);
+        SavePreferences();
 
         return options;
     }

@@ -3,20 +3,28 @@ using Mapzen;
 using UnityEditor;
 using UnityEngine;
 
-public class LayerStyleEditor
+[SerializeField]
+public class LayerStyleEditor : EditorBase
 {
+    [SerializeField]
+    private PolygonBuilderEditor polygonBuilderEditor;
+
+    [SerializeField]
+    private PolylineBuilderEditor polylineBuilderEditor;
+
     public LayerStyleEditor()
+        : base()
     {
+        polygonBuilderEditor = new PolygonBuilderEditor();
+        polylineBuilderEditor = new PolylineBuilderEditor();
     }
 
-    public static void OnInspectorGUI(FeatureStyle.LayerStyle layerStyle, string panelName)
+    public void OnInspectorGUI(FeatureStyle.LayerStyle layerStyle)
     {
-        panelName += '.' + layerStyle.LayerName;
-
         EditorGUI.indentLevel++;
 
-        layerStyle.PolygonBuilderOptions = PolygonBuilderEditor.OnInspectorGUI(layerStyle.PolygonBuilderOptions, panelName);
-        layerStyle.PolylineBuilderOptions = PolylineBuilderEditor.OnInspectorGUI(layerStyle.PolylineBuilderOptions, panelName);
+        layerStyle.PolygonBuilderOptions = polygonBuilderEditor.OnInspectorGUI(layerStyle.PolygonBuilderOptions);
+        layerStyle.PolylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(layerStyle.PolylineBuilderOptions);
 
         EditorGUI.indentLevel--;
 

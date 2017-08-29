@@ -35,6 +35,10 @@ public class MapzenMap : MonoBehaviour
     [SerializeField]
     private SceneGroup.Type groupOptions;
 
+    #if UNITY_EDITOR
+    public Dictionary<string, object> StyleEditors = new Dictionary<string, object>();
+    #endif
+
     private List<TileTask> tasks = new List<TileTask>();
 
     private int nTasksForArea = 0;

@@ -3,11 +3,16 @@ using UnityEditor;
 using Mapzen;
 using System;
 
-public class PolygonBuilderEditor
+[Serializable]
+public class PolygonBuilderEditor : EditorBase
 {
-    private class PolygonBuilderEditorPrefs
+    [SerializeField]
+    private bool show;
+
+    public PolygonBuilderEditor()
+        : base()
     {
-        public bool show = false;
+        this.show = false;
     }
 
     public static PolygonBuilder.Options DefaultOptions()
@@ -21,25 +26,25 @@ public class PolygonBuilderEditor
         return defaultOptions;
     }
 
-    private static PolygonBuilderEditorPrefs LoadPreferences(string name)
+    private void LoadPreferences()
     {
-        var prefs = new PolygonBuilderEditorPrefs();
-        prefs.show = EditorPrefs.GetBool(name + '.' + typeof(PolygonBuilderEditor).Name + ".show");
-        return prefs;
+        show = EditorPrefs.GetBool(guid + ".show");
     }
 
-    private static void SavePreferences(PolygonBuilderEditorPrefs prefs, string name)
+    private void SavePreferences()
     {
-        EditorPrefs.SetBool(name + '.' + typeof(PolygonBuilderEditor).Name + ".show", prefs.show);
+        EditorPrefs.SetBool(guid + ".show", show);
     }
 
-    public static PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options, string panelName)
+    public PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options)
     {
-        var prefs = PolygonBuilderEditor.LoadPreferences(panelName);
-        prefs.show = EditorGUILayout.Foldout(prefs.show, "Polygon builder options");
-        if (!prefs.show)
+        LoadPreferences();
+
+        show = EditorGUILayout.Foldout(show, "Polygon builder options");
+
+        if (!show)
         {
-            PolygonBuilderEditor.SavePreferences(prefs, panelName);
+            SavePreferences();
             return options;
         }
 
@@ -47,7 +52,7 @@ public class PolygonBuilderEditor
         options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
         options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
 
-        PolygonBuilderEditor.SavePreferences(prefs, panelName);
+        SavePreferences();
 
         return options;
     }
