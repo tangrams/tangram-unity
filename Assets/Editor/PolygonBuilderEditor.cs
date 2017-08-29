@@ -15,6 +15,7 @@ public class PolygonBuilderEditor
         var defaultOptions = new PolygonBuilder.Options();
 
         defaultOptions.Extrude = true;
+        defaultOptions.Enabled = true;
         defaultOptions.MaxHeight = 0.0f;
 
         return defaultOptions;
@@ -23,29 +24,30 @@ public class PolygonBuilderEditor
     private static PolygonBuilderEditorPrefs LoadPreferences(string name)
     {
         var prefs = new PolygonBuilderEditorPrefs();
-        prefs.show = EditorPrefs.GetBool("PolygonBuilderEditor.show" + name);
+        prefs.show = EditorPrefs.GetBool(name + '.' + typeof(PolygonBuilderEditor).Name + ".show");
         return prefs;
     }
 
     private static void SavePreferences(PolygonBuilderEditorPrefs prefs, string name)
     {
-        EditorPrefs.SetBool("PolygonBuilderEditor.show" + name, prefs.show);
+        EditorPrefs.SetBool(name + '.' + typeof(PolygonBuilderEditor).Name + ".show", prefs.show);
     }
 
-    public static PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options, string name)
+    public static PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options, string panelName)
     {
-        var prefs = PolygonBuilderEditor.LoadPreferences(name);
+        var prefs = PolygonBuilderEditor.LoadPreferences(panelName);
         prefs.show = EditorGUILayout.Foldout(prefs.show, "Polygon builder options");
         if (!prefs.show)
         {
-            PolygonBuilderEditor.SavePreferences(prefs, name);
+            PolygonBuilderEditor.SavePreferences(prefs, panelName);
             return options;
         }
 
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
         options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
+        options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
 
-        PolygonBuilderEditor.SavePreferences(prefs, name);
+        PolygonBuilderEditor.SavePreferences(prefs, panelName);
 
         return options;
     }

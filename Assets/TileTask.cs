@@ -67,24 +67,26 @@ public class TileTask
 
                         OnSceneGroupData(SceneGroup.Type.Feature, featureName, layerGroup, ref leaf);
 
-                        if (layerStyle.EnablePolygonBuilder
-                            && (feature.Type == GeometryType.Polygon
-                            || feature.Type == GeometryType.MultiPolygon))
+                        if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                         {
                             var polygonOptions = layerStyle.GetPolygonOptions(feature, inverseTileScale);
-                            var builder = new PolygonBuilder(leaf.meshData, polygonOptions, transform);
 
-                            feature.HandleGeometry(builder);
+                            if (polygonOptions.Enabled)
+                            {
+                                var builder = new PolygonBuilder(leaf.meshData, polygonOptions, transform);
+                                feature.HandleGeometry(builder);
+                            }
                         }
 
-                        if (layerStyle.EnablePolylineBuilder
-                            && (feature.Type == GeometryType.LineString
-                            || feature.Type == GeometryType.MultiLineString))
+                        if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
                         {
                             var polylineOptions = layerStyle.GetPolylineOptions(feature, inverseTileScale);
-                            var builder = new PolylineBuilder(leaf.meshData, polylineOptions, transform);
 
-                            feature.HandleGeometry(builder);
+                            if (polylineOptions.Enabled)
+                            {
+                                var builder = new PolylineBuilder(leaf.meshData, polylineOptions, transform);
+                                feature.HandleGeometry(builder);
+                            }
                         }
                     }
                 }

@@ -20,6 +20,7 @@ namespace Mapzen
             public float MaxHeight;
             public float Width;
             public float MiterLimit;
+            public bool Enabled;
         }
 
         public PolylineBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)

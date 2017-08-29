@@ -17,8 +17,6 @@ namespace Mapzen
             private string layerName;
 
             public Material Material;
-            public bool EnablePolygonBuilder;
-            public bool EnablePolylineBuilder;
             public PolygonBuilder.Options PolygonBuilderOptions;
             public PolylineBuilder.Options PolylineBuilderOptions;
 
@@ -30,8 +28,6 @@ namespace Mapzen
             public LayerStyle(string layerName)
             {
                 this.layerName = layerName;
-                this.EnablePolygonBuilder = true;
-                this.EnablePolylineBuilder = true;
             }
 
             public PolygonBuilder.Options GetPolygonOptions(Feature feature, float inverseTileScale)

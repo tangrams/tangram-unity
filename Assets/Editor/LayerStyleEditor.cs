@@ -11,10 +11,12 @@ public class LayerStyleEditor
 
     public static void OnInspectorGUI(FeatureStyle.LayerStyle layerStyle, string panelName)
     {
+        panelName += '.' + layerStyle.LayerName;
+
         EditorGUI.indentLevel++;
 
-        layerStyle.PolygonBuilderOptions = PolygonBuilderEditor.OnInspectorGUI(layerStyle.PolygonBuilderOptions, "");
-        layerStyle.PolylineBuilderOptions = PolylineBuilderEditor.OnInspectorGUI(layerStyle.PolylineBuilderOptions, "");
+        layerStyle.PolygonBuilderOptions = PolygonBuilderEditor.OnInspectorGUI(layerStyle.PolygonBuilderOptions, panelName);
+        layerStyle.PolylineBuilderOptions = PolylineBuilderEditor.OnInspectorGUI(layerStyle.PolylineBuilderOptions, panelName);
 
         EditorGUI.indentLevel--;
 

@@ -21,11 +21,11 @@ public class FilterStyleEditor
     private static FitlerStyleEditorPrefs LoadPreferences(FeatureStyle.FilterStyle filterStyle, string panelName)
     {
         FitlerStyleEditorPrefs preferences = new FitlerStyleEditorPrefs();
-        preferences.show = EditorPrefs.GetBool(panelName + '.' + filterStyle.Name + ".show");
+        preferences.show = EditorPrefs.GetBool(panelName + ".show");
 
         foreach (var layerStyling in filterStyle.LayerStyles)
         {
-            string prefKey = panelName + '.' + filterStyle.Name + '.' + layerStyling.LayerName + ".show";
+            string prefKey = panelName + '.' + layerStyling.LayerName + ".show";
             string dicKey = filterStyle.Name + layerStyling.LayerName;
             preferences.showLayer[dicKey] = EditorPrefs.GetBool(prefKey);
         }
@@ -34,11 +34,11 @@ public class FilterStyleEditor
 
     private static void SavePreferences(FitlerStyleEditorPrefs prefs, FeatureStyle.FilterStyle filterStyle, string panelName)
     {
-        EditorPrefs.SetBool(panelName + '.' + filterStyle.Name + ".show", prefs.show);
+        EditorPrefs.SetBool(panelName + ".show", prefs.show);
 
         foreach (var layerStyling in filterStyle.LayerStyles)
         {
-            string prefKey = panelName + '.' + filterStyle.Name + '.' + layerStyling.LayerName + ".show";
+            string prefKey = panelName + '.' + layerStyling.LayerName + ".show";
             string dicKey = filterStyle.Name + layerStyling.LayerName;
             EditorPrefs.SetBool(prefKey, prefs.showLayer[dicKey]);
         }
@@ -94,6 +94,8 @@ public class FilterStyleEditor
 
     public static bool OnInspectorGUI(FeatureStyle.FilterStyle filterStyle, string panelName)
     {
+        panelName += '.' + filterStyle.Name;
+
         var prefs = FilterStyleEditor.LoadPreferences(filterStyle, panelName);
 
         EditorGUILayout.BeginHorizontal();
@@ -161,7 +163,7 @@ public class FilterStyleEditor
                 continue;
             }
 
-            LayerStyleEditor.OnInspectorGUI(layerStyle, "");
+            LayerStyleEditor.OnInspectorGUI(layerStyle, panelName);
 
             EditorGUI.indentLevel--;
 
