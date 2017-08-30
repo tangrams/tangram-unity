@@ -8,33 +8,16 @@ using UnityEditor;
 public class MapzenMapEditor : Editor
 {
     private MapzenMap mapzenMap;
-    private string styleName = "";
-    private bool showStyleFoldout = false;
     private bool showTileDataFoldout = false;
 
     void OnEnable()
     {
         this.mapzenMap = (MapzenMap)target;
-
-        foreach (var style in this.mapzenMap.FeatureStyling)
-        {
-            // Check if an editor exists for a uniquely identified style name,
-            // and create a new editor when running/stop running the scene.
-            var editorQuery = mapzenMap.StyleEditors.Where(editor => 
-                (editor as StyleEditor).Style.Name == style.Name);
-
-            if (editorQuery.Count() == 0)
-            {
-                mapzenMap.StyleEditors.Add(new StyleEditor(style));
-            }
-        }
     }
 
     public override void OnInspectorGUI()
     {
         LoadPreferences();
-
-        StyleFoldout();
 
         TileDataFoldout();
 
@@ -63,67 +46,6 @@ public class MapzenMapEditor : Editor
         EditorStyle.ResetColor();
 
         SavePreferences();
-    }
-
-    private void StyleFoldout()
-    {
-        showStyleFoldout = EditorGUILayout.Foldout(showStyleFoldout, "Filtering and styling");
-        if (!showStyleFoldout)
-        {
-            return;
-        }
-
-        // Add style
-        EditorGUILayout.BeginHorizontal();
-        {
-            styleName = EditorGUILayout.TextField("Style name: ", styleName);
-
-            EditorStyle.SetColor(EditorStyle.AddButtonColor);
-            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
-            {
-                // Styles are identified by their unique name
-                var queryStyleName = mapzenMap.FeatureStyling.Where(style => style.Name == styleName);
-
-                if (styleName.Length == 0)
-                {
-                    Debug.LogError("The style name can't be empty");
-                }
-                else if (queryStyleName.Count() > 0)
-                {
-                    Debug.LogError("Style with name " + styleName + " already exists");
-                }
-                else
-                {
-                    var style = new FeatureStyle(styleName);
-                    mapzenMap.FeatureStyling.Add(style);
-                    mapzenMap.StyleEditors.Add(new StyleEditor(style));
-                }
-            }
-            EditorStyle.ResetColor();
-        }
-        EditorGUILayout.EndHorizontal();
-
-        // Display styles
-        EditorGUI.indentLevel++;
-        for (int i = mapzenMap.StyleEditors.Count - 1; i >= 0; i--)
-        {
-            var editor = mapzenMap.StyleEditors[i] as StyleEditor;
-            var style = editor.Style;
-
-            var state = FoldoutEditor.OnInspectorGUI(style.Name, style.Name);
-
-            if (state.show)
-            {
-                editor.OnInspectorGUI();
-            }
-
-            if (state.markedForDeletion)
-            {
-                mapzenMap.FeatureStyling.Remove(style);
-                mapzenMap.StyleEditors.RemoveAt(i);
-            }
-        }
-        EditorGUI.indentLevel--;
     }
 
     private void SceneGroupToggle(MapzenMap mapzenMap, SceneGroup.Type type)
@@ -167,16 +89,12 @@ public class MapzenMapEditor : Editor
     {
         string key = typeof(MapzenMapEditor).Name;
         showTileDataFoldout = EditorPrefs.GetBool(key + ".showTileDataFoldout");
-        showStyleFoldout = EditorPrefs.GetBool(key + ".showStyleFoldout");
-        styleName = EditorPrefs.GetString(key + ".styleName");
     }
 
     private void SavePreferences()
     {
         string key = typeof(MapzenMapEditor).Name;
         EditorPrefs.SetBool(key + ".showTileDataFoldout", showTileDataFoldout);
-        EditorPrefs.SetBool(key + ".showStyleFoldout", showStyleFoldout);
-        EditorPrefs.SetString(key + ".styleName", styleName);
     }
 
     private bool IsValid()
@@ -190,14 +108,14 @@ public class MapzenMapEditor : Editor
         {
             if (style.FilterStyles.Count == 0)
             {
-                Debug.LogWarning("The style " + style.Name + " has no filter");
+                Debug.LogWarning("The style " + style.name + " has no filter");
             }
 
             foreach (var filterStyle in style.FilterStyles)
             {
                 if (filterStyle.Filter.CollectionNameSet.Count == 0)
                 {
-                    Debug.LogWarning("The style " + style.Name + " has a filter selecting no layer");
+                    Debug.LogWarning("The style " + style.name + " has a filter selecting no layer");
                 }
             }
         }

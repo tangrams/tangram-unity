@@ -27,7 +27,6 @@ public class MapzenMap : MonoBehaviour
 
     private UnityIO tileIO = new UnityIO();
 
-    [HideInInspector]
     [SerializeField]
     private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
 

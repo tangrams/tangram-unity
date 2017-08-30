@@ -8,7 +8,8 @@ using UnityEngine;
 namespace Mapzen
 {
     [Serializable]
-    public class FeatureStyle
+    [CreateAssetMenu(menuName = "Mapzen/Style")]
+    public class FeatureStyle : ScriptableObject
     {
         [Serializable]
         public class LayerStyle
@@ -115,23 +116,14 @@ namespace Mapzen
         [SerializeField]
         private List<FilterStyle> filterStyles;
 
-        [SerializeField]
-        private string name;
-
         public List<FilterStyle> FilterStyles
         {
             get { return filterStyles; }
         }
 
-        public string Name
-        {
-            get { return name; }
-        }
-
-        public FeatureStyle(string name)
+        public FeatureStyle()
         {
             this.filterStyles = new List<FilterStyle>();
-            this.name = name;
         }
 
         public void AddFilterStyle(FilterStyle filterStyle)

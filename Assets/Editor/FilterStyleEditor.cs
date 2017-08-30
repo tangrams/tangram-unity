@@ -102,6 +102,8 @@ public class FilterStyleEditor : EditorBase
         }
         EditorGUILayout.EndHorizontal();
 
+        EditorGUI.indentLevel++;
+
         for (int i = layerStyleEditors.Count - 1; i >= 0; i--)
         {
             var editor = layerStyleEditors[i];
@@ -123,6 +125,8 @@ public class FilterStyleEditor : EditorBase
                 layerStyleEditors.RemoveAt(i);
             }
         }
+
+        EditorGUI.indentLevel--;
 
         // TODO: Matchers
     }

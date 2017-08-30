@@ -37,7 +37,6 @@ public class StyleEditor : EditorBase
 
     public void OnInspectorGUI()
     {
-        bool showFeatureStyle = false;
         EditorGUILayout.BeginHorizontal();
         {
             filterName = EditorGUILayout.TextField("Filter name: ", filterName);
