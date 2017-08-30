@@ -121,6 +121,10 @@ namespace Mapzen
             get { return filterStyles; }
         }
 
+        #if UNITY_EDITOR
+        public object Editor;
+        #endif
+
         public FeatureStyle()
         {
             this.filterStyles = new List<FilterStyle>();

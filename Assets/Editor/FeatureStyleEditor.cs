@@ -11,12 +11,21 @@ public class FeatureStyleEditor : Editor
 
     void OnEnable()
     {
-        this.featureStyle = (FeatureStyle)target;
-        this.styleEditor = new StyleEditor(featureStyle);
+        featureStyle = (FeatureStyle)target;
+        styleEditor = featureStyle.Editor as StyleEditor;
+
+        if (styleEditor == null)
+        {
+            styleEditor = new StyleEditor(featureStyle);
+            featureStyle.Editor = styleEditor;
+        }
+
     }
 
     public override void OnInspectorGUI()
     {
         styleEditor.OnInspectorGUI();
+
+        EditorUtility.SetDirty(featureStyle);
     }
 }

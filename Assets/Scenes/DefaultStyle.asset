@@ -11,4 +11,76 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0eb0cbbdcd42b4a18805177b7dc9da97, type: 3}
   m_Name: DefaultStyle
   m_EditorClassIdentifier: 
-  filterStyles: []
+  filterStyles:
+  - name: filter_0
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: ce1f4d2f66c614a9489e5ee52bbe34da, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 1
+    - layerName: earth
+      Material: {fileID: 2100000, guid: 0cdfce05273914dd4823f77af6b71663, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 1
+    - layerName: water
+      Material: {fileID: 2100000, guid: bb0267789bf4345c7916b57b125fc6ca, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 1
+    - layerName: roads
+      Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 1
+    filter:
+      CollectionNameSet:
+      - buildings
+      - earth
+      - water
+      - roads
