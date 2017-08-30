@@ -36,7 +36,7 @@ public class MapzenMap : MonoBehaviour
     private SceneGroup.Type groupOptions;
 
     #if UNITY_EDITOR
-    public Dictionary<string, object> StyleEditors = new Dictionary<string, object>();
+    public List<object> StyleEditors = new List<object>();
     #endif
 
     private List<TileTask> tasks = new List<TileTask>();

@@ -13,19 +13,29 @@ public class StyleEditor : EditorBase
     private string filterName = "";
 
     [SerializeField]
-    private Dictionary<string, FilterStyleEditor> filterStyleEditors;
+    private List<FilterStyleEditor> filterStyleEditors;
 
-    public StyleEditor(FeatureStyle featureStyling)
+    [SerializeField]
+    private FeatureStyle style;
+
+    public FeatureStyle Style
+    {
+        get { return style; }
+    }
+
+    public StyleEditor(FeatureStyle style)
         : base()
     {
-        this.filterStyleEditors = new Dictionary<string, FilterStyleEditor>();
-        foreach (var filterStyle in featureStyling.FilterStyles)
+        this.filterStyleEditors = new List<FilterStyleEditor>();
+        this.style = style;
+
+        foreach (var filterStyle in style.FilterStyles)
         {
-            filterStyleEditors.Add(filterStyle.Name, new FilterStyleEditor(filterStyle));
+            filterStyleEditors.Add(new FilterStyleEditor(filterStyle));
         }
     }
 
-    public void OnInspectorGUI(FeatureStyle style)
+    public void OnInspectorGUI()
     {
         bool showFeatureStyle = false;
         EditorGUILayout.BeginHorizontal();
@@ -35,6 +45,7 @@ public class StyleEditor : EditorBase
             EditorStyle.SetColor(EditorStyle.AddButtonColor);
             if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
             {
+                // Filters within a style are identified by their filter name
                 var queryFilterStyleName = style.FilterStyles.Where(filterStyle => filterStyle.Name == filterName);
 
                 if (filterName.Length == 0)
@@ -49,7 +60,7 @@ public class StyleEditor : EditorBase
                 {
                     var filterStyle = new FeatureStyle.FilterStyle(filterName);
                     style.AddFilterStyle(filterStyle);
-                    filterStyleEditors.Add(filterStyle.Name, new FilterStyleEditor(filterStyle));
+                    filterStyleEditors.Add(new FilterStyleEditor(filterStyle));
                 }
             }
             EditorStyle.ResetColor();
@@ -58,22 +69,24 @@ public class StyleEditor : EditorBase
 
         EditorGUI.indentLevel++;
 
-        for (int i = style.FilterStyles.Count - 1; i >= 0; i--)
+        for (int i = filterStyleEditors.Count - 1; i >= 0; i--)
         {
-            var filterStyling = style.FilterStyles[i];
-            var editor = filterStyleEditors[filterStyling.Name];
+            var editor = filterStyleEditors[i];
+            var filterStyle = editor.FilterStyle;
 
-            var state = FoldoutEditor.OnInspectorGUI(editor.GUID.ToString(), filterStyling.Name);
+            var state = FoldoutEditor.OnInspectorGUI(editor.GUID.ToString(), filterStyle.Name);
 
             if (state.show)
             {
-                editor.OnInspectorGUI(filterStyling);
+                editor.OnInspectorGUI();
             }
 
             if (state.markedForDeletion)
             {
-                style.FilterStyles.RemoveAt(i);
-                filterStyleEditors.Remove(style.Name);
+                style.RemoveFilterStyle(filterStyle);
+
+                // Remove the editor for this filter
+                filterStyleEditors.RemoveAt(i);
             }
         }
 

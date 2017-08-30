@@ -2,6 +2,9 @@
 using UnityEditor;
 using UnityEngine;
 
+/// <summary>
+/// Styling configuration for the editor.
+/// </summary>
 public class EditorStyle
 {
     public static Color AddButtonColor = new Color(0.8f, 0.8f, 0.8f);
@@ -20,12 +23,19 @@ public class EditorStyle
 
     public static Color DefaultColor;
 
+    /// <summary>
+    /// Globally sets the color of the GUI, saves the current color.
+    /// </summary>
+    /// <param name="color">Color.</param>
     public static void SetColor(Color color)
     {
         DefaultColor = GUI.color;
         GUI.color = color;
     }
 
+    /// <summary>
+    /// Globally resets the color of the GUI to its previous state.
+    /// </summary>
     public static void ResetColor()
     {
         GUI.color = DefaultColor;

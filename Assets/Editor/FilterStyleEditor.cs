@@ -28,15 +28,25 @@ public class FilterStyleEditor : EditorBase
     private int selectedLayer;
 
     [SerializeField]
-    private Dictionary<string, LayerStyleEditor> layerStyleEditors;
+    private List<LayerStyleEditor> layerStyleEditors;
+
+    [SerializeField]
+    private FeatureStyle.FilterStyle filterStyle;
+
+    public FeatureStyle.FilterStyle FilterStyle
+    {
+        get { return filterStyle; }
+    }
 
     public FilterStyleEditor(FeatureStyle.FilterStyle filterStyle)
         : base()
     {
-        this.layerStyleEditors = new Dictionary<string, LayerStyleEditor>();
+        this.filterStyle = filterStyle;
+        this.layerStyleEditors = new List<LayerStyleEditor>();
+
         foreach (var layerStyle in filterStyle.LayerStyles)
         {
-            layerStyleEditors.Add(layerStyle.LayerName, new LayerStyleEditor());
+            layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
         }
     }
 
@@ -45,6 +55,7 @@ public class FilterStyleEditor : EditorBase
         EditorStyle.SetColor(EditorStyle.AddButtonColor);
         if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
         {
+            // Layers within a filter are identifier by their layer name
             var queryLayer = filterStyle.LayerStyles.Where(layerStyle => name == layerStyle.LayerName);
 
             if (name.Length == 0)
@@ -65,14 +76,15 @@ public class FilterStyleEditor : EditorBase
                 layerStyle.Material = new Material(Shader.Find("Diffuse"));
 
                 filterStyle.AddLayerStyle(layerStyle);
-                filterStyle.Filter.CollectionNameSet.Add(name);
-                layerStyleEditors.Add(layerStyle.LayerName, new LayerStyleEditor());
+
+                // Create the associated layer editor
+                layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
             }
         }
         EditorStyle.ResetColor();
     }
 
-    public void OnInspectorGUI(FeatureStyle.FilterStyle filterStyle)
+    public void OnInspectorGUI()
     {
         // Default layers
         EditorGUILayout.BeginHorizontal();
@@ -90,23 +102,25 @@ public class FilterStyleEditor : EditorBase
         }
         EditorGUILayout.EndHorizontal();
 
-        for (int i = filterStyle.LayerStyles.Count - 1; i >= 0; i--)
+        for (int i = layerStyleEditors.Count - 1; i >= 0; i--)
         {
-            var layerStyling = filterStyle.LayerStyles[i];
-            var editor = layerStyleEditors[layerStyling.LayerName];
+            var editor = layerStyleEditors[i];
+            var layerStyling = editor.LayerStyle;
 
             var state = FoldoutEditor.OnInspectorGUI(editor.GUID.ToString(), layerStyling.LayerName);
 
             if (state.show)
             {
-                editor.OnInspectorGUI(layerStyling);
+                editor.OnInspectorGUI();
             }
 
             if (state.markedForDeletion)
             {
-                filterStyle.Filter.CollectionNameSet.Remove(layerStyling.LayerName);
-                filterStyle.LayerStyles.RemoveAt(i);
-                layerStyleEditors.Remove(layerStyling.LayerName);
+                // Remove the layer from the filter styles
+                filterStyle.RemoveLayerStyle(layerStyling);
+
+                // Remove the associated layer editor
+                layerStyleEditors.RemoveAt(i);
             }
         }
 

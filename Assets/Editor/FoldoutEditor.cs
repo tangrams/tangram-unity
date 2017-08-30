@@ -6,7 +6,9 @@ public class FoldoutEditor
 {
     public class State
     {
+        // Whether the foldout panel is shown
         public bool show;
+        // Whether the foldout panel is marked for deletion
         public bool markedForDeletion;
 
         public State()

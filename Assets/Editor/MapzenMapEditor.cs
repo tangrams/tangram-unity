@@ -18,9 +18,14 @@ public class MapzenMapEditor : Editor
 
         foreach (var style in this.mapzenMap.FeatureStyling)
         {
-            if (!mapzenMap.StyleEditors.ContainsKey(style.Name))
+            // Check if an editor exists for a uniquely identified style name,
+            // and create a new editor when running/stop running the scene.
+            var editorQuery = mapzenMap.StyleEditors.Where(editor => 
+                (editor as StyleEditor).Style.Name == style.Name);
+
+            if (editorQuery.Count() == 0)
             {
-                mapzenMap.StyleEditors.Add(style.Name, new StyleEditor(style));
+                mapzenMap.StyleEditors.Add(new StyleEditor(style));
             }
         }
     }
@@ -68,6 +73,7 @@ public class MapzenMapEditor : Editor
             return;
         }
 
+        // Add style
         EditorGUILayout.BeginHorizontal();
         {
             styleName = EditorGUILayout.TextField("Style name: ", styleName);
@@ -75,6 +81,7 @@ public class MapzenMapEditor : Editor
             EditorStyle.SetColor(EditorStyle.AddButtonColor);
             if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
             {
+                // Styles are identified by their unique name
                 var queryStyleName = mapzenMap.FeatureStyling.Where(style => style.Name == styleName);
 
                 if (styleName.Length == 0)
@@ -89,79 +96,34 @@ public class MapzenMapEditor : Editor
                 {
                     var style = new FeatureStyle(styleName);
                     mapzenMap.FeatureStyling.Add(style);
-                    mapzenMap.StyleEditors.Add(style.Name, new StyleEditor(style));
+                    mapzenMap.StyleEditors.Add(new StyleEditor(style));
                 }
             }
             EditorStyle.ResetColor();
         }
         EditorGUILayout.EndHorizontal();
 
+        // Display styles
         EditorGUI.indentLevel++;
-        for (int i = mapzenMap.FeatureStyling.Count - 1; i >= 0; i--)
+        for (int i = mapzenMap.StyleEditors.Count - 1; i >= 0; i--)
         {
-            var styling = mapzenMap.FeatureStyling[i];
-            var editor = mapzenMap.StyleEditors[styling.Name] as StyleEditor;
+            var editor = mapzenMap.StyleEditors[i] as StyleEditor;
+            var style = editor.Style;
 
-            var state = FoldoutEditor.OnInspectorGUI(styling.Name, styling.Name);
+            var state = FoldoutEditor.OnInspectorGUI(style.Name, style.Name);
 
             if (state.show)
             {
-                editor.OnInspectorGUI(styling);
+                editor.OnInspectorGUI();
             }
 
             if (state.markedForDeletion)
             {
-                mapzenMap.FeatureStyling.RemoveAt(i);
-                mapzenMap.StyleEditors.Remove(styling.Name);
+                mapzenMap.FeatureStyling.Remove(style);
+                mapzenMap.StyleEditors.RemoveAt(i);
             }
         }
         EditorGUI.indentLevel--;
-    }
-
-    private void TileDataFoldout()
-    {
-        showTileDataFoldout = EditorGUILayout.Foldout(showTileDataFoldout, "Tile data");
-        if (!showTileDataFoldout)
-        {
-            return;
-        }
-
-        // Group options
-        {
-            GUILayout.Label("Group by:");
-
-            EditorGUI.indentLevel++;
-
-            EditorGUILayout.BeginHorizontal();
-            SceneGroupToggle(mapzenMap, SceneGroup.Type.Feature);
-            SceneGroupToggle(mapzenMap, SceneGroup.Type.Filter);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            SceneGroupToggle(mapzenMap, SceneGroup.Type.Layer);
-            SceneGroupToggle(mapzenMap, SceneGroup.Type.Tile);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUI.indentLevel--;
-        }
-
-        mapzenMap.RegionName = EditorGUILayout.TextField("Region name:", mapzenMap.RegionName);
-    }
-
-    private void LoadPreferences()
-    {
-        string key = typeof(MapzenMapEditor).Name;
-        showTileDataFoldout = EditorPrefs.GetBool(key + "showTileDataFoldout");
-        showStyleFoldout = EditorPrefs.GetBool(key + "showStyleFoldout");
-        styleName = EditorPrefs.GetString(key + "styleName");
-    }
-
-    private void SavePreferences()
-    {
-        string key = typeof(MapzenMapEditor).Name;
-        EditorPrefs.SetBool(key + "showTileDataFoldout", showTileDataFoldout);
-        EditorPrefs.SetBool(key + "showStyleFoldout", showStyleFoldout);
-        EditorPrefs.SetString(key + "styleName", styleName);
     }
 
     private void SceneGroupToggle(MapzenMap mapzenMap, SceneGroup.Type type)
@@ -172,6 +134,49 @@ public class MapzenMapEditor : Editor
         mapzenMap.GroupOptions = isSet ?
             mapzenMap.GroupOptions | type :
             mapzenMap.GroupOptions & ~type;
+    }
+
+    private void TileDataFoldout()
+    {
+        showTileDataFoldout = EditorGUILayout.Foldout(showTileDataFoldout, "Tile data");
+        if (!showTileDataFoldout)
+        {
+            return;
+        }
+
+        GUILayout.Label("Group by:");
+
+        EditorGUI.indentLevel++;
+
+        EditorGUILayout.BeginHorizontal();
+        SceneGroupToggle(mapzenMap, SceneGroup.Type.Feature);
+        SceneGroupToggle(mapzenMap, SceneGroup.Type.Filter);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        SceneGroupToggle(mapzenMap, SceneGroup.Type.Layer);
+        SceneGroupToggle(mapzenMap, SceneGroup.Type.Tile);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUI.indentLevel--;
+
+        mapzenMap.RegionName = EditorGUILayout.TextField("Region name:", mapzenMap.RegionName);
+    }
+
+    private void LoadPreferences()
+    {
+        string key = typeof(MapzenMapEditor).Name;
+        showTileDataFoldout = EditorPrefs.GetBool(key + ".showTileDataFoldout");
+        showStyleFoldout = EditorPrefs.GetBool(key + ".showStyleFoldout");
+        styleName = EditorPrefs.GetString(key + ".styleName");
+    }
+
+    private void SavePreferences()
+    {
+        string key = typeof(MapzenMapEditor).Name;
+        EditorPrefs.SetBool(key + ".showTileDataFoldout", showTileDataFoldout);
+        EditorPrefs.SetBool(key + ".showStyleFoldout", showStyleFoldout);
+        EditorPrefs.SetString(key + ".styleName", styleName);
     }
 
     private bool IsValid()

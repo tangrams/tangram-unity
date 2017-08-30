@@ -12,14 +12,23 @@ public class LayerStyleEditor : EditorBase
     [SerializeField]
     private PolylineBuilderEditor polylineBuilderEditor;
 
-    public LayerStyleEditor()
-        : base()
+    [SerializeField]
+    private FeatureStyle.LayerStyle layerStyle;
+
+    public FeatureStyle.LayerStyle LayerStyle
     {
-        polygonBuilderEditor = new PolygonBuilderEditor();
-        polylineBuilderEditor = new PolylineBuilderEditor();
+        get { return layerStyle; }
     }
 
-    public void OnInspectorGUI(FeatureStyle.LayerStyle layerStyle)
+    public LayerStyleEditor(FeatureStyle.LayerStyle layerStyle)
+        : base()
+    {
+        this.polygonBuilderEditor = new PolygonBuilderEditor();
+        this.polylineBuilderEditor = new PolylineBuilderEditor();
+        this.layerStyle = layerStyle;
+    }
+
+    public void OnInspectorGUI()
     {
         EditorGUI.indentLevel++;
 

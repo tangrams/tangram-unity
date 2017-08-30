@@ -102,6 +102,13 @@ namespace Mapzen
             public void AddLayerStyle(LayerStyle layerStyle)
             {
                 layerStyles.Add(layerStyle);
+                filter.CollectionNameSet.Add(layerStyle.LayerName);
+            }
+
+            public void RemoveLayerStyle(LayerStyle layerStyle)
+            {
+                layerStyles.Remove(layerStyle);
+                filter.CollectionNameSet.Remove(layerStyle.LayerName);
             }
         }
 
@@ -130,6 +137,11 @@ namespace Mapzen
         public void AddFilterStyle(FilterStyle filterStyle)
         {
             filterStyles.Add(filterStyle);
+        }
+
+        public void RemoveFilterStyle(FilterStyle filterStyle)
+        {
+            filterStyles.Remove(filterStyle);
         }
     }
 }
