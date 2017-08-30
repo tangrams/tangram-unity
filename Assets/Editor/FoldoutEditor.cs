@@ -38,12 +38,12 @@ public class FoldoutEditor
         {
             state.show = EditorGUILayout.Foldout(state.show, foldoutName);
 
-            EditorStyle.SetColor(EditorStyle.RemoveButtonColor);
-            if (GUILayout.Button(EditorStyle.RemoveButtonContent, EditorStyle.SmallButtonWidth))
+            EditorConfig.SetColor(EditorConfig.RemoveButtonColor);
+            if (GUILayout.Button(EditorConfig.RemoveButtonContent, EditorConfig.SmallButtonWidth))
             {
                 state.markedForDeletion = true;
             }
-            EditorStyle.ResetColor();
+            EditorConfig.ResetColor();
         }
         EditorGUILayout.EndHorizontal();
 

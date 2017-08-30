@@ -25,9 +25,9 @@ public class MapzenMapEditor : Editor
 
         bool valid = IsValid();
 
-        EditorStyle.SetColor(valid ?
-            EditorStyle.DownloadButtonEnabledColor :
-            EditorStyle.DownloadButtonDisabledColor);
+        EditorConfig.SetColor(valid ?
+            EditorConfig.DownloadButtonEnabledColor :
+            EditorConfig.DownloadButtonDisabledColor);
 
         if (GUILayout.Button("Download"))
         {
@@ -43,7 +43,7 @@ public class MapzenMapEditor : Editor
             }
         }
 
-        EditorStyle.ResetColor();
+        EditorConfig.ResetColor();
 
         SavePreferences();
     }
@@ -81,8 +81,6 @@ public class MapzenMapEditor : Editor
         EditorGUILayout.EndHorizontal();
 
         EditorGUI.indentLevel--;
-
-        mapzenMap.RegionName = EditorGUILayout.TextField("Region name:", mapzenMap.RegionName);
     }
 
     private void LoadPreferences()

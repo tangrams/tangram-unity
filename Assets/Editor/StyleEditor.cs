@@ -41,8 +41,8 @@ public class StyleEditor : EditorBase
         {
             filterName = EditorGUILayout.TextField("Filter name: ", filterName);
 
-            EditorStyle.SetColor(EditorStyle.AddButtonColor);
-            if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
+            EditorConfig.SetColor(EditorConfig.AddButtonColor);
+            if (GUILayout.Button(EditorConfig.AddButtonContent, EditorConfig.SmallButtonWidth))
             {
                 // Filters within a style are identified by their filter name
                 var queryFilterStyleName = style.FilterStyles.Where(filterStyle => filterStyle.Name == filterName);
@@ -62,7 +62,7 @@ public class StyleEditor : EditorBase
                     filterStyleEditors.Add(new FilterStyleEditor(filterStyle));
                 }
             }
-            EditorStyle.ResetColor();
+            EditorConfig.ResetColor();
         }
         EditorGUILayout.EndHorizontal();
 

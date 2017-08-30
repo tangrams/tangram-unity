@@ -52,8 +52,8 @@ public class FilterStyleEditor : EditorBase
 
     private void AddLayerStyleLayout(FeatureStyle.FilterStyle filterStyle, string name)
     {
-        EditorStyle.SetColor(EditorStyle.AddButtonColor);
-        if (GUILayout.Button(EditorStyle.AddButtonContent, EditorStyle.SmallButtonWidth))
+        EditorConfig.SetColor(EditorConfig.AddButtonColor);
+        if (GUILayout.Button(EditorConfig.AddButtonContent, EditorConfig.SmallButtonWidth))
         {
             // Layers within a filter are identifier by their layer name
             var queryLayer = filterStyle.LayerStyles.Where(layerStyle => name == layerStyle.LayerName);
@@ -81,7 +81,7 @@ public class FilterStyleEditor : EditorBase
                 layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
             }
         }
-        EditorStyle.ResetColor();
+        EditorConfig.ResetColor();
     }
 
     public void OnInspectorGUI()

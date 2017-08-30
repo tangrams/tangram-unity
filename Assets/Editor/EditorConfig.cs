@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Styling configuration for the editor.
 /// </summary>
-public class EditorStyle
+public class EditorConfig
 {
     public static Color AddButtonColor = new Color(0.8f, 0.8f, 0.8f);
 
