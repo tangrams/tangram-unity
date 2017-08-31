@@ -22,17 +22,15 @@ namespace Mapzen
         public string name;
         // The mesh data, may be empty
         public MeshData meshData;
-        public Type type;
-        public bool isStatic;
-        public bool hasCollider;
 
-        public SceneGroup(Type type, string name, bool isStatic = false)
+        public Type type;
+
+        public SceneGroup(Type type, string name)
         {
             this.childs = new Dictionary<string, SceneGroup>();
             this.type = type;
             this.name = name;
             this.meshData = new MeshData();
-            this.isStatic = isStatic;
         }
 
         /// <summary>

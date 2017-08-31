@@ -14,8 +14,6 @@ public class TileTask
     private SceneGroup.Type groupOptions;
     private float inverseTileScale;
     private Matrix4x4 transform;
-    private bool isStaticGameObject = true;
-    private bool hasCollider = true;
 
     public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY, float regionScaleRatio)
     {
@@ -24,8 +22,11 @@ public class TileTask
         this.ready = false;
         this.groupOptions = groupOptions;
         this.inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
-        float val = (float)address.GetSizeMercatorMeters() * regionScaleRatio;
-        this.transform = Matrix4x4.Translate(new Vector3(offsetX * val, 0.0f, offsetY * val)) * Matrix4x4.Scale(new Vector3(val, val, val));
+
+        float scaleRatio = (float)address.GetSizeMercatorMeters() * regionScaleRatio;
+        Matrix4x4 scale = Matrix4x4.Scale(new Vector3(scaleRatio, scaleRatio, scaleRatio));
+        Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
+        this.transform = translate * scale;
     }
 
     public void Start(List<FeatureStyle> featureStyling, SceneGroup root)
@@ -41,9 +42,6 @@ public class TileTask
 
         foreach (var style in featureStyling)
         {
-            isStaticGameObject = style.IsStatic;
-            hasCollider = style.HasCollider;
-
             var filterGroup = OnSceneGroupData(SceneGroup.Type.Filter, style.Name, tileGroup, ref leaf);
 
             foreach (var layer in tileData.FeatureCollections)
@@ -98,7 +96,7 @@ public class TileTask
             // No group found for this idenfier
             if (group == null)
             {
-                group = new SceneGroup(type, name, isStaticGameObject);
+                group = new SceneGroup(type, name);
                 parent.childs[name] = group;
             }
 
@@ -106,7 +104,6 @@ public class TileTask
             if (SceneGroup.IsLeaf(type, groupOptions))
             {
                 leaf = group;
-                leaf.hasCollider = hasCollider;
             }
         }
         else

@@ -11,7 +11,7 @@ public class SceneGraph
     /// </summary>
     /// <param name="group">The scene group to visit.</param>
     /// <param name="parent">The parent transform of the generated game object for the current scene group.</param>
-    public static void Generate(SceneGroup group, Transform parent)
+    public static void Generate(SceneGroup group, Transform parent, GameObjectOptions options)
     {
         if (group.meshData.Meshes.Count == 0 && group.childs.Count == 0)
         {
@@ -21,7 +21,7 @@ public class SceneGraph
         if (group.childs.Count > 0)
         {
             var gameObject = new GameObject(group.ToString());
-            gameObject.isStatic = group.isStatic;
+            gameObject.isStatic = options.IsStatic;
 
             if (parent != null)
             {
@@ -30,7 +30,7 @@ public class SceneGraph
 
             foreach (var child in group.childs)
             {
-                Generate(child.Value, gameObject.transform);
+                Generate(child.Value, gameObject.transform, options);
             }
         }
         else
@@ -42,7 +42,7 @@ public class SceneGraph
                 var gameObject = new GameObject(group.ToString());
                 gameObject.transform.parent = parent;
                 parent = gameObject.transform;
-                gameObject.isStatic = group.isStatic;
+                gameObject.isStatic = options.IsStatic;
             }
 
             // Create one game object per mesh object 'bucket', each bucket is ensured to
@@ -51,7 +51,7 @@ public class SceneGraph
             {
                 var meshBucket = group.meshData.Meshes[i];
                 var gameObject = new GameObject(group.ToString());
-                gameObject.isStatic = group.isStatic;
+                gameObject.isStatic = options.IsStatic;
 
                 if (group.meshData.Meshes.Count > 1)
                 {
@@ -69,8 +69,12 @@ public class SceneGraph
                     mesh.SetTriangles(meshBucket.Submeshes[s].Indices, s);
                 }
                 mesh.RecalculateNormals();
-                // Generate default uvs for this mesh
-                Unwrapping.GenerateSecondaryUVSet(mesh);
+
+                if (options.IsStatic)
+                {
+                    // Generate default uvs for this mesh
+                    Unwrapping.GenerateSecondaryUVSet(mesh);
+                }
 
                 // Associate the mesh filter and mesh renderer components with this game object
                 var materials = meshBucket.Submeshes.Select(s => s.Material).ToArray();
@@ -79,13 +83,12 @@ public class SceneGraph
                 meshRendererComponent.materials = materials;
                 meshFilterComponent.mesh = mesh;
 
-                if (group.hasCollider)
+                if (options.GeneratePhysicMeshCollider)
                 {
                     var meshColliderComponent = gameObject.AddComponent<MeshCollider>();
+                    meshColliderComponent.material = options.PhysicMaterial;
                     meshColliderComponent.sharedMesh = mesh;
                 }
-
-
             }
         }
     }

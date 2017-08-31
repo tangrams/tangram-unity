@@ -8,26 +8,21 @@ namespace Mapzen
     [Serializable]
     public class FeatureStyle
     {
+
         public FeatureFilter Filter;
         public Material Material;
         public string Name;
         public PolygonBuilder.Options PolygonBuilderOptions;
         public PolylineBuilder.Options PolylineBuilderOptions;
-        public PhysicMaterial PhysicMaterial;
-        public bool IsStatic;
-        public bool HasCollider;
 
-        public FeatureStyle(FeatureFilter filter, Material material, PhysicMaterial physicMaterial,
-                            bool isStatic, bool hasCollider, string name,
+        public FeatureStyle(FeatureFilter filter,
+                            Material material, string name,
                             PolygonBuilder.Options polygonBuilderOptions,
                             PolylineBuilder.Options polylineBuilderOptions)
         {
             this.Filter = filter;
             this.Name = name;
             this.Material = material;
-            this.PhysicMaterial = physicMaterial;
-            this.IsStatic = isStatic;
-            this.HasCollider = hasCollider;
             this.PolygonBuilderOptions = polygonBuilderOptions;
             this.PolylineBuilderOptions = polylineBuilderOptions;
         }

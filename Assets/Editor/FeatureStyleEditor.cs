@@ -81,13 +81,9 @@ public class FeatureStyleEditor
                     var defaultPolygonBuilderOptions = polygonBuilderEditor.DefaultOptions;
                     var defaultPolylineBuilderOptions = polylineBuilderEditor.DefaultOptions;
                     var defaultFilter = new FeatureFilter();
-                    var defaultPhysicMaterial = new PhysicMaterial();
-                    // Default to static game object and having collider component set
-                    var isStatic = true;
-                    var hasCollider = true;
 
-                    var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, defaultPhysicMaterial, isStatic,
-                                           hasCollider, featureStyleName, defaultPolygonBuilderOptions, 
+                    var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial,
+                                           featureStyleName, defaultPolygonBuilderOptions,
                                            defaultPolylineBuilderOptions);
 
                     mapzenMap.FeatureStyling.Add(featureStyle);
@@ -135,20 +131,11 @@ public class FeatureStyleEditor
             var polylineBuilderOptions = polylineBuilderEditor.OnInspectorGUI(featureStyling.PolylineBuilderOptions, featureStyling.Name);
             var filter = featureFilterEditor.OnInspectorGUI(featureStyling.Filter, featureStyling.Name);
             var material = EditorGUILayout.ObjectField("Material:", featureStyling.Material, typeof(Material)) as Material;
-            var physicMaterial = EditorGUILayout.ObjectField("Physic Material:", featureStyling.PhysicMaterial, typeof(PhysicMaterial)) as PhysicMaterial;
-            var isStatic = true;
-            isStatic = EditorGUILayout.Toggle("Static Game Object", isStatic);
-            var hasCollider = true;
-            hasCollider = EditorGUILayout.Toggle("Has Collider Component", hasCollider);
-
 
             featureStyling.Filter = filter;
             featureStyling.Material = material;
-            featureStyling.PhysicMaterial = physicMaterial;
             featureStyling.PolygonBuilderOptions = polygonBuilderOptions;
             featureStyling.PolylineBuilderOptions = polylineBuilderOptions;
-            featureStyling.IsStatic = isStatic;
-            featureStyling.HasCollider = hasCollider;
 
             // TODO: add interface for filter matcher
 

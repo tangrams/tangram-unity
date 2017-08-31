@@ -10,12 +10,18 @@ using Mapzen;
 
 public class MapzenMap : MonoBehaviour
 {
+    public GameObjectOptions gameObjectOptions;
+
+    public float regionScaleRatio = 1.0f;
+
     public string ApiKey = "vector-tiles-tyHL4AY";
 
     public TileArea Area = new TileArea(
                                new LngLat(-74.014892578125, 40.70562793820589),
                                new LngLat(-74.00390625, 40.713955826286046),
                                16);
+
+    public string RegionName = "";
 
     private List<GameObject> tiles = new List<GameObject>();
 
@@ -33,14 +39,6 @@ public class MapzenMap : MonoBehaviour
     [SerializeField]
     private SceneGroup.Type groupOptions;
 
-    [HideInInspector]
-    [SerializeField]
-    private string regionName = "";
-
-    [HideInInspector]
-    [SerializeField]
-    private float regionScaleRatio = 1.0f;
-
     private List<TileTask> tasks = new List<TileTask>();
 
     private int nTasksForArea = 0;
@@ -54,7 +52,7 @@ public class MapzenMap : MonoBehaviour
         tasks.Clear();
         nTasksForArea = 0;
 
-        regionMap = new SceneGroup(SceneGroup.Type.None, regionName);
+        regionMap = new SceneGroup(SceneGroup.Type.None, RegionName);
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -106,7 +104,7 @@ public class MapzenMap : MonoBehaviour
         {
             tasks.Clear();
 
-            SceneGraph.Generate(regionMap, null);
+            SceneGraph.Generate(regionMap, null, gameObjectOptions);
         }
     }
 
@@ -130,17 +128,5 @@ public class MapzenMap : MonoBehaviour
     {
         get { return groupOptions; }
         set { groupOptions = value; }
-    }
-
-    public String RegionName
-    {
-        get { return regionName; }
-        set { regionName = value; }
-    }
-
-    public float RegionScaleRatio
-    {
-        get { return regionScaleRatio; }
-        set { regionScaleRatio = value; }
     }
 }

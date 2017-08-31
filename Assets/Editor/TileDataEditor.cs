@@ -61,14 +61,6 @@ public class TileDataEditor
             EditorGUI.indentLevel--;
         }
 
-        // Region Scale Ratio
-        // Defines the ratio of unity unit to world mercator units
-        mapzenMap.RegionScaleRatio = EditorGUILayout.FloatField("Region Scale Ratio:",
-            mapzenMap.RegionScaleRatio);
-
-        mapzenMap.RegionName = EditorGUILayout.TextField("Region name:",
-            mapzenMap.RegionName);
-
         EditorGUILayout.BeginHorizontal();
         {
             mapzenMap.ExportPath = EditorGUILayout.TextField("Export path:",
