@@ -22,6 +22,7 @@ namespace Mapzen
         public string name;
         // The mesh data, may be empty
         public MeshData meshData;
+
         public Type type;
 
         public SceneGroup(Type type, string name)

@@ -15,14 +15,18 @@ public class TileTask
     private float inverseTileScale;
     private Matrix4x4 transform;
 
-    public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY)
+    public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY, float regionScaleRatio)
     {
         this.address = address;
         this.response = response;
         this.ready = false;
         this.groupOptions = groupOptions;
         this.inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
-        this.transform = Matrix4x4.Translate(new Vector3(offsetX, 0.0f, offsetY));
+
+        float scaleRatio = (float)address.GetSizeMercatorMeters() * regionScaleRatio;
+        Matrix4x4 scale = Matrix4x4.Scale(new Vector3(scaleRatio, scaleRatio, scaleRatio));
+        Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
+        this.transform = translate * scale;
     }
 
     public void Start(List<FeatureStyle> featureStyling, SceneGroup root)

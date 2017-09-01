@@ -60,9 +60,6 @@ public class TileDataEditor
             EditorGUI.indentLevel--;
         }
 
-        mapzenMap.RegionName = EditorGUILayout.TextField("Region name:",
-            mapzenMap.RegionName);
-
         EditorGUILayout.BeginHorizontal();
         {
             mapzenMap.ExportPath = EditorGUILayout.TextField("Export path:",
