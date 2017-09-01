@@ -82,9 +82,8 @@ public class FeatureStyleEditor
                     var defaultPolylineBuilderOptions = polylineBuilderEditor.DefaultOptions;
                     var defaultFilter = new FeatureFilter();
 
-                    var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial,
-                                           featureStyleName, defaultPolygonBuilderOptions,
-                                           defaultPolylineBuilderOptions);
+                    var featureStyle = new FeatureStyle(defaultFilter, defaultMaterial, featureStyleName,
+                                           defaultPolygonBuilderOptions, defaultPolylineBuilderOptions);
 
                     mapzenMap.FeatureStyling.Add(featureStyle);
 
