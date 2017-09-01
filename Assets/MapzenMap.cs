@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Networking;
 using Mapzen.VectorData;
+using Mapzen.Unity;
 using Mapzen.VectorData.Filters;
 using Mapzen;
 
@@ -25,7 +26,7 @@ public class MapzenMap : MonoBehaviour
 
     private List<GameObject> tiles = new List<GameObject>();
 
-    private UnityIO tileIO = new UnityIO();
+    private IO tileIO = new IO();
 
     [SerializeField]
     private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
@@ -62,7 +63,7 @@ public class MapzenMap : MonoBehaviour
 
             Debug.Log("URL request " + uri.AbsoluteUri);
 
-            UnityIO.IORequestCallback onTileFetched = (response) =>
+            IO.IORequestCallback onTileFetched = (response) =>
             {
                 if (response.hasError())
                 {

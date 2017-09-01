@@ -2,6 +2,7 @@
 using UnityEngine;
 using System;
 using Mapzen;
+using Mapzen.Unity;
 
 [CustomEditor(typeof(FeatureStyle))]
 public class FeatureStyleEditor : Editor

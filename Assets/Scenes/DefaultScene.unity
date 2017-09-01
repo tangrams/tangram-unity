@@ -135,6 +135,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f99f332e167bc4c5cb799d5f5171e0b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameObjectOptions:
+    IsStatic: 0
+    GeneratePhysicMeshCollider: 0
+    PhysicMaterial: {fileID: 0}
+  regionScaleRatio: 1
   ApiKey: mapzen-MTyWgFy
   Area:
     min:
@@ -144,10 +149,10 @@ MonoBehaviour:
       longitude: -73.998306
       latitude: 40.716939
     zoom: 16
+  RegionName: region_0
   featureStyling:
-  - {fileID: 11400000, guid: 141951d475bf741588a63ed80ea9396d, type: 2}
+  - {fileID: 11400000, guid: b85c5ba8553a442a68b2ac5b34f2697c, type: 2}
   groupOptions: 4
-  regionName: region_0
 --- !u!4 &349009245
 Transform:
   m_ObjectHideFlags: 0
@@ -218,7 +223,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 5
+  far clip plane: 3000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -243,13 +248,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 530800346}
-  m_LocalRotation: {x: 0.42261827, y: 0, z: 0, w: 0.9063079}
-  m_LocalPosition: {x: 2, y: 2, z: -4}
+  m_LocalRotation: {x: 0.23344536, y: 0, z: 0, w: 0.97236997}
+  m_LocalPosition: {x: 1449, y: 495, z: 71}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 27, y: 0, z: 0}
 --- !u!1 &2091268523
 GameObject:
   m_ObjectHideFlags: 0
