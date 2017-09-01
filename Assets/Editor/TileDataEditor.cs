@@ -7,7 +7,6 @@ using System;
 public class TileDataEditor
 {
     private bool show = false;
-    private float meshScale = 1.0f;
 
     private static GUILayoutOption buttonWidth = GUILayout.Width(100.0f);
 
