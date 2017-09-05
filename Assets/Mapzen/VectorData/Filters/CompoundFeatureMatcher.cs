@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Mapzen.VectorData.Filters
 {
+    [Serializable]
     public class CompoundFeatureMatcher : IFeatureMatcher
     {
         public enum Operator
@@ -12,9 +14,9 @@ namespace Mapzen.VectorData.Filters
             None,
         }
 
-        public List<IFeatureMatcher> Matchers { get; set; }
+        public List<IFeatureMatcher> Matchers;
 
-        public Operator Type { get; set; }
+        public Operator Type;
 
         public bool MatchesFeature(Feature feature)
         {
