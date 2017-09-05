@@ -66,6 +66,32 @@ namespace Mapzen
         }
 
         [Serializable]
+        public class CompoundMatcher
+        {
+            [SerializeField]
+            private CompoundFeatureMatcher.Operator ooperator;
+
+            [SerializeField]
+            private List<IFeatureMatcher> matchers;
+
+            public List<IFeatureMatcher> Matchers
+            {
+                get { return matchers; }
+            }
+
+            public CompoundFeatureMatcher.Operator Operator
+            {
+                get { return ooperator; }
+                set { ooperator = value; }
+            }
+
+            public CompoundMatcher()
+            {
+                this.matchers = new List<IFeatureMatcher>();
+            }
+        }
+
+        [Serializable]
         public class FilterStyle
         {
             [SerializeField]
@@ -75,7 +101,15 @@ namespace Mapzen
             private List<LayerStyle> layerStyles;
 
             [SerializeField]
+            private List<CompoundMatcher> matchers;
+
+            [SerializeField]
             private FeatureFilter filter;
+
+            public List<CompoundMatcher> Matchers
+            {
+                get { return matchers; }
+            }
 
             public List<LayerStyle> LayerStyles
             {

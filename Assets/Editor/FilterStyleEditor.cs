@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using Mapzen;
+using Mapzen.VectorData.Filters;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,8 +19,16 @@ public class FilterStyleEditor : EditorBase
             "pois",
             "roads",
             "transit",
-            "water"
+            "water",
         });
+
+    private static Dictionary<string, CompoundFeatureMatcher.Operator> matcherOperatorsTable
+    = new Dictionary<string, CompoundFeatureMatcher.Operator>
+    {
+        { "all of", CompoundFeatureMatcher.Operator.All },
+        { "none of", CompoundFeatureMatcher.Operator.None },
+        { "any of", CompoundFeatureMatcher.Operator.Any },
+    };
 
     [SerializeField]
     private string customFeatureCollection = "";
@@ -28,7 +37,13 @@ public class FilterStyleEditor : EditorBase
     private int selectedLayer;
 
     [SerializeField]
+    private int selectedMatcherOperator;
+
+    [SerializeField]
     private List<LayerStyleEditor> layerStyleEditors;
+
+    [SerializeField]
+    private List<MatcherEditor> matcherEditors;
 
     [SerializeField]
     private FeatureStyle.FilterStyle filterStyle;
@@ -43,10 +58,16 @@ public class FilterStyleEditor : EditorBase
     {
         this.filterStyle = filterStyle;
         this.layerStyleEditors = new List<LayerStyleEditor>();
+        this.matcherEditors = new List<MatcherEditor>();
 
         foreach (var layerStyle in filterStyle.LayerStyles)
         {
             layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
+        }
+
+        foreach (var compoundMatcher in filterStyle.Matchers)
+        {
+            matcherEditors.Add(new MatcherEditor(compoundMatcher));
         }
     }
 
@@ -80,6 +101,20 @@ public class FilterStyleEditor : EditorBase
                 // Create the associated layer editor
                 layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
             }
+        }
+        EditorConfig.ResetColor();
+    }
+
+    private void AddMatcherLayout()
+    {
+        EditorConfig.SetColor(EditorConfig.AddButtonColor);
+        if (GUILayout.Button(EditorConfig.AddButtonContent, EditorConfig.SmallButtonWidth))
+        {
+            var matcher = new FeatureStyle.CompoundMatcher();
+            string key = matcherOperatorsTable.Keys.ElementAt(selectedMatcherOperator);
+            matcher.Operator = matcherOperatorsTable[key];
+
+            matcherEditors.Add(new MatcherEditor(matcher));
         }
         EditorConfig.ResetColor();
     }
@@ -128,6 +163,35 @@ public class FilterStyleEditor : EditorBase
 
         EditorGUI.indentLevel--;
 
-        // TODO: Matchers
+        EditorGUILayout.BeginHorizontal();
+        {
+            selectedMatcherOperator = EditorGUILayout.Popup("Property matcher:",
+                selectedMatcherOperator, matcherOperatorsTable.Keys.ToArray());
+            AddMatcherLayout();
+        }
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUI.indentLevel++;
+
+        for (int i = matcherEditors.Count - 1; i >= 0; i--)
+        {
+            var editor = matcherEditors[i];
+
+            var state = FoldoutEditor.OnInspectorGUI(editor.GUID.ToString(), editor.Matcher.Operator.ToString());
+
+            if (state.show)
+            {
+                editor.OnInspectorGUI();
+            }
+
+            if (state.markedForDeletion)
+            {
+                // TODO: delete
+            }
+        }
+
+        EditorGUI.indentLevel--;
+
+        // filterStyle.Filter.Matcher = matcher;
     }
 }
