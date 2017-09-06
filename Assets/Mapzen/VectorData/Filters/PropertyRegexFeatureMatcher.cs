@@ -3,9 +3,10 @@ using System.Text.RegularExpressions;
 
 namespace Mapzen.VectorData.Filters
 {
+    [Serializable]
     public class PropertyRegexFeatureMatcher : PropertyFeatureMatcher
     {
-        public Regex Regex { get; set; }
+        public Regex Regex;
 
         protected override bool MatchesProperty(object property)
         {

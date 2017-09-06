@@ -20,7 +20,6 @@ public class FeatureStyleEditor : Editor
             styleEditor = new StyleEditor(featureStyle);
             featureStyle.Editor = styleEditor;
         }
-
     }
 
     public override void OnInspectorGUI()

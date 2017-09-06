@@ -86,8 +86,13 @@ namespace Mapzen.Unity
             [SerializeField]
             private List<Matcher> matchers;
 
-            [SerializeField]
-            private IFeatureMatcher featureMatcher;
+            public string HasProperty = "";
+            public string PropertyValue = "";
+            public string PropertyRange = "";
+            public float MinRange;
+            public float MaxRange;
+            public bool MinRangeEnabled = true;
+            public bool MaxRangeEnabled = true;
 
             public bool IsCompound()
             {
@@ -99,9 +104,55 @@ namespace Mapzen.Unity
                 get { return matchers; }
             }
 
-            public IFeatureMatcher FeatureMatcher
+            public IFeatureMatcher GetFeatureMatcher()
             {
-                get { return featureMatcher; }
+                IFeatureMatcher matcher = null;
+
+                if (IsCompound() && matchers.Count > 0)
+                {
+                    var predicates = new IFeatureMatcher[matchers.Count];
+
+                    for (int i = 0; i < matchers.Count; ++i)
+                    {
+                        predicates[i] = matchers[i].GetFeatureMatcher();
+                    }
+
+                    switch (type)
+                    {
+                        case FeatureStyle.Matcher.Type.AllOf:
+                            matcher = FeatureMatcher.AllOf(predicates);
+                            break;
+                        case FeatureStyle.Matcher.Type.NoneOf:
+                            matcher = FeatureMatcher.NoneOf(predicates);
+                            break;
+                        case FeatureStyle.Matcher.Type.AnyOf:
+                            matcher = FeatureMatcher.AnyOf(predicates);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (type)
+                    {
+                        case FeatureStyle.Matcher.Type.PropertyRange:
+                            double? min = MinRangeEnabled ? (double)MinRange : (double?)null;
+                            double? max = MaxRangeEnabled ? (double)MaxRange : (double?)null;
+
+                            matcher = FeatureMatcher.HasPropertyInRange(PropertyRange, min, max);
+                            break;
+                        case FeatureStyle.Matcher.Type.Property:
+                            matcher = FeatureMatcher.HasProperty(HasProperty);
+                            break;
+                        case FeatureStyle.Matcher.Type.PropertyValue:
+                            matcher = FeatureMatcher.HasPropertyWithValue(HasProperty, PropertyValue);
+                            break;
+                        case FeatureStyle.Matcher.Type.PropertyRegex:
+                                // TODO
+                            break;
+                    }
+                }
+
+                return matcher;
             }
 
             public Type MatcherType
@@ -126,25 +177,24 @@ namespace Mapzen.Unity
             private List<LayerStyle> layerStyles;
 
             [SerializeField]
-            private List<Matcher> matchers;
-
-            [SerializeField]
             private FeatureFilter filter;
 
-            public List<Matcher> Matchers
-            {
-                get { return matchers; }
-            }
+            public Matcher Matcher;
 
             public List<LayerStyle> LayerStyles
             {
                 get { return layerStyles; }
             }
 
-            public FeatureFilter Filter
+            public FeatureFilter GetFilter()
             {
-                get { return filter; }
-                set { filter = value; }
+                var filter = new FeatureFilter();
+                filter.Matcher = Matcher.GetFeatureMatcher();
+                foreach (var layerStyle in layerStyles)
+                {
+                    filter.CollectionNameSet.Add(layerStyle.LayerName);
+                }
+                return filter;
             }
 
             public string Name
@@ -156,20 +206,6 @@ namespace Mapzen.Unity
             {
                 this.name = name;
                 this.layerStyles = new List<LayerStyle>();
-                this.filter = new FeatureFilter();
-                this.matchers = new List<Matcher>();
-            }
-
-            public void AddLayerStyle(LayerStyle layerStyle)
-            {
-                layerStyles.Add(layerStyle);
-                filter.CollectionNameSet.Add(layerStyle.LayerName);
-            }
-
-            public void RemoveLayerStyle(LayerStyle layerStyle)
-            {
-                layerStyles.Remove(layerStyle);
-                filter.CollectionNameSet.Remove(layerStyle.LayerName);
             }
         }
 
