@@ -135,6 +135,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f99f332e167bc4c5cb799d5f5171e0b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameObjectOptions:
+    IsStatic: 0
+    GeneratePhysicMeshCollider: 0
+    PhysicMaterial: {fileID: 0}
+  regionScaleRatio: 1
   ApiKey: mapzen-MTyWgFy
   Area:
     min:
@@ -144,10 +149,10 @@ MonoBehaviour:
       longitude: -73.998306
       latitude: 40.716939
     zoom: 16
+  RegionName: region_0
   featureStyling:
   - {fileID: 11400000, guid: 141951d475bf741588a63ed80ea9396d, type: 2}
   groupOptions: 4
-  regionName: region_0
 --- !u!4 &349009245
 Transform:
   m_ObjectHideFlags: 0

@@ -16,27 +16,6 @@ public class MatcherEditor : EditorBase
     private FeatureStyle.Matcher matcher;
 
     [SerializeField]
-    private string hasProperty = "";
-
-    [SerializeField]
-    private string propertyValue = "";
-
-    [SerializeField]
-    private string propertyRange = "";
-
-    [SerializeField]
-    private float minRange;
-
-    [SerializeField]
-    private float maxRange;
-
-    [SerializeField]
-    private bool minRangeEnabled = true;
-
-    [SerializeField]
-    private bool maxRangeEnabled = true;
-
-    [SerializeField]
     private List<MatcherEditor> matcherEditors;
 
     public FeatureStyle.Matcher Matcher
@@ -50,7 +29,10 @@ public class MatcherEditor : EditorBase
         this.matcher = matcher;
         this.matcherEditors = new List<MatcherEditor>();
 
-        // TODO: restore editor state from matcher
+        foreach (var matcherChild in matcher.Matchers)
+        {
+            this.matcherEditors.Add(new MatcherEditor(matcherChild));
+        }
     }
 
     private MatcherEditor AddMatcherLayout()
@@ -70,58 +52,16 @@ public class MatcherEditor : EditorBase
                 && selectedMatcherType != FeatureStyle.Matcher.Type.None)
             {
                 var matcherType = (FeatureStyle.Matcher.Type)selectedMatcherType;
-                var compoundMatcher = new FeatureStyle.Matcher(matcherType);
+                var newMatcher = new FeatureStyle.Matcher(matcherType);
 
-                editor = new MatcherEditor(compoundMatcher);
+                editor = new MatcherEditor(newMatcher);
+                matcher.Matchers.Add(newMatcher);
             }
             EditorConfig.ResetColor();
         }
         EditorGUILayout.EndHorizontal();
 
         return editor;
-    }
-
-    public IFeatureMatcher GetFeatureMatcher()
-    {
-        if (matcher.IsCompound())
-        {
-            var predicates = new IFeatureMatcher[matcherEditors.Count];
-
-            for (int i = 0; i < matcherEditors.Count; ++i)
-            {
-                predicates[i] = matcherEditors[i].GetFeatureMatcher();
-            }
-
-            switch (matcher.MatcherType)
-            {
-                case FeatureStyle.Matcher.Type.AllOf:
-                    return FeatureMatcher.AllOf(predicates);
-                case FeatureStyle.Matcher.Type.NoneOf:
-                    return FeatureMatcher.NoneOf(predicates);
-                case FeatureStyle.Matcher.Type.AnyOf:
-                    return FeatureMatcher.AnyOf(predicates);
-            }
-        }
-        else
-        {
-            switch (matcher.MatcherType)
-            {
-                case FeatureStyle.Matcher.Type.PropertyRange:
-                    double? min = minRangeEnabled ? (double)minRange : (double?)null;
-                    double? max = maxRangeEnabled ? (double)maxRange : (double?)null;
-
-                    return FeatureMatcher.HasPropertyInRange(propertyRange, min, max);
-                case FeatureStyle.Matcher.Type.Property:
-                    return FeatureMatcher.HasProperty(hasProperty);
-                case FeatureStyle.Matcher.Type.PropertyValue:
-                    return FeatureMatcher.HasPropertyWithValue(hasProperty, propertyValue);
-                case FeatureStyle.Matcher.Type.PropertyRegex:
-                    // TODO
-                    return null;
-            }
-        }
-
-        return null;
     }
 
     public void OnInspectorGUI()
@@ -141,23 +81,23 @@ public class MatcherEditor : EditorBase
             switch (matcher.MatcherType)
             {
                 case FeatureStyle.Matcher.Type.Property:
-                    hasProperty = EditorGUILayout.TextField("Has property:", hasProperty);
+                    matcher.HasProperty = EditorGUILayout.TextField("Has property:", matcher.HasProperty);
                     break;
 
                 case FeatureStyle.Matcher.Type.PropertyRange:
                     EditorGUILayout.BeginHorizontal();
-                    minRange = EditorGUILayout.FloatField("min:", minRange);
-                    minRangeEnabled = EditorGUILayout.Toggle(minRangeEnabled);
+                    matcher.MinRange = EditorGUILayout.FloatField("min:", matcher.MinRange);
+                    matcher.MinRangeEnabled = EditorGUILayout.Toggle(matcher.MinRangeEnabled);
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.BeginHorizontal();
-                    maxRange = EditorGUILayout.FloatField("max:", maxRange);
-                    maxRangeEnabled = EditorGUILayout.Toggle(maxRangeEnabled);
+                    matcher.MaxRange = EditorGUILayout.FloatField("max:", matcher.MaxRange);
+                    matcher.MaxRangeEnabled = EditorGUILayout.Toggle(matcher.MaxRangeEnabled);
                     EditorGUILayout.EndHorizontal();
                     break;
 
                 case FeatureStyle.Matcher.Type.PropertyValue:
-                    hasProperty = EditorGUILayout.TextField("Property:", hasProperty);
-                    propertyValue = EditorGUILayout.TextField("Property value:", propertyValue);
+                    matcher.HasProperty = EditorGUILayout.TextField("Property:", matcher.HasProperty);
+                    matcher.PropertyValue = EditorGUILayout.TextField("Property value:", matcher.PropertyValue);
                     break;
 
                 case FeatureStyle.Matcher.Type.PropertyRegex:

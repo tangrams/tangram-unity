@@ -53,7 +53,7 @@ public class TileTask
                 {
                     var layerGroup = OnSceneGroupData(SceneGroup.Type.Layer, layer.Name, filterGroup, ref leaf);
 
-                    foreach (var feature in filterStyle.Filter.Filter(layer))
+                    foreach (var feature in filterStyle.GetFilter().Filter(layer))
                     {
                         var layerStyle = filterStyle.LayerStyles.Find(ls => ls.LayerName == layer.Name);
 

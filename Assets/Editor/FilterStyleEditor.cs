@@ -56,7 +56,11 @@ public class FilterStyleEditor : EditorBase
             layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
         }
 
-        // TODO: restore matcher editor
+        if (filterStyle.Matcher != null)
+        {
+            selectedMatcherType = filterStyle.Matcher.MatcherType;
+            this.matcherEditor = new MatcherEditor(filterStyle.Matcher);
+        }
     }
 
     private void AddLayerStyleLayout(FeatureStyle.FilterStyle filterStyle, string name)
@@ -84,7 +88,7 @@ public class FilterStyleEditor : EditorBase
                 layerStyle.PolylineBuilderOptions = PolylineBuilderEditor.DefaultOptions();
                 layerStyle.Material = new Material(Shader.Find("Diffuse"));
 
-                filterStyle.AddLayerStyle(layerStyle);
+                filterStyle.LayerStyles.Add(layerStyle);
 
                 // Create the associated layer editor
                 layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
@@ -128,7 +132,7 @@ public class FilterStyleEditor : EditorBase
             if (state.markedForDeletion)
             {
                 // Remove the layer from the filter styles
-                filterStyle.RemoveLayerStyle(layerStyling);
+                filterStyle.LayerStyles.Remove(layerStyling);
 
                 // Remove the associated layer editor
                 layerStyleEditors.RemoveAt(i);
@@ -160,7 +164,7 @@ public class FilterStyleEditor : EditorBase
         {
             matcherEditor.OnInspectorGUI();
 
-            filterStyle.Filter.Matcher = matcherEditor.GetFeatureMatcher();
+            filterStyle.Matcher = matcherEditor.Matcher;
         }
     }
 }
