@@ -88,7 +88,6 @@ namespace Mapzen
 
             public string HasProperty = "";
             public string PropertyValue = "";
-            public string PropertyRange = "";
             public float MinRange;
             public float MaxRange;
             public bool MinRangeEnabled = true;
@@ -110,23 +109,27 @@ namespace Mapzen
 
                 if (IsCompound() && matchers.Count > 0)
                 {
-                    var predicates = new IFeatureMatcher[matchers.Count];
+                    var predicates = new List<IFeatureMatcher>();
 
                     for (int i = 0; i < matchers.Count; ++i)
                     {
-                        predicates[i] = matchers[i].GetFeatureMatcher();
+                        var predicate = matchers[i].GetFeatureMatcher();
+                        if (predicate != null)
+                        {
+                            predicates.Add(predicate);
+                        }
                     }
 
                     switch (type)
                     {
                         case FeatureStyle.Matcher.Type.AllOf:
-                            matcher = FeatureMatcher.AllOf(predicates);
+                            matcher = FeatureMatcher.AllOf(predicates.ToArray());
                             break;
                         case FeatureStyle.Matcher.Type.NoneOf:
-                            matcher = FeatureMatcher.NoneOf(predicates);
+                            matcher = FeatureMatcher.NoneOf(predicates.ToArray());
                             break;
                         case FeatureStyle.Matcher.Type.AnyOf:
-                            matcher = FeatureMatcher.AnyOf(predicates);
+                            matcher = FeatureMatcher.AnyOf(predicates.ToArray());
                             break;
                     }
                 }
@@ -138,7 +141,7 @@ namespace Mapzen
                             double? min = MinRangeEnabled ? (double)MinRange : (double?)null;
                             double? max = MaxRangeEnabled ? (double)MaxRange : (double?)null;
 
-                            matcher = FeatureMatcher.HasPropertyInRange(PropertyRange, min, max);
+                            matcher = FeatureMatcher.HasPropertyInRange(HasProperty, min, max);
                             break;
                         case FeatureStyle.Matcher.Type.Property:
                             matcher = FeatureMatcher.HasProperty(HasProperty);
@@ -147,7 +150,7 @@ namespace Mapzen
                             matcher = FeatureMatcher.HasPropertyWithValue(HasProperty, PropertyValue);
                             break;
                         case FeatureStyle.Matcher.Type.PropertyRegex:
-                                // TODO
+                            // TODO
                             break;
                     }
                 }

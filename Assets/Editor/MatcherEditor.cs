@@ -85,6 +85,7 @@ public class MatcherEditor : EditorBase
                     break;
 
                 case FeatureStyle.Matcher.Type.PropertyRange:
+                    matcher.HasProperty = EditorGUILayout.TextField("Property:", matcher.HasProperty);
                     EditorGUILayout.BeginHorizontal();
                     matcher.MinRange = EditorGUILayout.FloatField("min:", matcher.MinRange);
                     matcher.MinRangeEnabled = EditorGUILayout.Toggle(matcher.MinRangeEnabled);
@@ -119,6 +120,7 @@ public class MatcherEditor : EditorBase
 
             if (state.markedForDeletion)
             {
+                matcher.Matchers.Remove(editor.Matcher);
                 matcherEditors.RemoveAt(i);
             }
         }
