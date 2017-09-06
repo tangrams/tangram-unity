@@ -60,8 +60,6 @@ public class MapzenMap : MonoBehaviour
             var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
                               wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey));
 
-            Debug.Log("URL request " + uri.AbsoluteUri);
-
             UnityIO.IORequestCallback onTileFetched = (response) =>
             {
                 if (response.hasError())
