@@ -10,44 +10,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bdaa043e324e04b91a4dcefec1ebb409, type: 3}
   m_Name: DefaultStyle
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   filterStyles:
   - name: filter_0
     layerStyles:
-    - layerName: buildings
-      Material: {fileID: 2100000, guid: ce1f4d2f66c614a9489e5ee52bbe34da, type: 2}
-      PolygonBuilderOptions:
-        Material: {fileID: 0}
-        Extrude: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 1
-      PolylineBuilderOptions:
-        Material: {fileID: 0}
-        Extrude: 1
-        MinHeight: 0
-        MaxHeight: 3
-        Width: 15
-        MiterLimit: 3
-        Enabled: 1
     - layerName: earth
       Material: {fileID: 2100000, guid: 0cdfce05273914dd4823f77af6b71663, type: 2}
-      PolygonBuilderOptions:
-        Material: {fileID: 0}
-        Extrude: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 1
-      PolylineBuilderOptions:
-        Material: {fileID: 0}
-        Extrude: 1
-        MinHeight: 0
-        MaxHeight: 3
-        Width: 15
-        MiterLimit: 3
-        Enabled: 1
-    - layerName: roads
-      Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
         Extrude: 1
@@ -78,9 +46,44 @@ MonoBehaviour:
         Width: 15
         MiterLimit: 3
         Enabled: 1
+    - layerName: roads
+      Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 1
+    - layerName: roads
+      Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrude: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 1
+    matchers: []
     filter:
       CollectionNameSet:
-      - buildings
       - earth
       - roads
       - water
+      - buildings

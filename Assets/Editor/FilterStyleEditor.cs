@@ -23,14 +23,6 @@ public class FilterStyleEditor : EditorBase
             "water",
         });
 
-    private static Dictionary<string, CompoundFeatureMatcher.Operator> matcherOperatorsTable
-    = new Dictionary<string, CompoundFeatureMatcher.Operator>
-    {
-        { "all of", CompoundFeatureMatcher.Operator.All },
-        { "none of", CompoundFeatureMatcher.Operator.None },
-        { "any of", CompoundFeatureMatcher.Operator.Any },
-    };
-
     [SerializeField]
     private string customFeatureCollection = "";
 
@@ -38,13 +30,13 @@ public class FilterStyleEditor : EditorBase
     private int selectedLayer;
 
     [SerializeField]
-    private int selectedMatcherOperator;
+    private FeatureStyle.Matcher.Type selectedMatcherType;
 
     [SerializeField]
     private List<LayerStyleEditor> layerStyleEditors;
 
     [SerializeField]
-    private List<MatcherEditor> matcherEditors;
+    private MatcherEditor matcherEditor;
 
     [SerializeField]
     private FeatureStyle.FilterStyle filterStyle;
@@ -59,17 +51,13 @@ public class FilterStyleEditor : EditorBase
     {
         this.filterStyle = filterStyle;
         this.layerStyleEditors = new List<LayerStyleEditor>();
-        this.matcherEditors = new List<MatcherEditor>();
 
         foreach (var layerStyle in filterStyle.LayerStyles)
         {
             layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
         }
 
-        foreach (var compoundMatcher in filterStyle.Matchers)
-        {
-            matcherEditors.Add(new MatcherEditor(compoundMatcher));
-        }
+        // TODO: restore matcher editor
     }
 
     private void AddLayerStyleLayout(FeatureStyle.FilterStyle filterStyle, string name)
@@ -102,20 +90,6 @@ public class FilterStyleEditor : EditorBase
                 // Create the associated layer editor
                 layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
             }
-        }
-        EditorConfig.ResetColor();
-    }
-
-    private void AddMatcherLayout()
-    {
-        EditorConfig.SetColor(EditorConfig.AddButtonColor);
-        if (GUILayout.Button(EditorConfig.AddButtonContent, EditorConfig.SmallButtonWidth))
-        {
-            var matcher = new FeatureStyle.CompoundMatcher();
-            string key = matcherOperatorsTable.Keys.ElementAt(selectedMatcherOperator);
-            matcher.Operator = matcherOperatorsTable[key];
-
-            matcherEditors.Add(new MatcherEditor(matcher));
         }
         EditorConfig.ResetColor();
     }
@@ -164,35 +138,30 @@ public class FilterStyleEditor : EditorBase
 
         EditorGUI.indentLevel--;
 
-        EditorGUILayout.BeginHorizontal();
+        var matcherTypeList = Enum.GetValues(typeof(FeatureStyle.Matcher.Type)).Cast<FeatureStyle.Matcher.Type>();
+        var matcherTypeStringList = matcherTypeList.Select(type => type.ToString());
+        var oldType = selectedMatcherType;
+
+        selectedMatcherType = (FeatureStyle.Matcher.Type)EditorGUILayout.Popup("Matcher:",
+            (int)selectedMatcherType, matcherTypeStringList.ToArray());
+
+        if (selectedMatcherType != oldType)
         {
-            selectedMatcherOperator = EditorGUILayout.Popup("Property matcher:",
-                selectedMatcherOperator, matcherOperatorsTable.Keys.ToArray());
-            AddMatcherLayout();
+            matcherEditor = new MatcherEditor(new FeatureStyle.Matcher(selectedMatcherType));
         }
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUI.indentLevel++;
-
-        for (int i = matcherEditors.Count - 1; i >= 0; i--)
+        else
         {
-            var editor = matcherEditors[i];
-
-            var state = FoldoutEditor.OnInspectorGUI(editor.GUID.ToString(), editor.Matcher.Operator.ToString());
-
-            if (state.show)
+            if (selectedMatcherType == FeatureStyle.Matcher.Type.None)
             {
-                editor.OnInspectorGUI();
-            }
-
-            if (state.markedForDeletion)
-            {
-                // TODO: delete
+                matcherEditor = null;
             }
         }
 
-        EditorGUI.indentLevel--;
+        if (matcherEditor != null)
+        {
+            matcherEditor.OnInspectorGUI();
 
-        // filterStyle.Filter.Matcher = matcher;
+            filterStyle.Filter.Matcher = matcherEditor.GetFeatureMatcher();
+        }
     }
 }

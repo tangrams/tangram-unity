@@ -66,28 +66,53 @@ namespace Mapzen.Unity
         }
 
         [Serializable]
-        public class CompoundMatcher
+        public class Matcher
         {
-            [SerializeField]
-            private CompoundFeatureMatcher.Operator ooperator;
+            public enum Type
+            {
+                None,
+                AllOf,
+                NoneOf,
+                AnyOf,
+                Property,
+                PropertyRange,
+                PropertyRegex,
+                PropertyValue,
+            }
 
             [SerializeField]
-            private List<IFeatureMatcher> matchers;
+            private Type type;
 
-            public List<IFeatureMatcher> Matchers
+            [SerializeField]
+            private List<Matcher> matchers;
+
+            [SerializeField]
+            private IFeatureMatcher featureMatcher;
+
+            public bool IsCompound()
+            {
+                return type == Type.AllOf || type == Type.NoneOf || type == Type.AnyOf;
+            }
+
+            public List<Matcher> Matchers
             {
                 get { return matchers; }
             }
 
-            public CompoundFeatureMatcher.Operator Operator
+            public IFeatureMatcher FeatureMatcher
             {
-                get { return ooperator; }
-                set { ooperator = value; }
+                get { return featureMatcher; }
             }
 
-            public CompoundMatcher()
+            public Type MatcherType
             {
-                this.matchers = new List<IFeatureMatcher>();
+                get { return type; }
+            }
+
+            public Matcher(Type type)
+            {
+                this.matchers = new List<Matcher>();
+                this.type = type;
             }
         }
 
@@ -101,12 +126,12 @@ namespace Mapzen.Unity
             private List<LayerStyle> layerStyles;
 
             [SerializeField]
-            private List<CompoundMatcher> matchers;
+            private List<Matcher> matchers;
 
             [SerializeField]
             private FeatureFilter filter;
 
-            public List<CompoundMatcher> Matchers
+            public List<Matcher> Matchers
             {
                 get { return matchers; }
             }
@@ -132,6 +157,7 @@ namespace Mapzen.Unity
                 this.name = name;
                 this.layerStyles = new List<LayerStyle>();
                 this.filter = new FeatureFilter();
+                this.matchers = new List<Matcher>();
             }
 
             public void AddLayerStyle(LayerStyle layerStyle)
