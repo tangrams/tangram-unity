@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Mapzen.VectorData.Filters
 {
@@ -61,6 +62,15 @@ namespace Mapzen.VectorData.Filters
                 Key = property,
                 Min = min,
                 Max = max,
+            };
+        }
+
+        public static IFeatureMatcher HasPropertyWithRegex(string property, string regexPattern)
+        {
+            return new PropertyRegexFeatureMatcher
+            {
+                Key = property,
+                Regex = new Regex(regexPattern),
             };
         }
     }

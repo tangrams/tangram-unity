@@ -88,6 +88,7 @@ namespace Mapzen.Unity
 
             public string HasProperty = "";
             public string PropertyValue = "";
+            public string RegexPattern = "";
             public float MinRange;
             public float MaxRange;
             public bool MinRangeEnabled = true;
@@ -150,7 +151,14 @@ namespace Mapzen.Unity
                             matcher = FeatureMatcher.HasPropertyWithValue(HasProperty, PropertyValue);
                             break;
                         case FeatureStyle.Matcher.Type.PropertyRegex:
-                            // TODO
+                            try
+                            {
+                                matcher = FeatureMatcher.HasPropertyWithRegex(HasProperty, RegexPattern);
+                            }
+                            catch (ArgumentException ae)
+                            {
+                                Debug.LogError(ae.Message);
+                            }
                             break;
                     }
                 }
