@@ -63,7 +63,7 @@ MonoBehaviour:
         MiterLimit: 3
         Enabled: 0
     - layerName: roads
-      Material: {fileID: 2100000, guid: ce1f4d2f66c614a9489e5ee52bbe34da, type: 2}
+      Material: {fileID: 2100000, guid: e1694dfd1d13b43bba19545430a1aebc, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
         Extrude: 1
@@ -158,7 +158,7 @@ MonoBehaviour:
   - name: filter_2
     layerStyles:
     - layerName: buildings
-      Material: {fileID: 2100000, guid: ce1f4d2f66c614a9489e5ee52bbe34da, type: 2}
+      Material: {fileID: 2100000, guid: c583580183f69476bbe6cda2361da21e, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
         Extrude: 1
@@ -183,33 +183,4 @@ MonoBehaviour:
       MinRange: 0
       MaxRange: 30
       MinRangeEnabled: 0
-      MaxRangeEnabled: 1
-  - name: filter_3
-    layerStyles:
-    - layerName: roads
-      Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
-      PolygonBuilderOptions:
-        Material: {fileID: 0}
-        Extrude: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 0
-      PolylineBuilderOptions:
-        Material: {fileID: 0}
-        Extrude: 1
-        MinHeight: 0
-        MaxHeight: 1
-        Width: 5
-        MiterLimit: 3
-        Enabled: 1
-    filter:
-      CollectionNameSet: []
-    Matcher:
-      type: 7
-      matchers: []
-      HasProperty: kind
-      PropertyValue: ferry
-      MinRange: 0
-      MaxRange: 0
-      MinRangeEnabled: 1
       MaxRangeEnabled: 1
