@@ -1,8 +1,8 @@
 language: android
 
-branches:
-    only:
-        - master
+# branches:
+#     only:
+#         - master
 
 matrix:
     include:
