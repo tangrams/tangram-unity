@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 if [[ ${PLATFORM} == "osx" ]]; then
     /Applications/Unity/Unity.app/Contents/MacOS/Unity \
         -batchmode \
@@ -13,18 +16,21 @@ if [[ ${PLATFORM} == "osx" ]]; then
     echo 'Logs from build'
     cat $(pwd)/unity.log
 
-    cd NativePlugin
-    cmake . -Bbuild
-    make -c build/
+    mkdir NativePlugin/build
+    pushd NativePlugin/build
+    cmake .. && make
+    popd
 fi
 
 if [[ ${PLATFORM} == "linux" ]]; then
-    cd NativePlugin
-    cmake . -Bbuild -DARCH=x86
-    make -c build/
+    mkdir NativePlugin/build
+    pushd NativePlugin/build
+    cmake .. -DARCH=x86 && make
+    popd
 fi
 
 if [[ ${PLATFORM} == "android" ]]; then
-    cd NativePlugin
+    pushd NativePlugin
     ./gradlew earcut:assembleFullRelease
+    popd
 fi
