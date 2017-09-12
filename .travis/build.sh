@@ -31,6 +31,6 @@ fi
 
 if [[ ${PLATFORM} == "android" ]]; then
     pushd NativePlugin
-    ./gradlew earcut:assembleFullRelease
+    ./gradlew earcut:assembleRelease
     popd
 fi
