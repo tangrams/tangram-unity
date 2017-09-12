@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 /Applications/Unity/Unity.app/Contents/MacOS/Unity \
     -batchmode \
     -nographics \
@@ -11,3 +14,7 @@
 
 echo 'Logs from build'
 cat $(pwd)/unity.log
+
+# https://github.com/travis-ci/travis-ci/issues/6307
+rvm get head
+
