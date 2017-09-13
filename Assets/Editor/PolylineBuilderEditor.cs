@@ -3,54 +3,59 @@ using UnityEditor;
 using Mapzen;
 using System;
 
-public class PolylineBuilderEditor
+[Serializable]
+public class PolylineBuilderEditor : EditorBase
 {
-    private bool show = false;
-    private PolylineBuilder.Options defaultOptions;
-
-    public PolylineBuilder.Options DefaultOptions
-    {
-        get
-        {
-            return defaultOptions;
-        }
-    }
+    [SerializeField]
+    private bool show;
 
     public PolylineBuilderEditor()
+        : base()
     {
-        defaultOptions = new PolylineBuilder.Options();
+        this.show = false;
+    }
+
+    public static PolylineBuilder.Options DefaultOptions()
+    {
+        var defaultOptions = new PolylineBuilder.Options();
 
         defaultOptions.Extrude = true;
+        defaultOptions.Enabled = true;
         defaultOptions.MaxHeight = 3.0f;
         defaultOptions.MiterLimit = 3.0f;
         defaultOptions.Width = 15.0f;
+
+        return defaultOptions;
     }
 
-    private void LoadPreferences(string name)
+    private void LoadPreferences()
     {
-        show = EditorPrefs.GetBool("PolylineBuilderEditor.show" + name);
+        show = EditorPrefs.GetBool(guid + ".show");
     }
 
-    private void SavePreferences(string name)
+    private void SavePreferences()
     {
-        EditorPrefs.SetBool("PolylineBuilderEditor.show" + name, show);
+        EditorPrefs.SetBool(guid + ".show", show);
     }
 
-    public PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options, string name)
+    public PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options)
     {
-        LoadPreferences(name);
+        LoadPreferences();
+
         show = EditorGUILayout.Foldout(show, "Polyline builder options");
+
         if (!show)
         {
-            SavePreferences(name);
+            SavePreferences();
             return options;
         }
 
         options.Width = EditorGUILayout.FloatField("Width: ", options.Width);
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
         options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
+        options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
 
-        SavePreferences(name);
+        SavePreferences();
 
         return options;
     }

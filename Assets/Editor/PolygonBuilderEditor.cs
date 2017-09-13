@@ -3,51 +3,56 @@ using UnityEditor;
 using Mapzen;
 using System;
 
-public class PolygonBuilderEditor
+[Serializable]
+public class PolygonBuilderEditor : EditorBase
 {
-    private bool show = false;
-    private PolygonBuilder.Options defaultOptions;
-
-    public PolygonBuilder.Options DefaultOptions
-    {
-        get
-        {
-            return defaultOptions;
-        }
-    }
+    [SerializeField]
+    private bool show;
 
     public PolygonBuilderEditor()
+        : base()
     {
-        defaultOptions = new PolygonBuilder.Options();
+        this.show = false;
+    }
+
+    public static PolygonBuilder.Options DefaultOptions()
+    {
+        var defaultOptions = new PolygonBuilder.Options();
 
         defaultOptions.Extrude = true;
+        defaultOptions.Enabled = true;
         defaultOptions.MaxHeight = 0.0f;
+
+        return defaultOptions;
     }
 
-    private void LoadPreferences(string name)
+    private void LoadPreferences()
     {
-        show = EditorPrefs.GetBool("PolygonBuilderEditor.show" + name);
+        show = EditorPrefs.GetBool(guid + ".show");
     }
 
-    private void SavePreferences(string name)
+    private void SavePreferences()
     {
-        EditorPrefs.SetBool("PolygonBuilderEditor.show" + name, show);
+        EditorPrefs.SetBool(guid + ".show", show);
     }
 
-    public PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options, string name)
+    public PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options)
     {
-        LoadPreferences(name);
+        LoadPreferences();
+
         show = EditorGUILayout.Foldout(show, "Polygon builder options");
+
         if (!show)
         {
-            SavePreferences(name);
+            SavePreferences();
             return options;
         }
 
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
         options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
+        options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
 
-        SavePreferences(name);
+        SavePreferences();
 
         return options;
     }

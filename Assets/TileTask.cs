@@ -5,6 +5,7 @@ using Mapzen.VectorData;
 using Mapzen.VectorData.Formats;
 using Mapzen.VectorData.Filters;
 using UnityEngine;
+using System.Linq;
 
 public class TileTask
 {
@@ -42,38 +43,51 @@ public class TileTask
 
         foreach (var style in featureStyling)
         {
-            var filterGroup = OnSceneGroupData(SceneGroup.Type.Filter, style.Name, tileGroup, ref leaf);
+            // TODO: group by style?
 
-            foreach (var layer in tileData.FeatureCollections)
+            foreach (var filterStyle in style.FilterStyles)
             {
-                var layerGroup = OnSceneGroupData(SceneGroup.Type.Layer, layer.Name, filterGroup, ref leaf);
+                var filterGroup = OnSceneGroupData(SceneGroup.Type.Filter, filterStyle.Name, tileGroup, ref leaf);
 
-                foreach (var feature in style.Filter.Filter(layer))
+                foreach (var layer in tileData.FeatureCollections)
                 {
-                    string featureName = "";
-                    object identifier;
+                    var layerGroup = OnSceneGroupData(SceneGroup.Type.Layer, layer.Name, filterGroup, ref leaf);
 
-                    if (feature.TryGetProperty("id", out identifier))
+                    foreach (var feature in filterStyle.Filter.Filter(layer))
                     {
-                        featureName += identifier.ToString();
-                    }
+                        var layerStyle = filterStyle.LayerStyles.Find(ls => ls.LayerName == layer.Name);
 
-                    OnSceneGroupData(SceneGroup.Type.Feature, featureName, layerGroup, ref leaf);
+                        string featureName = "";
+                        object identifier;
 
-                    if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
-                    {
-                        var polygonOptions = style.GetPolygonOptions(feature, inverseTileScale);
-                        var builder = new PolygonBuilder(leaf.meshData, polygonOptions, transform);
+                        if (feature.TryGetProperty("id", out identifier))
+                        {
+                            featureName += identifier.ToString();
+                        }
 
-                        feature.HandleGeometry(builder);
-                    }
+                        OnSceneGroupData(SceneGroup.Type.Feature, featureName, layerGroup, ref leaf);
 
-                    if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
-                    {
-                        var polylineOptions = style.GetPolylineOptions(feature, inverseTileScale);
-                        var builder = new PolylineBuilder(leaf.meshData, polylineOptions, transform);
+                        if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
+                        {
+                            var polygonOptions = layerStyle.GetPolygonOptions(feature, inverseTileScale);
 
-                        feature.HandleGeometry(builder);
+                            if (polygonOptions.Enabled)
+                            {
+                                var builder = new PolygonBuilder(leaf.meshData, polygonOptions, transform);
+                                feature.HandleGeometry(builder);
+                            }
+                        }
+
+                        if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
+                        {
+                            var polylineOptions = layerStyle.GetPolylineOptions(feature, inverseTileScale);
+
+                            if (polylineOptions.Enabled)
+                            {
+                                var builder = new PolylineBuilder(leaf.meshData, polylineOptions, transform);
+                                feature.HandleGeometry(builder);
+                            }
+                        }
                     }
                 }
             }

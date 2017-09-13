@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4465785, g: 0.49641252, b: 0.574817, a: 1}
+  m_IndirectSpecularColor: {r: 0.44659358, g: 0.49642974, b: 0.574825, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -144,6 +144,10 @@ MonoBehaviour:
       longitude: -73.998306
       latitude: 40.716939
     zoom: 16
+  featureStyling:
+  - {fileID: 11400000, guid: 141951d475bf741588a63ed80ea9396d, type: 2}
+  groupOptions: 4
+  regionName: region_0
 --- !u!4 &349009245
 Transform:
   m_ObjectHideFlags: 0

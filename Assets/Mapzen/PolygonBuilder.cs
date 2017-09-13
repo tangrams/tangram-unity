@@ -14,6 +14,7 @@ namespace Mapzen
             public bool Extrude;
             public float MinHeight;
             public float MaxHeight;
+            public bool Enabled;
         }
 
         public PolygonBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)

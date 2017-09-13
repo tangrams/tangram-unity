@@ -2,7 +2,10 @@
 using System.Linq;
 using Mapzen;
 using UnityEngine;
+
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 public class SceneGraph
 {
@@ -72,8 +75,10 @@ public class SceneGraph
 
                 if (options.IsStatic)
                 {
+#if UNITY_EDITOR
                     // Generate default uvs for this mesh
                     Unwrapping.GenerateSecondaryUVSet(mesh);
+#endif
                 }
 
                 // Associate the mesh filter and mesh renderer components with this game object
@@ -93,4 +98,3 @@ public class SceneGraph
         }
     }
 }
-
