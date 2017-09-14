@@ -1,15 +1,7 @@
 language: android
 
-# branches:
-#     only:
-#         - master
-
 matrix:
     include:
-        - os: osx
-          env: PLATFORM=osx
-          osx_image: xcode8.3
-          compiler: clang
         - os: linux
           env: PLATFORM=linux CXX=g++-4.8 CC=gcc-4.8
           addons:
