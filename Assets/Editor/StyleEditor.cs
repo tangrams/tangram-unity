@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using Mapzen;
+using Mapzen.Unity;
 using Mapzen.VectorData.Filters;
 using System.Collections.Generic;
 using System.Linq;

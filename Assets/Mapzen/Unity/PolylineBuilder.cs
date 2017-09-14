@@ -3,7 +3,7 @@ using Mapzen.VectorData;
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Mapzen
+namespace Mapzen.Unity
 {
     public class PolylineBuilder : IGeometryHandler
     {

@@ -3,7 +3,7 @@ using Mapzen.VectorData;
 using UnityEngine;
 using System;
 
-namespace Mapzen
+namespace Mapzen.Unity
 {
     public class PolygonBuilder : IGeometryHandler
     {

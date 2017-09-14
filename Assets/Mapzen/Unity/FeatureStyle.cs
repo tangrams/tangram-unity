@@ -5,7 +5,7 @@ using Mapzen.VectorData.Filters;
 using Mapzen.VectorData;
 using UnityEngine;
 
-namespace Mapzen
+namespace Mapzen.Unity
 {
     [Serializable]
     [CreateAssetMenu(menuName = "Mapzen/Style")]

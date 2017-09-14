@@ -1,5 +1,6 @@
 ﻿using System;
 using Mapzen;
+using Mapzen.Unity;
 using UnityEditor;
 using UnityEngine;
 

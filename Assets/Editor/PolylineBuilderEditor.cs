@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using Mapzen;
+using Mapzen.Unity;
 using System;
 
 [Serializable]
