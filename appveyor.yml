@@ -1,0 +1,5 @@
+image:
+  - Visual Studio 2015
+build_script:
+  - cmake NativePlugin -Bbuild -G "Visual Studio 14 2015 Win64" -DARCH=x86_64 && cmake --build build
+
