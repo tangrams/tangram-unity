@@ -3,7 +3,7 @@ using System.Linq;
 using Mapzen;
 using UnityEngine;
 
-#ifdef UNITY_EDITOR
+#if UNITY_EDITOR
 using UnityEditor;
 #endif
 
@@ -77,7 +77,7 @@ namespace Mapzen.Unity
 
                     if (options.IsStatic)
                     {
-#ifdef UNITY_EDITOR
+#if UNITY_EDITOR
                         // Generate default uvs for this mesh
                         Unwrapping.GenerateSecondaryUVSet(mesh);
 #endif
