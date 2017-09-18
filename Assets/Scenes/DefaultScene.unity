@@ -139,7 +139,7 @@ MonoBehaviour:
     IsStatic: 0
     GeneratePhysicMeshCollider: 0
     PhysicMaterial: {fileID: 0}
-  regionScaleRatio: 1
+  regionScaleRatio: 0.01
   ApiKey: mapzen-MTyWgFy
   Area:
     min:
@@ -151,7 +151,7 @@ MonoBehaviour:
     zoom: 16
   RegionName: region_0
   featureStyling:
-  - {fileID: 11400000, guid: b85c5ba8553a442a68b2ac5b34f2697c, type: 2}
+  - {fileID: 11400000, guid: fc13486fe526f434c97435d16023999a, type: 2}
   groupOptions: 4
 --- !u!4 &349009245
 Transform:
@@ -248,13 +248,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 530800346}
-  m_LocalRotation: {x: 0.23344536, y: 0, z: 0, w: 0.97236997}
-  m_LocalPosition: {x: 1449, y: 495, z: 71}
+  m_LocalRotation: {x: 0.2896165, y: 0, z: 0, w: 0.9571428}
+  m_LocalPosition: {x: 12.81, y: 6.63, z: -1.55}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 27, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 33.67, y: 0, z: 0}
 --- !u!1 &2091268523
 GameObject:
   m_ObjectHideFlags: 0
