@@ -1,13 +1,17 @@
 #!/bin/bash
 
-/Applications/Unity/Unity.app/Contents/MacOS/Unity \
-    -batchmode \
-    -nographics \
-    -silent-crashes \
-    -logFile $(pwd)/unity.log \
-    -projectpath $(pwd) \
-    -buildOSXUniversalPlayer "$(pwd)/tangram-unity.app" \
-    -quit
+set -e
+set -o pipefail
 
-echo 'Logs from build'
-cat $(pwd)/unity.log
+if [[ ${PLATFORM} == "linux" ]]; then
+    mkdir NativePlugin/build
+    pushd NativePlugin/build
+    cmake .. -DARCH=x86 && make
+    popd
+fi
+
+if [[ ${PLATFORM} == "android" ]]; then
+    pushd NativePlugin
+    ./gradlew earcut:assembleRelease
+    popd
+fi

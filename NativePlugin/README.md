@@ -88,7 +88,7 @@ After installing dependencies in Android Studio, you can execute Android builds 
 For the build only target:
 
 ```sh
-$ ./gradlew earcut:assembleFullRelease
+$ ./gradlew earcut:assembleRelease
 ```
 
 To install and build the libraries:
