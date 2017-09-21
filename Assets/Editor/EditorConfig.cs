@@ -13,6 +13,10 @@ public class EditorConfig
 
     public static Color DownloadButtonDisabledColor = new Color(0.45f, 0.45f, 0.45f);
 
+    public static Color ExportButtonEnabledColor = new Color(0.30f, 0.35f, 0.85f);
+
+    public static Color ExportButtonDisabledColor = new Color(0.45f, 0.45f, 0.45f);
+
     public static Color RemoveButtonColor = new Color(0.5f, 0.5f, 0.5f);
 
     public static GUILayoutOption SmallButtonWidth = GUILayout.Width(50.0f);

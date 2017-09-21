@@ -1,12 +1,8 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.Networking;
-using Mapzen.VectorData;
 using Mapzen.Unity;
-using Mapzen.VectorData.Filters;
 using Mapzen;
 
 public class MapzenMap : MonoBehaviour
@@ -24,7 +20,7 @@ public class MapzenMap : MonoBehaviour
 
     public string RegionName = "";
 
-    private List<GameObject> tiles = new List<GameObject>();
+    private List<MeshFilter> meshFilters = new List<MeshFilter>();
 
     private IO tileIO = new IO();
 
@@ -123,13 +119,13 @@ public class MapzenMap : MonoBehaviour
         {
             tasks.Clear();
 
-            SceneGraph.Generate(regionMap, null, gameObjectOptions);
+            meshFilters = SceneGraph.Generate(regionMap, null, gameObjectOptions);
         }
     }
 
-    public List<GameObject> Tiles
+    public List<MeshFilter> MeshFilters
     {
-        get { return tiles; }
+        get { return meshFilters; }
     }
 
     public List<FeatureStyle> FeatureStyling
