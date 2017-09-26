@@ -1,8 +1,11 @@
-﻿namespace Mapzen.VectorData.Filters
+﻿using System;
+
+namespace Mapzen.VectorData.Filters
 {
+    [Serializable]
     public class PropertyFeatureMatcher : IFeatureMatcher
     {
-        public string Key { get; set; }
+        public string Key;
 
         public bool MatchesFeature(Feature feature)
         {

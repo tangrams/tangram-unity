@@ -2,11 +2,12 @@
 
 namespace Mapzen.VectorData.Filters
 {
+    [Serializable]
     public class PropertyRangeFeatureMatcher : PropertyFeatureMatcher
     {
-        public double? Min { get; set; }
+        public double? Min;
 
-        public double? Max { get; set; }
+        public double? Max;
 
         protected override bool MatchesProperty(object property)
         {

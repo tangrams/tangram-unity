@@ -111,7 +111,7 @@ public class MapzenMapEditor : Editor
 
             foreach (var filterStyle in style.FilterStyles)
             {
-                if (filterStyle.Filter.CollectionNameSet.Count == 0)
+                if (filterStyle.GetFilter().CollectionNameSet.Count == 0)
                 {
                     Debug.LogWarning("The style " + style.name + " has a filter selecting no layer");
                 }
