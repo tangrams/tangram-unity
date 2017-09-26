@@ -69,6 +69,7 @@ namespace Mapzen.Unity
                     var mesh = new Mesh();
 
                     mesh.SetVertices(meshBucket.Vertices);
+                    mesh.SetUVs(0, meshBucket.UVs);
                     mesh.subMeshCount = meshBucket.Submeshes.Count;
                     for (int s = 0; s < meshBucket.Submeshes.Count; s++)
                     {

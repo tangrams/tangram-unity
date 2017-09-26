@@ -27,6 +27,7 @@ namespace Mapzen.Unity
             this.lastPoint = new Point();
             this.pointsInRing = 0;
             this.extrusionVertices = new List<Vector3>();
+            this.extrusionUVs = new List<Vector2>();
             this.extrusionIndices = new List<int>();
         }
 
@@ -42,6 +43,7 @@ namespace Mapzen.Unity
         // Values for extrusions.
         private Point lastPoint;
         private List<Vector3> extrusionVertices;
+        private List<Vector2> extrusionUVs;
         private List<int> extrusionIndices;
 
         public void OnPoint(Point point)
@@ -69,6 +71,11 @@ namespace Mapzen.Unity
                 extrusionVertices.Add(v1);
                 extrusionVertices.Add(v2);
                 extrusionVertices.Add(v3);
+
+                extrusionUVs.Add(new Vector2(1.0f, 1.0f));
+                extrusionUVs.Add(new Vector2(0.0f, 1.0f));
+                extrusionUVs.Add(new Vector2(1.0f, 0.0f));
+                extrusionUVs.Add(new Vector2(0.0f, 0.0f));
 
                 extrusionIndices.Add(indexOffset + 1);
                 extrusionIndices.Add(indexOffset + 3);
@@ -108,13 +115,14 @@ namespace Mapzen.Unity
             coordinates.Clear();
             rings.Clear();
             extrusionVertices.Clear();
+            extrusionUVs.Clear();
             extrusionIndices.Clear();
         }
 
         public void OnEndPolygon()
         {
             // First add vertices and indices for extrusions.
-            outputMeshData.AddElements(extrusionVertices, extrusionIndices, options.Material);
+            outputMeshData.AddElements(extrusionVertices, extrusionUVs, extrusionIndices, options.Material);
 
             // Then tesselate polygon interior and add vertices and indices.
             var earcut = new Earcut();
@@ -122,17 +130,20 @@ namespace Mapzen.Unity
             earcut.Tesselate(coordinates.ToArray(), rings.ToArray());
 
             var vertices = new List<Vector3>(earcut.Vertices.Length / 2);
+            var uvs = new List<Vector2>(earcut.Vertices.Length / 2);
 
             for (int i = 0; i < earcut.Vertices.Length; i += 2)
             {
                 var v = new Vector3(earcut.Vertices[i], options.MaxHeight, earcut.Vertices[i + 1]);
+
+                uvs.Add(new Vector2(v.x, v.z));
 
                 v = this.transform.MultiplyPoint(v);
 
                 vertices.Add(v);
             }
 
-            outputMeshData.AddElements(vertices, earcut.Indices, options.Material);
+            outputMeshData.AddElements(vertices, uvs, earcut.Indices, options.Material);
 
             earcut.Release();
         }
