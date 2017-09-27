@@ -1,3 +1,7 @@
+//
+// @CMAKE_DOCS@
+//
+
 #pragma once
 
 #include <algorithm>
