@@ -48,7 +48,7 @@ namespace Mapzen.Unity
                 yield return request.Send();
                 string requestError = null;
 
-                if (request.isError)
+                if (request.isNetworkError)
                 {
                     // only handles system errors
                     requestError = request.error;
