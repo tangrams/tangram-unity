@@ -6,6 +6,7 @@
 #include "earcut.h"
 #include <array>
 #include <mutex>
+#include <cstring>
 
 #define CAPACITY 32
 
