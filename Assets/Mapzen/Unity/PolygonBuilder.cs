@@ -30,6 +30,7 @@ namespace Mapzen.Unity
             this.extrusionVertices = new List<Vector3>();
             this.extrusionUVs = new List<Vector2>();
             this.extrusionIndices = new List<int>();
+            this.polygonUVs = new List<Vector2>();
         }
 
         private Matrix4x4 transform;
@@ -45,6 +46,7 @@ namespace Mapzen.Unity
         private Point lastPoint;
         private List<Vector3> extrusionVertices;
         private List<Vector2> extrusionUVs;
+        private List<Vector2> polygonUVs;
         private List<int> extrusionIndices;
 
         public void OnPoint(Point point)
@@ -93,6 +95,15 @@ namespace Mapzen.Unity
             pointsInRing++;
         }
 
+        public void AddUV(Vector2 uv)
+        {
+            polygonUVs.Add(uv);
+        }
+        public void RepeatUV()
+        {
+            polygonUVs.Add(polygonUVs.First());
+        }
+
         public void OnBeginLineString()
         {
         }
@@ -118,6 +129,7 @@ namespace Mapzen.Unity
             extrusionVertices.Clear();
             extrusionUVs.Clear();
             extrusionIndices.Clear();
+            polygonUVs.Clear();
         }
 
         public void OnEndPolygon()
@@ -130,16 +142,25 @@ namespace Mapzen.Unity
 
             earcut.Tesselate(coordinates.ToArray(), rings.ToArray());
             var vertices = new List<Vector3>(coordinates.Count / 2);
-            var uvs = new List<Vector2>(coordinates.Count / 2);
+            List<Vector2> uvs;
+
+            if (polygonUVs.Count > 0)
+            {
+                uvs = polygonUVs;
+            }
+            else
+            {
+                uvs = new List<Vector2>(coordinates.Count / 2);
+                for (int i = 0; i < coordinates.Count; i += 2)
+                {
+                    uvs.Add(new Vector2(coordinates[i], coordinates[i + 1]));
+                }
+            }
 
             for (int i = 0; i < coordinates.Count; i += 2)
             {
                 var v = new Vector3(coordinates[i], options.MaxHeight, coordinates[i + 1]);
-
-                uvs.Add(new Vector2(v.x, v.z));
-
                 v = this.transform.MultiplyPoint(v);
-
                 vertices.Add(v);
             }
 

@@ -72,9 +72,24 @@ namespace Mapzen.Unity
                 polygonBuilder.OnPoint(new Point(currPoint.x + perp.x, currPoint.y + perp.y));
                 polygonBuilder.OnPoint(new Point(nextPoint.x + perp.x, nextPoint.y + perp.y));
                 polygonBuilder.OnPoint(new Point(nextPoint.x - perp.x, nextPoint.y - perp.y));
+
+                float uvScaleFactor = (nextPoint - currPoint).magnitude / options.Width;
+                polygonBuilder.AddUV(new Vector2(0.0f, 0.0f));
+                polygonBuilder.AddUV(new Vector2(1.0f, 0.0f));
+                polygonBuilder.AddUV(new Vector2(1.0f, 1.0f * uvScaleFactor));
+                polygonBuilder.AddUV(new Vector2(0.0f, 1.0f * uvScaleFactor));
             }
             else
             {
+                float polylineMagnitude = 0.0f;
+                float currentMagnitude = 0.0f;
+                for (int i = 0; i < polyline.Count - 1; ++i)
+                {
+                    currPoint = polyline[i];
+                    nextPoint = polyline[i + 1];
+                    polylineMagnitude += (nextPoint - currPoint).magnitude;
+                }
+
                 // The polyline has more than 2 points, generate a polygon around it
                 for (int i = 1; i < polyline.Count - 1; ++i)
                 {
@@ -82,8 +97,13 @@ namespace Mapzen.Unity
                     nextPoint = polyline[i + 1];
                     lastPoint = polyline[i - 1];
 
-                    AddPoint(i == 1, lastPoint, currPoint, nextPoint);
+                    currentMagnitude += (currPoint - lastPoint).magnitude;
+
+                    AddPoint(true, i == 1, lastPoint, currPoint, nextPoint,
+                        polylineMagnitude, currentMagnitude);
                 }
+
+                currentMagnitude = 0.0f;
 
                 for (int i = polyline.Count - 2; i >= 1; --i)
                 {
@@ -91,7 +111,10 @@ namespace Mapzen.Unity
                     nextPoint = polyline[i - 1];
                     lastPoint = polyline[i + 1];
 
-                    AddPoint(i == polyline.Count - 2, lastPoint, currPoint, nextPoint);
+                    currentMagnitude += (currPoint - lastPoint).magnitude;
+
+                    AddPoint(false, i == polyline.Count - 2, lastPoint, currPoint, nextPoint,
+                        polylineMagnitude, polylineMagnitude - currentMagnitude);
                 }
             }
 
@@ -101,6 +124,7 @@ namespace Mapzen.Unity
 
             // Repeat the last point to form a ring.
             polygonBuilder.OnPoint(new Point(currPoint.x - perp.x, currPoint.y - perp.y));
+            polygonBuilder.RepeatUV();
 
             // Finish the polygon.
             polygonBuilder.OnEndLinearRing();
@@ -173,21 +197,22 @@ namespace Mapzen.Unity
         /// adds an intersection point otherwise:
         ///
         /// Right turn:                Left turn:
-        ///     p0        p1  p2
-        ///     +         +  +
-        ///     |         | /          nextPoint
-        ///     +---------+--+ p3         +---------+ currPoint
+        ///     p0            p1
+        ///     +            +
+        ///     |           /          nextPoint
+        ///     +---------+               +---------+ currPoint
         /// lastPoint     | currPoint     |    p1 / |
         ///               |               +      +  |
-        ///               |              p3         |
-        ///               +--+ p4             p0 +--+ lastPoint
+        ///               |              p2         |
+        ///               +--+ p2             p0 +--+ lastPoint
         ///            nextPoint
         /// </summary>
         /// <param name="isFirstPoint">Whether the point is the first point in the polyline.</param>
         /// <param name="lastPoint">The last point in the polyline.</param>
         /// <param name="currPoint">The current point in the polyline.</param>
         /// <param name="nextPoint">The next point in the polyline.</param>
-        private void AddPoint(bool isFirstPoint, Vector2 lastPoint, Vector2 currPoint, Vector2 nextPoint)
+        private void AddPoint(bool forward, bool isFirstPoint, Vector2 lastPoint, Vector2 currPoint,
+            Vector2 nextPoint, float polylineMagnitude, float currentMagnitude)
         {
             float extrude = options.Width * 0.5f;
 
@@ -200,6 +225,10 @@ namespace Mapzen.Unity
 
                 polygonBuilder.OnPoint(new Point(lastPoint.x - perp.x, lastPoint.y - perp.y));
                 polygonBuilder.OnPoint(new Point(lastPoint.x + perp.x, lastPoint.y + perp.y));
+
+                float yUV = forward ? 0.0f : polylineMagnitude / options.Width;
+                polygonBuilder.AddUV(new Vector2(forward ? 1.0f : 0.0f, yUV));
+                polygonBuilder.AddUV(new Vector2(forward ? 0.0f : 1.0f, yUV));
             }
 
             // Early return if we have a segment with no length.
@@ -259,6 +288,8 @@ namespace Mapzen.Unity
                 miter *= extrude;
 
                 polygonBuilder.OnPoint(new Point(currPoint.x + miter.x, currPoint.y + miter.y));
+                currentMagnitude += Vector2.Dot(currPoint - lastPoint, miter);
+                polygonBuilder.AddUV(new Vector2(forward ? 0.0f : 1.0f, currentMagnitude / options.Width));
             }
             else
             {
@@ -274,11 +305,14 @@ namespace Mapzen.Unity
                 if (Intersection(p0, p1, v0, v1, out intersection))
                 {
                     polygonBuilder.OnPoint(new Point(intersection.x, intersection.y));
+                    currentMagnitude -= (currPoint.y - intersection.y);
+                    polygonBuilder.AddUV(new Vector2(forward ? 0.0f : 1.0f, currentMagnitude / options.Width));
                 }
                 else
                 {
                     // Not intersection, vectors may be colinear, simply use the normal.
                     polygonBuilder.OnPoint(new Point(currPoint.x + n0.x, currPoint.y + n0.y));
+                    polygonBuilder.AddUV(new Vector2(forward ? 0.0f : 1.0f, currentMagnitude / options.Width));
                 }
             }
         }
