@@ -99,10 +99,6 @@ namespace Mapzen.Unity
         {
             polygonUVs.Add(uv);
         }
-        public void RepeatUV()
-        {
-            polygonUVs.Add(polygonUVs.First());
-        }
 
         public void OnBeginLineString()
         {

@@ -49,6 +49,11 @@ namespace Mapzen.Unity
 
         public void OnEndLineString()
         {
+            // polyline.Clear();
+            // polyline.Add(new Vector2(0.0f, 0.0f));
+            // polyline.Add(new Vector2(0.0f, 1.0f));
+            // polyline.Add(new Vector2(0.2f, 1.0f));
+
             if (polyline.Count < 2)
             {
                 return;
@@ -81,29 +86,93 @@ namespace Mapzen.Unity
             }
             else
             {
-                float polylineMagnitude = 0.0f;
-                float currentMagnitude = 0.0f;
-                for (int i = 0; i < polyline.Count - 1; ++i)
-                {
-                    currPoint = polyline[i];
-                    nextPoint = polyline[i + 1];
-                    polylineMagnitude += (nextPoint - currPoint).magnitude;
-                }
+                float extrude = options.Width * 0.5f;
+
+                perp =  Perp(polyline[1] - polyline[0]) * extrude;
+
+                polygonBuilder.OnPoint(new Point(polyline[0].x - perp.x, polyline[0].y - perp.y));
+                polygonBuilder.OnPoint(new Point(polyline[0].x + perp.x, polyline[0].y + perp.y));
+
+                polygonBuilder.AddUV(new Vector2(1.0f, 0.0f));
+                polygonBuilder.AddUV(new Vector2(0.0f, 0.0f));
+
+                List<Vector2> points = new List<Vector2>();
+                points.Add(polyline[0] + perp);
 
                 // The polyline has more than 2 points, generate a polygon around it
+                ///
+                /// Right turn:                Left turn:
+                ///     p0            p1
+                ///     +            +
+                ///     |           /          nextPoint
+                ///     +---------+               +---------+ currPoint
+                /// lastPoint     | currPoint     |    p1 / |
+                ///               |               +      +  |
+                ///               |              p2         |
+                ///               +--+ p2             p0 +--+ lastPoint
+                ///            nextPoint
+
                 for (int i = 1; i < polyline.Count - 1; ++i)
                 {
                     currPoint = polyline[i];
                     nextPoint = polyline[i + 1];
                     lastPoint = polyline[i - 1];
 
-                    currentMagnitude += (currPoint - lastPoint).magnitude;
+                    // currentMagnitude += (currPoint - lastPoint).magnitude;
 
-                    AddPoint(true, i == 1, lastPoint, currPoint, nextPoint,
-                        polylineMagnitude, currentMagnitude);
+                    //          ^
+                    //      n0  |  currPoint
+                    //     +----|-----+
+                    // lastPoint      |
+                    //                ---->
+                    //                | n1
+                    //                +
+                    //            nextPoint
+                    var n0 = Perp(currPoint - lastPoint) * extrude;
+                    var n1 = Perp(nextPoint - currPoint) * extrude;
+
+                    // Define 2d cross product between v0(x0, y0) and v1(x1, y1) as:
+                    //  v0 x v1 = v1.x * v0.y - v1.y * v0.x
+                    bool isRightTurn = n1.x * n0.y - n1.y * n0.x > 0.0f;
+
+                    // On a right turn, build the corner with a miter vector
+                    if (isRightTurn)
+                    {
+                        Vector2 miter = Miter(lastPoint, currPoint, nextPoint, n0, n1) * extrude;
+                        polygonBuilder.OnPoint(new Point(currPoint.x + miter.x, currPoint.y + miter.y));
+                        points.Add(currPoint + miter);
+                    }
+                    else
+                    {
+                        Vector2 intersection;
+                        if (Intersection(lastPoint, currPoint, nextPoint, n0, n1, out intersection)) {
+                            polygonBuilder.OnPoint(new Point(intersection.x, intersection.y));
+                            points.Add(intersection);
+                        } else { // Not intersecting, vectors may be colinear, simply use the normal.
+                            polygonBuilder.OnPoint(new Point(currPoint.x + n0.x, currPoint.y + n0.y));
+                            points.Add(currPoint + n0);
+                        }
+                    }
                 }
 
-                currentMagnitude = 0.0f;
+                float totalDistance = 0.0f;
+                for (int i = 0; i < points.Count - 1; ++i) {
+                    totalDistance += (points[i + 1] - points[i]).magnitude;
+                    polygonBuilder.AddUV(new Vector2(0.0f, totalDistance / options.Width));
+                }
+
+                int last = polyline.Count - 1;
+                perp =  Perp(polyline[last - 1] - polyline[last]) * extrude;
+
+                polygonBuilder.OnPoint(new Point(polyline[last].x - perp.x, polyline[last].y - perp.y));
+                polygonBuilder.OnPoint(new Point(polyline[last].x + perp.x, polyline[last].y + perp.y));
+
+                totalDistance += (polyline[last] - polyline[last - 1]).magnitude;
+                polygonBuilder.AddUV(new Vector2(0.0f, totalDistance / options.Width));
+                polygonBuilder.AddUV(new Vector2(1.0f, totalDistance / options.Width));
+
+                points.Clear();
+                points.Add(polyline[last] + perp);
 
                 for (int i = polyline.Count - 2; i >= 1; --i)
                 {
@@ -111,10 +180,32 @@ namespace Mapzen.Unity
                     nextPoint = polyline[i - 1];
                     lastPoint = polyline[i + 1];
 
-                    currentMagnitude += (currPoint - lastPoint).magnitude;
+                    var n0 = Perp(currPoint - lastPoint) * extrude;
+                    var n1 = Perp(nextPoint - currPoint) * extrude;
+                    bool isRightTurn = n1.x * n0.y - n1.y * n0.x > 0.0f;
 
-                    AddPoint(false, i == polyline.Count - 2, lastPoint, currPoint, nextPoint,
-                        polylineMagnitude, polylineMagnitude - currentMagnitude);
+                    if (isRightTurn)
+                    {
+                        Vector2 miter = Miter(lastPoint, currPoint, nextPoint, n0, n1) * extrude;
+                        polygonBuilder.OnPoint(new Point(currPoint.x + miter.x, currPoint.y + miter.y));
+                        points.Add(currPoint + miter);
+                    }
+                    else
+                    {
+                        Vector2 intersection;
+                        if (Intersection(lastPoint, currPoint, nextPoint, n0, n1, out intersection)) {
+                            polygonBuilder.OnPoint(new Point(intersection.x, intersection.y));
+                            points.Add(intersection);
+                        } else {
+                            polygonBuilder.OnPoint(new Point(currPoint.x + n0.x, currPoint.y + n0.y));
+                            points.Add(currPoint + n0);
+                        }
+                    }
+                }
+
+                for (int i = 0; i < points.Count - 1; ++i) {
+                    totalDistance -= (points[i + 1] - points[i]).magnitude;
+                    polygonBuilder.AddUV(new Vector2(1.0f, totalDistance / options.Width));
                 }
             }
 
@@ -124,7 +215,7 @@ namespace Mapzen.Unity
 
             // Repeat the last point to form a ring.
             polygonBuilder.OnPoint(new Point(currPoint.x - perp.x, currPoint.y - perp.y));
-            polygonBuilder.RepeatUV();
+            polygonBuilder.AddUV(new Vector2(1.0f, 0.0f));
 
             // Finish the polygon.
             polygonBuilder.OnEndLinearRing();
@@ -156,14 +247,19 @@ namespace Mapzen.Unity
         /// <summary>
         /// Computes the intersection point between the two rays r0(t) = p0 + t.v0 and r1(u) = p1 + t.v1.
         /// </summary>
-        /// <param name="p0">The origin of the first ray r0.</param>
-        /// <param name="p1">The origin of the second ray r1.</param>
-        /// <param name="v0">The direction of the first ray r0.</param>
-        /// <param name="v1">The direction of the second ray r1.</param>
         /// <param name="intersection">The 2d intersection point.</param>
         /// <returns>Whether the rays intersect.</returns>
-        private static bool Intersection(Vector2 p0, Vector2 p1, Vector2 v0, Vector2 v1, out Vector2 intersection)
+        private static bool Intersection(Vector2 lastPoint, Vector2 currPoint, Vector2 nextPoint,
+            Vector2 n0, Vector2 n1, out Vector2 intersection)
         {
+            // First ray r0(t) = p0 + t.v0
+            var p0 = lastPoint + n0;
+            var v0 = currPoint - nextPoint;
+
+            // Second ray r1(u) = p1 + u.v1
+            var p1 = nextPoint + n1;
+            var v1 = currPoint - lastPoint;
+
             intersection = new Vector2();
 
             var p0p1 = p1 - p0;
@@ -191,130 +287,38 @@ namespace Mapzen.Unity
             return false;
         }
 
-        /// <summary>
-        /// Adds points around the two polyline segments [lastPoint, currPoint] and [currPoint, nextPoint]
-        /// on one side of the segments, builds a miter vector if the points form a 'right turn',
-        /// adds an intersection point otherwise:
-        ///
-        /// Right turn:                Left turn:
-        ///     p0            p1
-        ///     +            +
-        ///     |           /          nextPoint
-        ///     +---------+               +---------+ currPoint
-        /// lastPoint     | currPoint     |    p1 / |
-        ///               |               +      +  |
-        ///               |              p2         |
-        ///               +--+ p2             p0 +--+ lastPoint
-        ///            nextPoint
-        /// </summary>
-        /// <param name="isFirstPoint">Whether the point is the first point in the polyline.</param>
-        /// <param name="lastPoint">The last point in the polyline.</param>
-        /// <param name="currPoint">The current point in the polyline.</param>
-        /// <param name="nextPoint">The next point in the polyline.</param>
-        private void AddPoint(bool forward, bool isFirstPoint, Vector2 lastPoint, Vector2 currPoint,
-            Vector2 nextPoint, float polylineMagnitude, float currentMagnitude)
-        {
-            float extrude = options.Width * 0.5f;
+        Vector2 Miter(Vector2 lastPoint, Vector2 currPoint, Vector2 nextPoint, Vector2 n0, Vector2 n1) {
+            var v0 = lastPoint - currPoint;
+            var v1 = nextPoint - currPoint;
+            var miter = (n0 + n1).normalized;
 
-            if (isFirstPoint)
+            // theta1 and theta2 are the two angle between
+            var theta = Math.Atan2(v1.y, v1.x) - Math.Atan2(v0.y, v0.x);
+
+            if (theta < 0.0f)
             {
-                // Get normal from next segment if currPoint == lastPoint.
-                Vector2 perp = currPoint == lastPoint ?
-                    Perp(nextPoint - currPoint) * extrude :
-                    Perp(currPoint - lastPoint) * extrude;
-
-                polygonBuilder.OnPoint(new Point(lastPoint.x - perp.x, lastPoint.y - perp.y));
-                polygonBuilder.OnPoint(new Point(lastPoint.x + perp.x, lastPoint.y + perp.y));
-
-                float yUV = forward ? 0.0f : polylineMagnitude / options.Width;
-                polygonBuilder.AddUV(new Vector2(forward ? 1.0f : 0.0f, yUV));
-                polygonBuilder.AddUV(new Vector2(forward ? 0.0f : 1.0f, yUV));
+                theta += 2.0 * Math.PI;
             }
 
-            // Early return if we have a segment with no length.
-            if (currPoint == lastPoint || nextPoint == currPoint)
+            var sinHalfTheta = Math.Sin(theta * 0.5);
+
+            // miterLength = sin(halfTheta) = length(n0) / sin(halfTheta)
+            // n0 represents the normal vector scaled by the extrusion.
+            // Assume that length(n0) is 1.0 for convenience and cap the
+            // miter vector before applying the extrusion.
+            var scale = (float)(1.0f / Math.Max(sinHalfTheta, 1e-5f));
+
+            miter *= scale;
+
+            // Cap the miter vector
+            if (miter.magnitude > options.MiterLimit)
             {
-                return;
+                // Apply the miter limit to the normalized miter vector
+                // to make its magnitude equals to 'options.MiterLimit'.
+                miter *= options.MiterLimit / miter.magnitude;
             }
 
-            //          ^
-            //      n0  |  currPoint
-            //     +----|-----+
-            // lastPoint      |
-            //                ---->
-            //                | n1
-            //                +
-            //            nextPoint
-            var n0 = Perp(currPoint - lastPoint) * extrude;
-            var n1 = Perp(nextPoint - currPoint) * extrude;
-
-            // Define 2d cross product between v0(x0, y0) and v1(x1, y1) as:
-            //  v0 x v1 = v1.x * v0.y - v1.y * v0.x
-            bool isRightTurn = n1.x * n0.y - n1.y * n0.x > 0.0f;
-
-            // On a right turn, build the corner with a miter vector
-            if (isRightTurn)
-            {
-                var v0 = lastPoint - currPoint;
-                var v1 = nextPoint - currPoint;
-                var miter = (n0 + n1).normalized;
-
-                // theta1 and theta2 are the two angle between
-                var theta = Math.Atan2(v1.y, v1.x) - Math.Atan2(v0.y, v0.x);
-
-                if (theta < 0.0f)
-                {
-                    theta += 2.0 * Math.PI;
-                }
-
-                var sinHalfTheta = Math.Sin(theta * 0.5);
-
-                // miterLength = sin(halfTheta) = length(n0) / sin(halfTheta)
-                // n0 represents the normal vector scaled by the extrusion.
-                // Assume that length(n0) is 1.0 for convenience and cap the
-                // miter vector before applying the extrusion.
-                var scale = (float)(1.0f / Math.Max(sinHalfTheta, 1e-5f));
-
-                miter *= scale;
-
-                // Cap the miter vector
-                if (miter.magnitude > options.MiterLimit)
-                {
-                    // Apply the miter limit to the normalized miter vector
-                    // to make its magnitude equals to 'options.MiterLimit'.
-                    miter *= options.MiterLimit / miter.magnitude;
-                }
-
-                miter *= extrude;
-
-                polygonBuilder.OnPoint(new Point(currPoint.x + miter.x, currPoint.y + miter.y));
-                currentMagnitude += Vector2.Dot(currPoint - lastPoint, miter);
-                polygonBuilder.AddUV(new Vector2(forward ? 0.0f : 1.0f, currentMagnitude / options.Width));
-            }
-            else
-            {
-                // First ray r0(t) = p0 + t.v0
-                var p0 = lastPoint + n0;
-                var v0 = currPoint - nextPoint;
-
-                // Second ray r1(u) = p1 + u.v1
-                var p1 = nextPoint + n1;
-                var v1 = currPoint - lastPoint;
-
-                Vector2 intersection;
-                if (Intersection(p0, p1, v0, v1, out intersection))
-                {
-                    polygonBuilder.OnPoint(new Point(intersection.x, intersection.y));
-                    currentMagnitude -= (currPoint.y - intersection.y);
-                    polygonBuilder.AddUV(new Vector2(forward ? 0.0f : 1.0f, currentMagnitude / options.Width));
-                }
-                else
-                {
-                    // Not intersection, vectors may be colinear, simply use the normal.
-                    polygonBuilder.OnPoint(new Point(currPoint.x + n0.x, currPoint.y + n0.y));
-                    polygonBuilder.AddUV(new Vector2(forward ? 0.0f : 1.0f, currentMagnitude / options.Width));
-                }
-            }
+            return miter;
         }
     }
 }
