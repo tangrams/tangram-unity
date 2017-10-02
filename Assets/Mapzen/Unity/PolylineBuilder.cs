@@ -79,10 +79,10 @@ namespace Mapzen.Unity
                 polygonBuilder.OnPoint(new Point(nextPoint.x - perp.x, nextPoint.y - perp.y));
 
                 float uvScaleFactor = (nextPoint - currPoint).magnitude / options.Width;
-                polygonBuilder.AddUV(new Vector2(0.0f, 0.0f));
                 polygonBuilder.AddUV(new Vector2(1.0f, 0.0f));
-                polygonBuilder.AddUV(new Vector2(1.0f, 1.0f * uvScaleFactor));
+                polygonBuilder.AddUV(new Vector2(0.0f, 0.0f));
                 polygonBuilder.AddUV(new Vector2(0.0f, 1.0f * uvScaleFactor));
+                polygonBuilder.AddUV(new Vector2(1.0f, 1.0f * uvScaleFactor));
             }
             else
             {
