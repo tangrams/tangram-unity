@@ -1,4 +1,5 @@
 ﻿using System;
+using Mapzen;
 using Mapzen.VectorData;
 using UnityEngine;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ namespace Mapzen.Unity
         private PolygonBuilder polygonBuilder;
         private List<Vector2> polyline;
         private Options options;
+
+        private float uvDistance;
 
         [Serializable]
         public struct Options
@@ -35,6 +38,7 @@ namespace Mapzen.Unity
 
             polygonBuilder = new PolygonBuilder(outputMeshData, polygonOptions, transform);
             polyline = new List<Vector2>();
+            uvDistance = 0.0f;
         }
 
         public void OnPoint(Point point)
@@ -45,181 +49,161 @@ namespace Mapzen.Unity
         public void OnBeginLineString()
         {
             polyline.Clear();
+            uvDistance = 0.0f;
+        }
+
+        private void AddUVs(float uvScaleFactor)
+        {
+            polygonBuilder.AddUV(new Vector2(1.0f, uvDistance));
+            polygonBuilder.AddUV(new Vector2(0.0f, uvDistance));
+            polygonBuilder.AddUV(new Vector2(0.0f, uvDistance + uvScaleFactor));
+            polygonBuilder.AddUV(new Vector2(1.0f, uvDistance + uvScaleFactor));
+
+            polygonBuilder.AddUV(new Vector2(1.0f, uvDistance));
+
+            uvDistance += uvScaleFactor;
         }
 
         public void OnEndLineString()
         {
-            // polyline.Clear();
-            // polyline.Add(new Vector2(0.0f, 0.0f));
-            // polyline.Add(new Vector2(0.0f, 1.0f));
-            // polyline.Add(new Vector2(0.2f, 1.0f));
-
             if (polyline.Count < 2)
             {
                 return;
             }
 
-            Vector2 currPoint, nextPoint, lastPoint, perp;
+            float extrude = options.Width * 0.5f;
+            float invWidth = 1.0f / options.Width;
 
-            // Start a polygon for the segment from the last point in the linestring to this one.
-            polygonBuilder.OnBeginPolygon();
-            polygonBuilder.OnBeginLinearRing();
-
-            // Trivial case, only generate a quad polygon
             if (polyline.Count == 2)
             {
-                currPoint = polyline[0];
-                nextPoint = polyline[1];
+                // Trivial case, build a quad
+                polygonBuilder.OnBeginPolygon();
+                polygonBuilder.OnBeginLinearRing();
 
-                // Create a quad around the segment.
-                perp = Perp(nextPoint - currPoint) * (options.Width * 0.5f);
-                polygonBuilder.OnPoint(new Point(currPoint.x - perp.x, currPoint.y - perp.y));
-                polygonBuilder.OnPoint(new Point(currPoint.x + perp.x, currPoint.y + perp.y));
-                polygonBuilder.OnPoint(new Point(nextPoint.x + perp.x, nextPoint.y + perp.y));
-                polygonBuilder.OnPoint(new Point(nextPoint.x - perp.x, nextPoint.y - perp.y));
+                var currPoint = polyline[0];
+                var nextPoint = polyline[1];
 
-                float uvScaleFactor = (nextPoint - currPoint).magnitude / options.Width;
-                polygonBuilder.AddUV(new Vector2(1.0f, 0.0f));
-                polygonBuilder.AddUV(new Vector2(0.0f, 0.0f));
-                polygonBuilder.AddUV(new Vector2(0.0f, 1.0f * uvScaleFactor));
-                polygonBuilder.AddUV(new Vector2(1.0f, 1.0f * uvScaleFactor));
+                // Create a quad around the segment
+                var n0 = Perp(nextPoint - currPoint) * extrude;
+
+                polygonBuilder.OnPoint(new Point(currPoint.x - n0.x, currPoint.y - n0.y));
+                polygonBuilder.OnPoint(new Point(currPoint.x + n0.x, currPoint.y + n0.y));
+                polygonBuilder.OnPoint(new Point(nextPoint.x + n0.x, nextPoint.y + n0.y));
+                polygonBuilder.OnPoint(new Point(nextPoint.x - n0.x, nextPoint.y - n0.y));
+
+                // Close the polygon
+                polygonBuilder.OnPoint(new Point(currPoint.x - n0.x, currPoint.y - n0.y));
+
+                AddUVs((nextPoint - currPoint).magnitude * invWidth);
+
+                polygonBuilder.OnEndLinearRing();
+                polygonBuilder.OnEndPolygon();
             }
             else
             {
-                float extrude = options.Width * 0.5f;
-
-                perp =  Perp(polyline[1] - polyline[0]) * extrude;
-
-                polygonBuilder.OnPoint(new Point(polyline[0].x - perp.x, polyline[0].y - perp.y));
-                polygonBuilder.OnPoint(new Point(polyline[0].x + perp.x, polyline[0].y + perp.y));
-
-                polygonBuilder.AddUV(new Vector2(1.0f, 0.0f));
-                polygonBuilder.AddUV(new Vector2(0.0f, 0.0f));
-
-                List<Vector2> points = new List<Vector2>();
-                points.Add(polyline[0] + perp);
-
-                // The polyline has more than 2 points, generate a polygon around it
-                ///
-                /// Right turn:                Left turn:
-                ///     p0            p1
-                ///     +            +
-                ///     |           /          nextPoint
-                ///     +---------+               +---------+ currPoint
-                /// lastPoint     | currPoint     |    p1 / |
-                ///               |               +      +  |
-                ///               |              p2         |
-                ///               +--+ p2             p0 +--+ lastPoint
-                ///            nextPoint
+                Vector2 currPoint, nextPoint, lastPoint, lastp0 = new Vector2(), lastp1 = new Vector2();
 
                 for (int i = 1; i < polyline.Count - 1; ++i)
                 {
+                    polygonBuilder.OnBeginPolygon();
+                    polygonBuilder.OnBeginLinearRing();
+
                     currPoint = polyline[i];
-                    nextPoint = polyline[i + 1];
-                    lastPoint = polyline[i - 1];
+                    nextPoint = polyline[i+1];
+                    lastPoint = polyline[i-1];
 
-                    // currentMagnitude += (currPoint - lastPoint).magnitude;
-
-                    //          ^
-                    //      n0  |  currPoint
-                    //     +----|-----+
-                    // lastPoint      |
-                    //                ---->
-                    //                | n1
-                    //                +
-                    //            nextPoint
                     var n0 = Perp(currPoint - lastPoint) * extrude;
                     var n1 = Perp(nextPoint - currPoint) * extrude;
 
-                    // Define 2d cross product between v0(x0, y0) and v1(x1, y1) as:
-                    //  v0 x v1 = v1.x * v0.y - v1.y * v0.x
-                    bool isRightTurn = n1.x * n0.y - n1.y * n0.x > 0.0f;
-
-                    // On a right turn, build the corner with a miter vector
-                    if (isRightTurn)
+                    // First iteration, initialize lastp1 and lastp0
+                    if (i == 1)
                     {
-                        Vector2 miter = Miter(lastPoint, currPoint, nextPoint, n0, n1) * extrude;
-                        polygonBuilder.OnPoint(new Point(currPoint.x + miter.x, currPoint.y + miter.y));
-                        points.Add(currPoint + miter);
+                        lastp1 = lastPoint - n0;
+                        lastp0 = lastPoint + n0;
+                    }
+
+                    Vector2 p0, p1;
+
+                    if (n0 == n1)
+                    {
+                        // Previous and current line vectors are collinear
+                        p0 = currPoint + n0;
+                        p1 = currPoint - n1;
                     }
                     else
                     {
+                        // Right turn:                Left turn:
+                        //     n0            p0                       p1
+                        //     ^            +                        +
+                        //     |           /          nextPoint     /
+                        //     +---------+--> n1         +---------+ currPoint
+                        // lastPoint    /| currPoint     |    p0 / |
+                        //          p1 + |               v      +  |
+                        //               |              n1         |
+                        //               +                   n0 <--+ lastPoint
+                        //            nextPoint
+
+                        // Define 2d cross product between v0(x0, y0) and v1(x1, y1) as:
+                        //  v0 x v1 = v1.x * v0.y - v1.y * v0.x
+                        bool isRightTurn = n1.x * n0.y - n1.y * n0.x > 0.0f;
+
+                        Vector2 miter = Miter(lastPoint, currPoint, nextPoint,
+                            isRightTurn ? n0 : -n0,
+                            isRightTurn ? n1 : -n1);
+
+                        p0 = currPoint + miter * extrude;
                         Vector2 intersection;
-                        if (Intersection(lastPoint, currPoint, nextPoint, n0, n1, out intersection)) {
-                            polygonBuilder.OnPoint(new Point(intersection.x, intersection.y));
-                            points.Add(intersection);
-                        } else { // Not intersecting, vectors may be colinear, simply use the normal.
-                            polygonBuilder.OnPoint(new Point(currPoint.x + n0.x, currPoint.y + n0.y));
-                            points.Add(currPoint + n0);
+
+                        bool intersect = Intersection(lastPoint, currPoint, nextPoint,
+                            isRightTurn ? -n0 : n0,
+                            isRightTurn ? -n1 : n1,
+                            out intersection);
+
+                        p1 = intersect ? intersection : currPoint + n0;
+
+                        if (!isRightTurn)
+                        {
+                            Util.Swap<Vector2>(ref p0, ref p1);
                         }
                     }
-                }
 
-                float totalDistance = 0.0f;
-                for (int i = 0; i < points.Count - 1; ++i) {
-                    totalDistance += (points[i + 1] - points[i]).magnitude;
-                    polygonBuilder.AddUV(new Vector2(0.0f, totalDistance / options.Width));
-                }
+                    polygonBuilder.OnPoint(new Point(lastp1.x, lastp1.y));
+                    polygonBuilder.OnPoint(new Point(lastp0.x, lastp0.y));
+                    polygonBuilder.OnPoint(new Point(p0.x, p0.y));
+                    polygonBuilder.OnPoint(new Point(p1.x, p1.y));
 
-                int last = polyline.Count - 1;
-                perp =  Perp(polyline[last - 1] - polyline[last]) * extrude;
+                    // Close the polygon
+                    polygonBuilder.OnPoint(new Point(lastp1.x, lastp1.y));
 
-                polygonBuilder.OnPoint(new Point(polyline[last].x - perp.x, polyline[last].y - perp.y));
-                polygonBuilder.OnPoint(new Point(polyline[last].x + perp.x, polyline[last].y + perp.y));
+                    lastp0 = p0;
+                    lastp1 = p1;
 
-                totalDistance += (polyline[last] - polyline[last - 1]).magnitude;
-                polygonBuilder.AddUV(new Vector2(0.0f, totalDistance / options.Width));
-                polygonBuilder.AddUV(new Vector2(1.0f, totalDistance / options.Width));
+                    AddUVs((currPoint - lastPoint).magnitude * invWidth);
 
-                points.Clear();
-                points.Add(polyline[last] + perp);
+                    polygonBuilder.OnEndLinearRing();
+                    polygonBuilder.OnEndPolygon();
 
-                for (int i = polyline.Count - 2; i >= 1; --i)
-                {
-                    currPoint = polyline[i];
-                    nextPoint = polyline[i - 1];
-                    lastPoint = polyline[i + 1];
-
-                    var n0 = Perp(currPoint - lastPoint) * extrude;
-                    var n1 = Perp(nextPoint - currPoint) * extrude;
-                    bool isRightTurn = n1.x * n0.y - n1.y * n0.x > 0.0f;
-
-                    if (isRightTurn)
+                    // Last point, close the polyline
+                    if (i == polyline.Count - 2)
                     {
-                        Vector2 miter = Miter(lastPoint, currPoint, nextPoint, n0, n1) * extrude;
-                        polygonBuilder.OnPoint(new Point(currPoint.x + miter.x, currPoint.y + miter.y));
-                        points.Add(currPoint + miter);
-                    }
-                    else
-                    {
-                        Vector2 intersection;
-                        if (Intersection(lastPoint, currPoint, nextPoint, n0, n1, out intersection)) {
-                            polygonBuilder.OnPoint(new Point(intersection.x, intersection.y));
-                            points.Add(intersection);
-                        } else {
-                            polygonBuilder.OnPoint(new Point(currPoint.x + n0.x, currPoint.y + n0.y));
-                            points.Add(currPoint + n0);
-                        }
-                    }
-                }
+                        polygonBuilder.OnBeginPolygon();
+                        polygonBuilder.OnBeginLinearRing();
 
-                for (int i = 0; i < points.Count - 1; ++i) {
-                    totalDistance -= (points[i + 1] - points[i]).magnitude;
-                    polygonBuilder.AddUV(new Vector2(1.0f, totalDistance / options.Width));
+                        polygonBuilder.OnPoint(new Point(lastp1.x, lastp1.y));
+                        polygonBuilder.OnPoint(new Point(lastp0.x, lastp0.y));
+                        polygonBuilder.OnPoint(new Point(nextPoint.x + n1.x, nextPoint.y + n1.y));
+                        polygonBuilder.OnPoint(new Point(nextPoint.x - n1.x, nextPoint.y - n1.y));
+
+                        // Close the polygon
+                        polygonBuilder.OnPoint(new Point(lastp1.x, lastp1.y));
+
+                        AddUVs((nextPoint - currPoint).magnitude * invWidth);
+
+                        polygonBuilder.OnEndLinearRing();
+                        polygonBuilder.OnEndPolygon();
+                    }
                 }
             }
-
-            currPoint = polyline[0];
-            nextPoint = polyline[1];
-            perp = Perp(nextPoint - currPoint) * (options.Width * 0.5f);
-
-            // Repeat the last point to form a ring.
-            polygonBuilder.OnPoint(new Point(currPoint.x - perp.x, currPoint.y - perp.y));
-            polygonBuilder.AddUV(new Vector2(1.0f, 0.0f));
-
-            // Finish the polygon.
-            polygonBuilder.OnEndLinearRing();
-            polygonBuilder.OnEndPolygon();
         }
 
         public void OnBeginLinearRing()
