@@ -14,7 +14,7 @@ public class MapzenMap : MonoBehaviour
     public GameObjectOptions gameObjectOptions;
 
     private float regionScaleRatio = 1.0f;
-    private float regionScaleValue = 1.0f;
+    private float regionScaledValue = 1.0f;
 
     public string ApiKey = "vector-tiles-tyHL4AY";
 
@@ -83,7 +83,7 @@ public class MapzenMap : MonoBehaviour
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
-                TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY, regionScaleValue);
+                TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY, regionScaledValue);
 
                 task.Start(featureStyling, regionMap);
 
@@ -122,9 +122,9 @@ public class MapzenMap : MonoBehaviour
         set { regionScaleRatio = value; }
     }
 
-    public float RegionScaleValue {
-        get { return regionScaleValue; }
-        set { regionScaleValue = value; }
+    public float RegionScaledValue {
+        get { return regionScaledValue; }
+        set { regionScaledValue = value; }
     }
         
     public SceneGroup.Type GroupOptions

@@ -138,7 +138,7 @@ public class MapzenMapEditor : Editor
                 break;
         }
 
-        mapzenMap.RegionScaleValue = mapzenMap.RegionScaleRatio * unitConverter;
+        mapzenMap.RegionScaledValue = mapzenMap.RegionScaleRatio * unitConverter;
 
         EditorGUI.indentLevel--;
     }
