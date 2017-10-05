@@ -124,7 +124,7 @@ namespace Mapzen.Unity
 
                     Vector2 p0, p1;
 
-                    if (n0 == n1)
+                    if (Vector2.SqrMagnitude(n0 - n1) < 0.0001f)
                     {
                         // Previous and current line vectors are collinear
                         p0 = currPoint + n0;
