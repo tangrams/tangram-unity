@@ -9,10 +9,18 @@ namespace Mapzen.Unity
     public class PolygonBuilder : IGeometryHandler
     {
         [Serializable]
+        public enum ExtrusionType
+        {
+            TopOnly,
+            TopAndSides,
+            SidesOnly,
+        }
+
+        [Serializable]
         public struct Options
         {
             public Material Material;
-            public bool Extrude;
+            public ExtrusionType Extrusion;
             public float MinHeight;
             public float MaxHeight;
             public bool Enabled;
@@ -51,9 +59,13 @@ namespace Mapzen.Unity
 
         public void OnPoint(Point point)
         {
+            bool buildWalls =
+                options.Extrusion == ExtrusionType.TopAndSides ||
+                options.Extrusion == ExtrusionType.SidesOnly;
+
             // For all but the first point in each ring, create a quad extending from the
             // previous point to the current point and from MinHeight to MaxHeight.
-            if (options.Extrude && pointsInRing > 0)
+            if (buildWalls && pointsInRing > 0)
             {
                 var p0 = lastPoint;
                 var p1 = point;
@@ -87,11 +99,16 @@ namespace Mapzen.Unity
                 extrusionIndices.Add(indexOffset + 2);
                 extrusionIndices.Add(indexOffset + 0);
             }
+
             lastPoint = point;
 
             // Add the current point to the buffer of coordinates for the tesselator.
-            coordinates.Add(point.X);
-            coordinates.Add(point.Y);
+            if (options.Extrusion != ExtrusionType.SidesOnly)
+            {
+                coordinates.Add(point.X);
+                coordinates.Add(point.Y);
+            }
+
             pointsInRing++;
         }
 
@@ -133,36 +150,39 @@ namespace Mapzen.Unity
             // First add vertices and indices for extrusions.
             outputMeshData.AddElements(extrusionVertices, extrusionUVs, extrusionIndices, options.Material);
 
-            // Then tesselate polygon interior and add vertices and indices.
-            var earcut = new Earcut();
-
-            earcut.Tesselate(coordinates.ToArray(), rings.ToArray());
-            var vertices = new List<Vector3>(coordinates.Count / 2);
-            List<Vector2> uvs;
-
-            if (polygonUVs.Count > 0)
+            if (coordinates.Count > 0)
             {
-                uvs = polygonUVs;
-            }
-            else
-            {
-                uvs = new List<Vector2>(coordinates.Count / 2);
+                // Then tesselate polygon interior and add vertices and indices.
+                var earcut = new Earcut();
+
+                earcut.Tesselate(coordinates.ToArray(), rings.ToArray());
+                var vertices = new List<Vector3>(coordinates.Count / 2);
+                List<Vector2> uvs;
+
+                if (polygonUVs.Count > 0)
+                {
+                    uvs = polygonUVs;
+                }
+                else
+                {
+                    uvs = new List<Vector2>(coordinates.Count / 2);
+                    for (int i = 0; i < coordinates.Count; i += 2)
+                    {
+                        uvs.Add(new Vector2(coordinates[i], coordinates[i + 1]));
+                    }
+                }
+
                 for (int i = 0; i < coordinates.Count; i += 2)
                 {
-                    uvs.Add(new Vector2(coordinates[i], coordinates[i + 1]));
+                    var v = new Vector3(coordinates[i], options.MaxHeight, coordinates[i + 1]);
+                    v = this.transform.MultiplyPoint(v);
+                    vertices.Add(v);
                 }
+
+                outputMeshData.AddElements(vertices, uvs, earcut.Indices, options.Material);
+
+                earcut.Release();
             }
-
-            for (int i = 0; i < coordinates.Count; i += 2)
-            {
-                var v = new Vector3(coordinates[i], options.MaxHeight, coordinates[i + 1]);
-                v = this.transform.MultiplyPoint(v);
-                vertices.Add(v);
-            }
-
-            outputMeshData.AddElements(vertices, uvs, earcut.Indices, options.Material);
-
-            earcut.Release();
         }
     }
 }

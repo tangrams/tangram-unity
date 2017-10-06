@@ -14,11 +14,12 @@ namespace Mapzen.Unity
 
         private float uvDistance;
 
+
         [Serializable]
         public struct Options
         {
             public Material Material;
-            public bool Extrude;
+            public PolygonBuilder.ExtrusionType Extrusion;
             public float MinHeight;
             public float MaxHeight;
             public float Width;
@@ -32,7 +33,7 @@ namespace Mapzen.Unity
 
             var polygonOptions = new PolygonBuilder.Options();
             polygonOptions.Material = options.Material;
-            polygonOptions.Extrude = options.Extrude;
+            polygonOptions.Extrusion = options.Extrusion;
             polygonOptions.MinHeight = options.MinHeight;
             polygonOptions.MaxHeight = options.MaxHeight;
 

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using Mapzen;
 using Mapzen.Unity;
+using System.Linq;
 using System;
 
 [Serializable]
@@ -9,6 +10,9 @@ public class PolylineBuilderEditor : EditorBase
 {
     [SerializeField]
     private bool show;
+
+    [SerializeField]
+    private int selectedExtrusionType = -1;
 
     public PolylineBuilderEditor()
         : base()
@@ -20,7 +24,7 @@ public class PolylineBuilderEditor : EditorBase
     {
         var defaultOptions = new PolylineBuilder.Options();
 
-        defaultOptions.Extrude = true;
+        defaultOptions.Extrusion = PolygonBuilder.ExtrusionType.TopAndSides;
         defaultOptions.Enabled = true;
         defaultOptions.MaxHeight = 3.0f;
         defaultOptions.MiterLimit = 3.0f;
@@ -51,9 +55,16 @@ public class PolylineBuilderEditor : EditorBase
             return options;
         }
 
+        if (selectedExtrusionType == -1)
+        {
+            selectedExtrusionType = (int) options.Extrusion;
+        }
+
         options.Width = EditorGUILayout.FloatField("Width: ", options.Width);
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
-        options.Extrude = EditorGUILayout.Toggle("Extrude: ", options.Extrude);
+        var extrusionTypeList = Enum.GetValues(typeof(PolygonBuilder.ExtrusionType)).Cast<PolygonBuilder.ExtrusionType>();
+        var extrusionTypeStringList = extrusionTypeList.Select(type => type.ToString());
+        selectedExtrusionType = EditorGUILayout.Popup("Extrusion type:", selectedExtrusionType, extrusionTypeStringList.ToArray());
         options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
 
         SavePreferences();
