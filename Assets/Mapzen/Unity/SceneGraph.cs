@@ -2,6 +2,7 @@
 using System.Linq;
 using Mapzen;
 using UnityEngine;
+using System.Collections.Generic;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -79,7 +80,18 @@ namespace Mapzen.Unity
                     {
 #if UNITY_EDITOR
                         // Generate default uvs for this mesh
+                        var UVs = Unwrapping.GeneratePerTriangleUV(mesh);
+                        var mergedUVs = new Vector2[mesh.vertices.Length];
+                        for (int index = 0; index < UVs.Length; ++index)
+                        {
+                            Vector2 uv = UVs[index];
+                            int vertexIndex = mesh.triangles[index];
+                            mergedUVs[vertexIndex] = uv;
+                        }
+                        mesh.uv = mergedUVs;
                         Unwrapping.GenerateSecondaryUVSet(mesh);
+#else
+                        Debug.LogError("Static meshes not supported in non-editor mode");
 #endif
                     }
 
