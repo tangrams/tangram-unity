@@ -106,7 +106,7 @@ namespace Mapzen.Unity
 
             public IFeatureMatcher GetFeatureMatcher()
             {
-                IFeatureMatcher matcher = null;
+                IFeatureMatcher matcher = new FeatureMatcher();
 
                 if (IsCompound() && matchers.Count > 0)
                 {
