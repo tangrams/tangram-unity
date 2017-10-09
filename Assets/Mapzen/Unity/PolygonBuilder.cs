@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Mapzen.VectorData;
 using UnityEngine;
 using System;
@@ -120,12 +121,11 @@ namespace Mapzen.Unity
             var earcut = new Earcut();
 
             earcut.Tesselate(coordinates.ToArray(), rings.ToArray());
+            var vertices = new List<Vector3>(coordinates.Count / 2);
 
-            var vertices = new List<Vector3>(earcut.Vertices.Length / 2);
-
-            for (int i = 0; i < earcut.Vertices.Length; i += 2)
+            for (int i = 0; i < coordinates.Count; i += 2)
             {
-                var v = new Vector3(earcut.Vertices[i], options.MaxHeight, earcut.Vertices[i + 1]);
+                var v = new Vector3(coordinates[i], options.MaxHeight, coordinates[i + 1]);
 
                 v = this.transform.MultiplyPoint(v);
 

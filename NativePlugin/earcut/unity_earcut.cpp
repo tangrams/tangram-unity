@@ -6,6 +6,7 @@
 #include "earcut.h"
 #include <array>
 #include <mutex>
+#include <cstring>
 
 #define CAPACITY 32
 
@@ -14,11 +15,10 @@ extern "C" {
     using N = int;
     using Point = std::array<Coord, 2>;
     using PolygonArray = std::vector<std::vector<Point>>;
-    using Earcut = mapbox::Earcut<Coord, N>;
 
     struct EarcutContext {
         std::array<bool, CAPACITY> used;
-        std::array<Earcut, CAPACITY> earcuts;
+        std::array<std::vector<N>, CAPACITY> indices;
         std::array<PolygonArray, CAPACITY> polygons;
     };
 
@@ -56,7 +56,7 @@ extern "C" {
     }
 
     void TesselatePolygon(unsigned int contextId, char* pointsBuffer, char* ringsBuffer,
-                          int nRings, unsigned int& nIndices, unsigned int& nVertices)
+                          int nRings, unsigned int& nIndices)
     {
         if (contextId == 0) { return; }
 
@@ -75,27 +75,16 @@ extern "C" {
             byteOffset += ringByteSize;
         }
 
-        auto& earcut = earcutContext.earcuts[contextId - 1];
-
-        earcut(polygon);
-
-        nIndices = (unsigned int)earcut.indices.size();
-        nVertices = (unsigned int)earcut.vertices.size();
+        auto& indices = earcutContext.indices[contextId - 1];
+        indices = mapbox::earcut<N>(polygon);
+        nIndices = (unsigned int)indices.size();
     }
 
     void GetIndices(unsigned int contextId, char* indices)
     {
         if (contextId == 0) { return; }
 
-        auto& earcut = earcutContext.earcuts[contextId - 1];
-        std::memcpy(indices, earcut.indices.data(), earcut.indices.size() * sizeof(N));
-    }
-
-    void GetVertices(unsigned int contextId, char* vertices)
-    {
-        if (contextId == 0) { return; }
-
-        auto& earcut = earcutContext.earcuts[contextId - 1];
-        std::memcpy(vertices, earcut.vertices.data(), earcut.vertices.size() * sizeof(Point));
+        auto& earcutIndices = earcutContext.indices[contextId - 1];
+        std::memcpy(indices, earcutIndices.data(), earcutIndices.size() * sizeof(N));
     }
 }
