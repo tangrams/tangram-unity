@@ -65,6 +65,7 @@ public class PolylineBuilderEditor : EditorBase
         var extrusionTypeList = Enum.GetValues(typeof(PolygonBuilder.ExtrusionType)).Cast<PolygonBuilder.ExtrusionType>();
         var extrusionTypeStringList = extrusionTypeList.Select(type => type.ToString());
         selectedExtrusionType = EditorGUILayout.Popup("Extrusion type:", selectedExtrusionType, extrusionTypeStringList.ToArray());
+        options.Extrusion = (PolygonBuilder.ExtrusionType) selectedExtrusionType;
         options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
 
         SavePreferences();
