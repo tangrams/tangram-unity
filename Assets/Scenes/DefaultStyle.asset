@@ -189,3 +189,33 @@ MonoBehaviour:
       MaxRange: 30
       MinRangeEnabled: 0
       MaxRangeEnabled: 1
+  - name: filter_4
+    layerStyles:
+    - layerName: roads
+      Material: {fileID: 2100000, guid: f776709bfa7fa4d3a88a6b24cd6c7429, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 1
+        Width: 10
+        MiterLimit: 3
+        Enabled: 1
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 7
+      matchers: []
+      HasProperty: kind
+      PropertyValue: minor_road
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
