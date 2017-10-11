@@ -7,7 +7,6 @@ namespace Mapzen
         [Flags]
         public enum Units
         {
-            None = 0,
             Meters = 1 << 0,
             KiloMeters = 1 << 1,
             Miles = 1 << 2,

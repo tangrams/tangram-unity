@@ -96,7 +96,6 @@ public class MapzenMapEditor : Editor
 
     private void RegionScaleRatioFoldout()
     {
-        float unitConverter = 1.0f;
         showRegionScaleRatioFoldout = EditorGUILayout.Foldout(showRegionScaleRatioFoldout, "Region Scale Ratio");
         if (!showRegionScaleRatioFoldout)
         {
@@ -116,30 +115,6 @@ public class MapzenMapEditor : Editor
         UnitScaleToggle(mapzenMap, RegionScaleUnits.Units.Feet);
         EditorGUILayout.EndHorizontal();
 
-        switch (mapzenMap.RegionScaleUnit)
-        {
-            case RegionScaleUnits.Units.None:
-                unitConverter = 0.0f;
-                break;
-            case RegionScaleUnits.Units.Meters:
-                unitConverter = 1.0f;
-                break;
-            case RegionScaleUnits.Units.KiloMeters:
-                unitConverter = 0.001f;
-                break;
-            case RegionScaleUnits.Units.Miles:
-                unitConverter = 0.00063f;
-                break;
-            case RegionScaleUnits.Units.Feet:
-                unitConverter = 3.28f;
-                break;
-            default:
-                unitConverter = 0.0f;
-                break;
-        }
-
-        mapzenMap.RegionScaledValue = mapzenMap.RegionScaleRatio * unitConverter;
-
         EditorGUI.indentLevel--;
     }
 
@@ -147,12 +122,14 @@ public class MapzenMapEditor : Editor
     {
         string key = typeof(MapzenMapEditor).Name;
         showTileDataFoldout = EditorPrefs.GetBool(key + ".showTileDataFoldout");
+        showRegionScaleRatioFoldout = EditorPrefs.GetBool(key + ".showRegionScaleRatioFoldout");
     }
 
     private void SavePreferences()
     {
         string key = typeof(MapzenMapEditor).Name;
         EditorPrefs.SetBool(key + ".showTileDataFoldout", showTileDataFoldout);
+        EditorPrefs.SetBool(key + ".showRegionScaleRatioFoldout", showRegionScaleRatioFoldout);
     }
 
     private bool IsValid()
