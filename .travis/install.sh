@@ -26,6 +26,6 @@ if [[ ${PLATFORM} == "android" ]]; then
     echo "Done."
 
     # Copy a license file into the SDK (needed to install CMake).
-    mkdir -p ${ANDROID_HOME}/licenses
-    cp .travis/android-sdk-license ${ANDROID_HOME}/licenses/
+    # Accept sdk cmake license
+    echo "y" | sdkmanager "cmake;3.6.4111459"
 fi
