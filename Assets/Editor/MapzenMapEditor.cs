@@ -9,6 +9,7 @@ public class MapzenMapEditor : Editor
 {
     private MapzenMap mapzenMap;
     private bool showTileDataFoldout = false;
+    private bool showRegionScaleRatioFoldout = false;
 
     void OnEnable()
     {
@@ -20,6 +21,8 @@ public class MapzenMapEditor : Editor
         LoadPreferences();
 
         TileDataFoldout();
+
+        RegionScaleRatioFoldout();
 
         base.OnInspectorGUI();
 
@@ -83,16 +86,50 @@ public class MapzenMapEditor : Editor
         EditorGUI.indentLevel--;
     }
 
+    private void UnitScaleToggle(MapzenMap mapzenMap, RegionScaleUnits.Units unit)
+    {
+        bool isSet = RegionScaleUnits.Test(unit, mapzenMap.RegionScaleUnit);
+        isSet = EditorGUILayout.Toggle(unit.ToString(), isSet);
+
+        mapzenMap.RegionScaleUnit = isSet ? unit : mapzenMap.RegionScaleUnit;
+    }
+
+    private void RegionScaleRatioFoldout()
+    {
+        showRegionScaleRatioFoldout = EditorGUILayout.Foldout(showRegionScaleRatioFoldout, "Region Scale Ratio");
+        if (!showRegionScaleRatioFoldout)
+        {
+            return;
+        }
+
+        mapzenMap.RegionScaleRatio = EditorGUILayout.FloatField("Scale: ", mapzenMap.RegionScaleRatio);
+        GUILayout.Label("Choose world scale units: ");
+        EditorGUI.indentLevel++;
+
+        EditorGUILayout.BeginHorizontal();
+        UnitScaleToggle(mapzenMap, RegionScaleUnits.Units.Meters);
+        UnitScaleToggle(mapzenMap, RegionScaleUnits.Units.KiloMeters);
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.BeginHorizontal();
+        UnitScaleToggle(mapzenMap, RegionScaleUnits.Units.Miles);
+        UnitScaleToggle(mapzenMap, RegionScaleUnits.Units.Feet);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUI.indentLevel--;
+    }
+
     private void LoadPreferences()
     {
         string key = typeof(MapzenMapEditor).Name;
         showTileDataFoldout = EditorPrefs.GetBool(key + ".showTileDataFoldout");
+        showRegionScaleRatioFoldout = EditorPrefs.GetBool(key + ".showRegionScaleRatioFoldout");
     }
 
     private void SavePreferences()
     {
         string key = typeof(MapzenMapEditor).Name;
         EditorPrefs.SetBool(key + ".showTileDataFoldout", showTileDataFoldout);
+        EditorPrefs.SetBool(key + ".showRegionScaleRatioFoldout", showRegionScaleRatioFoldout);
     }
 
     private bool IsValid()

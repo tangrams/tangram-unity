@@ -13,7 +13,7 @@ public class MapzenMap : MonoBehaviour
 {
     public GameObjectOptions gameObjectOptions;
 
-    public float regionScaleRatio = 1.0f;
+    private float regionScaleRatio = 1.0f;
 
     public string ApiKey = "vector-tiles-tyHL4AY";
 
@@ -34,6 +34,10 @@ public class MapzenMap : MonoBehaviour
     [HideInInspector]
     [SerializeField]
     private SceneGroup.Type groupOptions;
+
+    [HideInInspector]
+    [SerializeField]
+    private RegionScaleUnits.Units regionScaleUnit = RegionScaleUnits.Units.Meters;
 
     private List<TileTask> tasks = new List<TileTask>();
 
@@ -78,7 +82,28 @@ public class MapzenMap : MonoBehaviour
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
 
-                TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY, regionScaleRatio);
+
+                float unitConverter = 1.0f;
+                switch (regionScaleUnit)
+                {
+                    case RegionScaleUnits.Units.Meters:
+                        unitConverter = 1.0f;
+                        break;
+                    case RegionScaleUnits.Units.KiloMeters:
+                        unitConverter = 0.001f;
+                        break;
+                    case RegionScaleUnits.Units.Miles:
+                        unitConverter = 0.00063f;
+                        break;
+                    case RegionScaleUnits.Units.Feet:
+                        unitConverter = 3.28f;
+                        break;
+                    default:
+                        unitConverter = 0.0f;
+                        break;
+                 }
+
+                TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY, regionScaleRatio * unitConverter);
 
                 task.Start(featureStyling, regionMap);
 
@@ -112,9 +137,20 @@ public class MapzenMap : MonoBehaviour
         get { return featureStyling; }
     }
 
+    public float RegionScaleRatio {
+        get { return regionScaleRatio; }
+        set { regionScaleRatio = value; }
+    }
+
     public SceneGroup.Type GroupOptions
     {
         get { return groupOptions; }
         set { groupOptions = value; }
+    }
+
+    public RegionScaleUnits.Units RegionScaleUnit
+    {
+        get { return regionScaleUnit; }
+        set { regionScaleUnit = value; }
     }
 }
