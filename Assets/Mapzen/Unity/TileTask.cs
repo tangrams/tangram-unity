@@ -17,6 +17,8 @@ public class TileTask
     private float inverseTileScale;
     private Matrix4x4 transform;
 
+    private float epsilonOffset;
+
     public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY, float regionScaleRatio)
     {
         this.address = address;
@@ -29,6 +31,7 @@ public class TileTask
         Matrix4x4 scale = Matrix4x4.Scale(new Vector3(scaleRatio, scaleRatio, scaleRatio));
         Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
         this.transform = translate * scale;
+        this.epsilonOffset = regionScaleRatio / 100.0f;
     }
 
     public void Start(List<FeatureStyle> featureStyling, SceneGroup root)
@@ -73,7 +76,7 @@ public class TileTask
 
                         if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                         {
-                            var polygonOptions = layerStyle.GetPolygonOptions(feature, inverseTileScale);
+                            var polygonOptions = layerStyle.GetPolygonOptions(feature, inverseTileScale, epsilonOffset);
 
                             if (polygonOptions.Enabled)
                             {
@@ -84,7 +87,7 @@ public class TileTask
 
                         if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
                         {
-                            var polylineOptions = layerStyle.GetPolylineOptions(feature, inverseTileScale);
+                            var polylineOptions = layerStyle.GetPolylineOptions(feature, inverseTileScale, epsilonOffset);
 
                             if (polylineOptions.Enabled)
                             {

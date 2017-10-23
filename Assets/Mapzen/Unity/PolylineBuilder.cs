@@ -25,6 +25,7 @@ namespace Mapzen.Unity
             public float Width;
             public float MiterLimit;
             public bool Enabled;
+            public float LayerOffset;
         }
 
         public PolylineBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)
@@ -36,6 +37,7 @@ namespace Mapzen.Unity
             polygonOptions.Extrusion = options.Extrusion;
             polygonOptions.MinHeight = options.MinHeight;
             polygonOptions.MaxHeight = options.MaxHeight;
+            polygonOptions.LayerOffset = options.LayerOffset;
 
             polygonBuilder = new PolygonBuilder(outputMeshData, polygonOptions, transform);
             polyline = new List<Vector2>();

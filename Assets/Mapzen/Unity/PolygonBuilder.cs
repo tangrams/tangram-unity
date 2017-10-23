@@ -24,11 +24,13 @@ namespace Mapzen.Unity
             public float MinHeight;
             public float MaxHeight;
             public bool Enabled;
+            public float LayerOffset;
         }
 
         public PolygonBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)
         {
-            this.transform = transform;
+            Matrix4x4 layerOffset = Matrix4x4.Translate(new Vector3(0.0f, options.LayerOffset, 0.0f));
+            this.transform =  layerOffset * transform;
             this.outputMeshData = outputMeshData;
             this.options = options;
             this.coordinates = new List<float>();

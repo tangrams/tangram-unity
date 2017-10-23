@@ -38,6 +38,8 @@ public class LayerStyleEditor : EditorBase
 
         EditorGUI.indentLevel--;
 
+		layerStyle.Order = EditorGUILayout.IntField("Order: ", layerStyle.Order);
+
         layerStyle.Material = EditorGUILayout.ObjectField("Material:", layerStyle.Material, typeof(Material)) as Material;
     }
 }

@@ -20,6 +20,7 @@ namespace Mapzen.Unity
             public Material Material;
             public PolygonBuilder.Options PolygonBuilderOptions;
             public PolylineBuilder.Options PolylineBuilderOptions;
+            public int Order;
 
             public string LayerName
             {
@@ -29,12 +30,14 @@ namespace Mapzen.Unity
             public LayerStyle(string layerName)
             {
                 this.layerName = layerName;
+                this.Order = 0;
             }
 
-            public PolygonBuilder.Options GetPolygonOptions(Feature feature, float inverseTileScale)
+            public PolygonBuilder.Options GetPolygonOptions(Feature feature, float inverseTileScale, float epsilon)
             {
                 var options = PolygonBuilderOptions;
 
+                options.LayerOffset = Order * epsilon;
                 options.Material = this.Material;
 
                 if (options.MaxHeight > 0.0f)
@@ -53,10 +56,11 @@ namespace Mapzen.Unity
                 return options;
             }
 
-            public PolylineBuilder.Options GetPolylineOptions(Feature feature, float inverseTileScale)
+            public PolylineBuilder.Options GetPolylineOptions(Feature feature, float inverseTileScale, float epsilon)
             {
                 var options = PolylineBuilderOptions;
 
+                options.LayerOffset = Order * epsilon;
                 options.Material = this.Material;
                 options.Width *= inverseTileScale;
                 options.MaxHeight *= inverseTileScale;
