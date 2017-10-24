@@ -1,0 +1,194 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdaa043e324e04b91a4dcefec1ebb409, type: 3}
+  m_Name: ManhattanStyle
+  m_EditorClassIdentifier: 
+  filterStyles:
+  - name: Water
+    layerStyles:
+    - layerName: water
+      Material: {fileID: 2100000, guid: bb0267789bf4345c7916b57b125fc6ca, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 0.5
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 0
+      matchers: []
+      HasProperty: 
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 0
+      MaxRangeEnabled: 0
+  - name: Earth
+    layerStyles:
+    - layerName: earth
+      Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 0.5
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 1
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 0
+      matchers: []
+      HasProperty: 
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 0
+      MaxRangeEnabled: 0
+  - name: Buildings
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 360982c1d471c45d5ad7d0d8f78be7fe, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: height
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 50
+      MaxRange: 0
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 0
+  - name: Low Buildings
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 958a61943c0824c76994d79e3bbe577d, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 1
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: height
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 50
+      MinRangeEnabled: 0
+      MaxRangeEnabled: 1
+  - name: Concrete Buildings
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 91a74d3b8970c4316956b8cd707084bd, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 7
+      matchers: []
+      HasProperty: roof_material
+      PropertyValue: concrete
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: Roads
+    layerStyles:
+    - layerName: roads
+      Material: {fileID: 2100000, guid: ce1f4d2f66c614a9489e5ee52bbe34da, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 0
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 1
+        Width: 15
+        MiterLimit: 3
+        Enabled: 1
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 7
+      matchers: []
+      HasProperty: kind
+      PropertyValue: major_road
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
