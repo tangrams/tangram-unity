@@ -14,33 +14,77 @@ MonoBehaviour:
   filterStyles:
   - name: filter_0
     layerStyles:
-    - layerName: buildings
-      Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
+    - layerName: roads
+      Material: {fileID: 2100000, guid: ca945bef7446a48c3a7e6c2241195361, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 2
         MinHeight: 0
         MaxHeight: 0
-        Enabled: 1
+        Enabled: 0
       PolylineBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 2
         MinHeight: 0
         MaxHeight: 3
         Width: 15
         MiterLimit: 3
         Enabled: 1
-    - layerName: earth
-      Material: {fileID: 2100000, guid: 0cdfce05273914dd4823f77af6b71663, type: 2}
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 7
+      matchers: []
+      HasProperty: kind
+      PropertyValue: major_road
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: filter_1
+    layerStyles:
+    - layerName: roads
+      Material: {fileID: 2100000, guid: ce1f4d2f66c614a9489e5ee52bbe34da, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 0
         MinHeight: 0
         MaxHeight: 0
-        Enabled: 1
+        Enabled: 0
       PolylineBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 1
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 7
+      matchers: []
+      HasProperty: kind
+      PropertyValue: major_road
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: filter_2
+    layerStyles:
+    - layerName: boundaries
+      Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 0
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
         MinHeight: 0
         MaxHeight: 3
         Width: 15
@@ -50,45 +94,45 @@ MonoBehaviour:
       Material: {fileID: 2100000, guid: bb0267789bf4345c7916b57b125fc6ca, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 1
         MinHeight: 0
         MaxHeight: 0
         Enabled: 1
       PolylineBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 1
         MinHeight: 0
         MaxHeight: 3
         Width: 15
         MiterLimit: 3
         Enabled: 0
-    - layerName: roads
-      Material: {fileID: 2100000, guid: ce1f4d2f66c614a9489e5ee52bbe34da, type: 2}
+    - layerName: earth
+      Material: {fileID: 2100000, guid: 0cdfce05273914dd4823f77af6b71663, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 1
         MinHeight: 0
         MaxHeight: 0
         Enabled: 1
       PolylineBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 1
         MinHeight: 0
         MaxHeight: 3
         Width: 15
         MiterLimit: 3
-        Enabled: 1
-    - layerName: boundaries
+        Enabled: 0
+    - layerName: buildings
       Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 1
         MinHeight: 0
         MaxHeight: 0
         Enabled: 1
       PolylineBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 1
         MinHeight: 0
         MaxHeight: 3
         Width: 15
@@ -99,24 +143,6 @@ MonoBehaviour:
     Matcher:
       type: 2
       matchers:
-      - type: 7
-        matchers: []
-        HasProperty: kind
-        PropertyValue: ferry
-        RegexPattern: 
-        MinRange: 0
-        MaxRange: 0
-        MinRangeEnabled: 1
-        MaxRangeEnabled: 1
-      - type: 7
-        matchers: []
-        HasProperty: kind
-        PropertyValue: minor_road
-        RegexPattern: 
-        MinRange: 0
-        MaxRange: 0
-        MinRangeEnabled: 1
-        MaxRangeEnabled: 1
       - type: 5
         matchers: []
         HasProperty: height
@@ -133,67 +159,19 @@ MonoBehaviour:
       MaxRange: 0
       MinRangeEnabled: 1
       MaxRangeEnabled: 1
-  - name: filter_1
-    layerStyles:
-    - layerName: roads
-      Material: {fileID: 2100000, guid: c583580183f69476bbe6cda2361da21e, type: 2}
-      PolygonBuilderOptions:
-        Material: {fileID: 0}
-        Extrude: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 1
-      PolylineBuilderOptions:
-        Material: {fileID: 0}
-        Extrude: 1
-        MinHeight: 0
-        MaxHeight: 3
-        Width: 15
-        MiterLimit: 3
-        Enabled: 1
-    filter:
-      CollectionNameSet: []
-    Matcher:
-      type: 1
-      matchers:
-      - type: 6
-        matchers: []
-        HasProperty: name
-        PropertyValue: 
-        RegexPattern: .*St\..*
-        MinRange: 0
-        MaxRange: 0
-        MinRangeEnabled: 1
-        MaxRangeEnabled: 1
-      - type: 7
-        matchers: []
-        HasProperty: kind
-        PropertyValue: minor_road
-        RegexPattern: 
-        MinRange: 0
-        MaxRange: 0
-        MinRangeEnabled: 1
-        MaxRangeEnabled: 1
-      HasProperty: 
-      PropertyValue: 
-      RegexPattern: 
-      MinRange: 0
-      MaxRange: 0
-      MinRangeEnabled: 1
-      MaxRangeEnabled: 1
-  - name: filter_2
+  - name: filter_3
     layerStyles:
     - layerName: buildings
       Material: {fileID: 2100000, guid: c583580183f69476bbe6cda2361da21e, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 1
         MinHeight: 0
         MaxHeight: 0
         Enabled: 1
       PolylineBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 1
         MinHeight: 0
         MaxHeight: 3
         Width: 15
@@ -211,22 +189,22 @@ MonoBehaviour:
       MaxRange: 30
       MinRangeEnabled: 0
       MaxRangeEnabled: 1
-  - name: filter_3
+  - name: filter_4
     layerStyles:
     - layerName: roads
-      Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
+      Material: {fileID: 2100000, guid: f776709bfa7fa4d3a88a6b24cd6c7429, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 1
         MinHeight: 0
         MaxHeight: 0
-        Enabled: 0
+        Enabled: 1
       PolylineBuilderOptions:
         Material: {fileID: 0}
-        Extrude: 1
+        Extrusion: 0
         MinHeight: 0
         MaxHeight: 1
-        Width: 5
+        Width: 10
         MiterLimit: 3
         Enabled: 1
     filter:
@@ -235,7 +213,7 @@ MonoBehaviour:
       type: 7
       matchers: []
       HasProperty: kind
-      PropertyValue: ferry
+      PropertyValue: minor_road
       RegexPattern: 
       MinRange: 0
       MaxRange: 0

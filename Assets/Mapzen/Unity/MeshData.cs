@@ -16,10 +16,12 @@ namespace Mapzen.Unity
         {
             public List<Submesh> Submeshes;
             public List<Vector3> Vertices;
+            public List<Vector2> UVs;
 
             public MeshBucket()
             {
                 Vertices = new List<Vector3>();
+                UVs = new List<Vector2>();
                 Submeshes = new List<Submesh>();
             }
         }
@@ -33,7 +35,7 @@ namespace Mapzen.Unity
             Meshes = new List<MeshBucket>();
         }
 
-        public void AddElements(IEnumerable<Vector3> vertices, IEnumerable<int> indices, Material material)
+        public void AddElements(IEnumerable<Vector3> vertices, IEnumerable<Vector2> uvs, IEnumerable<int> indices, Material material)
         {
             var vertexList = new List<Vector3>(vertices);
             int vertexCount = vertexList.Count;
@@ -59,6 +61,7 @@ namespace Mapzen.Unity
 
             int offset = bucket.Vertices.Count;
             bucket.Vertices.AddRange(vertexList);
+            bucket.UVs.AddRange(uvs);
 
             // Find a submesh with this material, or create a new one.
             Submesh submesh = null;

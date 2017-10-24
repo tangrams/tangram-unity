@@ -141,6 +141,12 @@ public class MapzenMapEditor : Editor
     {
         foreach (var style in mapzenMap.FeatureStyling)
         {
+            if (style == null)
+            {
+                Debug.LogWarning("'Null' style provided in feature styling collection");
+                continue;
+            }
+
             if (style.FilterStyles.Count == 0)
             {
                 Debug.LogWarning("The style " + style.name + " has no filter");

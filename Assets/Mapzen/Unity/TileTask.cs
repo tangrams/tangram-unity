@@ -44,7 +44,10 @@ public class TileTask
 
         foreach (var style in featureStyling)
         {
-            // TODO: group by style?
+            if (style == null)
+            {
+                continue;
+            }
 
             foreach (var filterStyle in style.FilterStyles)
             {
