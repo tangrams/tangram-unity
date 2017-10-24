@@ -32,8 +32,8 @@ namespace Mapzen.Unity
             this.outputMeshData = outputMeshData;
             this.options = options;
             this.coordinates = new List<float>();
-            this.rings = new List<int>();
             this.lastPoint = new Point();
+            this.rings = new List<int>();
             this.pointsInRing = 0;
             this.extrusionVertices = new List<Vector3>();
             this.extrusionUVs = new List<Vector2>();
@@ -152,11 +152,32 @@ namespace Mapzen.Unity
 
             if (coordinates.Count > 0)
             {
-                // Then tesselate polygon interior and add vertices and indices.
-                var earcut = new Earcut();
+                List<List<Vector3>> polygon = new List<List<Vector3>>();
+                int ringOffset = 0;
 
-                earcut.Tesselate(coordinates.ToArray(), rings.ToArray());
+                for (int i = 0; i < rings.Count; ++i)
+                {
+                    polygon.Add(new List<Vector3>());
+                    for (int ring = 0; ring < rings[i]; ++ring)
+                    {
+                        float x = coordinates[(ring + ringOffset) * 2];
+                        float y = coordinates[(ring + ringOffset) * 2 + 1];
+
+                        polygon[i].Add(new Vector3(x, 0.0f, y));
+                    }
+
+                    ringOffset += rings[i];
+                }
+
+                var flatData = EarcutLibrary.Flatten(polygon);
+
+                // Then tesselate polygon interior and add vertices and indices.
+                var indices = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim);
+
+                indices.Reverse();
+
                 var vertices = new List<Vector3>(coordinates.Count / 2);
+
                 List<Vector2> uvs;
 
                 if (polygonUVs.Count > 0)
@@ -179,9 +200,7 @@ namespace Mapzen.Unity
                     vertices.Add(v);
                 }
 
-                outputMeshData.AddElements(vertices, uvs, earcut.Indices, options.Material);
-
-                earcut.Release();
+                outputMeshData.AddElements(vertices, uvs, indices, options.Material);
             }
         }
     }
