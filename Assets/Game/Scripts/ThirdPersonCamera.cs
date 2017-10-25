@@ -42,7 +42,6 @@ public class ThirdPersonCamera : MonoBehaviour {
 		CameraPitchAngle += mouseY * InputSensitivity * Time.deltaTime;
 		CameraPitchAngle = Mathf.Clamp(CameraPitchAngle, CameraPitchAngleMin, CameraPitchAngleMax);
 
-		Debug.Log(mouseY);
 		if (FollowedObject.transform.position != targetLastPosition)
 		{
 			Vector3 direction = FollowedObject.transform.position - targetLastPosition;
@@ -101,18 +100,18 @@ public class ThirdPersonCamera : MonoBehaviour {
 			{
 				if (raycastHitInfo.collider.gameObject != FollowedObject)
 				{
-				if (distance == -1.0f)
-				{
-					distance = raycastHitInfo.distance;
-				}
-				else
-				{
-					if (raycastHitInfo.distance < distance)
-					{
-						distance = raycastHitInfo.distance;
-					}
-				}
-			}
+    				if (distance == -1.0f)
+    				{
+    					distance = raycastHitInfo.distance;
+    				}
+    				else
+    				{
+    					if (raycastHitInfo.distance < distance)
+    					{
+    						distance = raycastHitInfo.distance;
+    					}
+    				}
+			    }
 			}
 		}
 
