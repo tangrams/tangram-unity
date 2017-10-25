@@ -6,12 +6,16 @@ public class ThirdPersonCamera : MonoBehaviour {
 
 	public GameObject FollowedObject;
 	public float InputSensitivity = 100.0f;
-	public const float Distance = 5.0f;
+	public float Distance = 5.0f;
+	public float CameraPitchAngle = 45.0f;
+	public float CameraPitchAngleMin = 10.0f;
+	public float CameraPitchAngleMax = 120.0f;
+	public float AimingBlendFactor = 0.05f;
 
-	float theta = 0.0f;
-	float phi = 0.0f;
 
-	float adjustedDistance = Distance;
+	Vector3 targetLastPosition;
+
+	Vector2 dir2d;
 
 	struct CameraDesc
 	{
@@ -27,22 +31,25 @@ public class ThirdPersonCamera : MonoBehaviour {
 	{
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
+		dir2d = Vector2.right;
 	}
 	
 	void Update()
 	{
-		float mouseX = Input.GetAxis("Mouse X");
 		float mouseY = Input.GetAxis("Mouse Y");
+		float mouseX = Input.GetAxis("Mouse X");
 
-		theta += mouseY * InputSensitivity * Time.deltaTime;
-		phi   += mouseX * InputSensitivity * Time.deltaTime;
+		CameraPitchAngle += mouseY * InputSensitivity * Time.deltaTime;
+		CameraPitchAngle = Mathf.Clamp(CameraPitchAngle, CameraPitchAngleMin, CameraPitchAngleMax);
 
-		theta = Mathf.Clamp(theta, 10.0f, 120.0f);
-		phi   = phi % 360.0f;
+		if (FollowedObject.transform.position != targetLastPosition)
+		{
+			Vector3 direction = FollowedObject.transform.position - targetLastPosition;
+			Vector2 newDir2d = new Vector2(direction.x, direction.z).normalized;
+			dir2d = Vector2.Lerp(dir2d, newDir2d, AimingBlendFactor);
+		}
 
-		Quaternion rotation = Quaternion.Euler(theta, phi, 0.0f);
-		Vector3 dir = new Vector3(0.0f, 1.0f, 0.0f);
-		Vector3 pointOnSphere = rotation * dir * Distance;
+		Vector3 cameraPosition = new Vector3(-dir2d.x, Mathf.Sin(CameraPitchAngle * Mathf.Deg2Rad), -dir2d.y) * Distance;
 
 		CameraDesc cameraDesc = new CameraDesc();
 		cameraDesc.view = Camera.main.cameraToWorldMatrix;
@@ -50,7 +57,7 @@ public class ThirdPersonCamera : MonoBehaviour {
 		cameraDesc.nearClipPlane = Camera.main.nearClipPlane;
 		cameraDesc.fieldOfView = Camera.main.fieldOfView;
 		cameraDesc.aspect = Camera.main.aspect;
-		cameraDesc.position = FollowedObject.transform.position + pointOnSphere;
+		cameraDesc.position = FollowedObject.transform.position + cameraPosition;
 		cameraDesc.view = Matrix4x4.LookAt(Camera.main.transform.position,
 			FollowedObject.transform.position,
 			Vector3.up);
@@ -58,6 +65,7 @@ public class ThirdPersonCamera : MonoBehaviour {
 		var frustrumPoints = ExtractFrustrumNearPlanePoints(cameraDesc);
 		float distance = GetMinimumCollisionDistanceFromTarget(frustrumPoints);
 
+		float adjustedDistance;
 		if (distance != -1)
 		{
 			adjustedDistance = distance;
@@ -67,10 +75,12 @@ public class ThirdPersonCamera : MonoBehaviour {
 			adjustedDistance = Distance;
 		}
 
-		pointOnSphere = rotation * dir * adjustedDistance;
+		cameraPosition = new Vector3(-dir2d.x, Mathf.Sin(CameraPitchAngle * Mathf.Deg2Rad), -dir2d.y) * adjustedDistance;
 
-		transform.position = FollowedObject.transform.position + pointOnSphere;
+		transform.position = FollowedObject.transform.position + cameraPosition;
 		transform.LookAt(FollowedObject.transform);
+
+		targetLastPosition = FollowedObject.transform.position;
 	}
 
 	float GetMinimumCollisionDistanceFromTarget(Vector3[] nearPlaneFrustrumPoints)
@@ -90,18 +100,18 @@ public class ThirdPersonCamera : MonoBehaviour {
 			{
 				if (raycastHitInfo.collider.gameObject != FollowedObject)
 				{
-					if (distance == -1.0f)
+				if (distance == -1.0f)
+				{
+					distance = raycastHitInfo.distance;
+				}
+				else
+				{
+					if (raycastHitInfo.distance < distance)
 					{
 						distance = raycastHitInfo.distance;
 					}
-					else
-					{
-						if (raycastHitInfo.distance < distance)
-						{
-							distance = raycastHitInfo.distance;
-						}
-					}
 				}
+			}
 			}
 		}
 
@@ -111,7 +121,7 @@ public class ThirdPersonCamera : MonoBehaviour {
 	Vector3[] ExtractFrustrumNearPlanePoints(CameraDesc camera)
 	{
 		float zn = camera.nearClipPlane;
-		float fovRadians = camera.fieldOfView * (Mathf.PI / 180.0f);
+		float fovRadians = Mathf.Deg2Rad * camera.fieldOfView;
 		float e = Mathf.Tan(fovRadians * 0.5f);
 
 		Vector4 axisX = camera.view.GetColumn(0);
