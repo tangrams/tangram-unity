@@ -34,8 +34,8 @@ public class TileTask
     public void Start(List<FeatureStyle> featureStyling, SceneGroup root)
     {
         // Parse the GeoJSON
-        // var tileData = new GeoJsonTile(address, response);
-        var tileData = new MvtTile(address, response);
+        var tileData = new GeoJsonTile(address, response);
+        // var tileData = new MvtTile(address, response);
 
         // The leaf currently used (will hold the mesh data for the currently matched group)
         SceneGroup leaf = root;
