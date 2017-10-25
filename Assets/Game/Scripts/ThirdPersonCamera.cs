@@ -42,6 +42,7 @@ public class ThirdPersonCamera : MonoBehaviour {
 		CameraPitchAngle += mouseY * InputSensitivity * Time.deltaTime;
 		CameraPitchAngle = Mathf.Clamp(CameraPitchAngle, CameraPitchAngleMin, CameraPitchAngleMax);
 
+		Debug.Log(mouseY);
 		if (FollowedObject.transform.position != targetLastPosition)
 		{
 			Vector3 direction = FollowedObject.transform.position - targetLastPosition;
