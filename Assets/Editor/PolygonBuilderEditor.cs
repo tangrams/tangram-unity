@@ -26,6 +26,7 @@ public class PolygonBuilderEditor : EditorBase
 
         defaultOptions.Extrusion = PolygonBuilder.ExtrusionType.TopAndSides;
         defaultOptions.Enabled = true;
+        defaultOptions.TileUVs = true;
         defaultOptions.MaxHeight = 0.0f;
 
         return defaultOptions;
@@ -64,6 +65,7 @@ public class PolygonBuilderEditor : EditorBase
         selectedExtrusionType = EditorGUILayout.Popup("Extrusion type: ", selectedExtrusionType, extrusionTypeStringList.ToArray());
         options.Extrusion = (PolygonBuilder.ExtrusionType) selectedExtrusionType;
         options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
+        options.TileUVs = EditorGUILayout.Toggle("Tile UVs: ", options.TileUVs);
 
         SavePreferences();
 
