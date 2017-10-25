@@ -15,13 +15,15 @@ MonoBehaviour:
   - name: Water
     layerStyles:
     - layerName: water
-      Material: {fileID: 2100000, guid: bb0267789bf4345c7916b57b125fc6ca, type: 2}
+      Material: {fileID: 2100000, guid: d8246d480c5644ecc9ae385f88300e80, type: 2}
       PolygonBuilderOptions:
         Material: {fileID: 0}
         Extrusion: 0
         MinHeight: 0
         MaxHeight: 0
+        TileUVs: 1
         Enabled: 1
+        offset: {x: 0, y: 0}
       PolylineBuilderOptions:
         Material: {fileID: 0}
         Extrusion: 1
@@ -50,8 +52,10 @@ MonoBehaviour:
         Material: {fileID: 0}
         Extrusion: 1
         MinHeight: 0
-        MaxHeight: 0.5
+        MaxHeight: 0.2
+        TileUVs: 1
         Enabled: 1
+        offset: {x: 0, y: 0}
       PolylineBuilderOptions:
         Material: {fileID: 0}
         Extrusion: 1
@@ -72,96 +76,6 @@ MonoBehaviour:
       MaxRange: 0
       MinRangeEnabled: 0
       MaxRangeEnabled: 0
-  - name: Buildings
-    layerStyles:
-    - layerName: buildings
-      Material: {fileID: 2100000, guid: 360982c1d471c45d5ad7d0d8f78be7fe, type: 2}
-      PolygonBuilderOptions:
-        Material: {fileID: 0}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 1
-      PolylineBuilderOptions:
-        Material: {fileID: 0}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 3
-        Width: 15
-        MiterLimit: 3
-        Enabled: 0
-    filter:
-      CollectionNameSet: []
-    Matcher:
-      type: 5
-      matchers: []
-      HasProperty: height
-      PropertyValue: 
-      RegexPattern: 
-      MinRange: 50
-      MaxRange: 0
-      MinRangeEnabled: 1
-      MaxRangeEnabled: 0
-  - name: Low Buildings
-    layerStyles:
-    - layerName: buildings
-      Material: {fileID: 2100000, guid: 958a61943c0824c76994d79e3bbe577d, type: 2}
-      PolygonBuilderOptions:
-        Material: {fileID: 0}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 1
-      PolylineBuilderOptions:
-        Material: {fileID: 0}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 3
-        Width: 15
-        MiterLimit: 3
-        Enabled: 1
-    filter:
-      CollectionNameSet: []
-    Matcher:
-      type: 5
-      matchers: []
-      HasProperty: height
-      PropertyValue: 
-      RegexPattern: 
-      MinRange: 0
-      MaxRange: 50
-      MinRangeEnabled: 0
-      MaxRangeEnabled: 1
-  - name: Concrete Buildings
-    layerStyles:
-    - layerName: buildings
-      Material: {fileID: 2100000, guid: 91a74d3b8970c4316956b8cd707084bd, type: 2}
-      PolygonBuilderOptions:
-        Material: {fileID: 0}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 1
-      PolylineBuilderOptions:
-        Material: {fileID: 0}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 3
-        Width: 15
-        MiterLimit: 3
-        Enabled: 0
-    filter:
-      CollectionNameSet: []
-    Matcher:
-      type: 7
-      matchers: []
-      HasProperty: roof_material
-      PropertyValue: concrete
-      RegexPattern: 
-      MinRange: 0
-      MaxRange: 0
-      MinRangeEnabled: 1
-      MaxRangeEnabled: 1
   - name: Roads
     layerStyles:
     - layerName: roads
@@ -171,12 +85,14 @@ MonoBehaviour:
         Extrusion: 1
         MinHeight: 0
         MaxHeight: 0
+        TileUVs: 0
         Enabled: 0
+        offset: {x: 0, y: 0}
       PolylineBuilderOptions:
         Material: {fileID: 0}
         Extrusion: 1
         MinHeight: 0
-        MaxHeight: 1
+        MaxHeight: 0.6
         Width: 15
         MiterLimit: 3
         Enabled: 1
@@ -190,5 +106,357 @@ MonoBehaviour:
       RegexPattern: 
       MinRange: 0
       MaxRange: 0
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: Parks
+    layerStyles:
+    - layerName: landuse
+      Material: {fileID: 2100000, guid: c5bc0927aa4854f4a977c28df5b0b083, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 0.4
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 0.2
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 0
+      matchers: []
+      HasProperty: 
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 0
+      MaxRangeEnabled: 0
+  - name: Building Sides 1
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 360982c1d471c45d5ad7d0d8f78be7fe, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 2
+        MinHeight: 0
+        MaxHeight: 0
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: scale_rank
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 0.5
+      MaxRange: 1.5
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: Building Sides 2
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 086b96e604d1b4237821834d57d9e61a, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 2
+        MinHeight: 0
+        MaxHeight: 0
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: scale_rank
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 1.5
+      MaxRange: 2.5
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: Building Sides 3
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: d346cbfcd059e4ded829832becb95c0a, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 2
+        MinHeight: 0
+        MaxHeight: 0
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: scale_rank
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 2.5
+      MaxRange: 3.5
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: Building Sides 4
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 91a74d3b8970c4316956b8cd707084bd, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 2
+        MinHeight: 0
+        MaxHeight: 0
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: scale_rank
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 3.5
+      MaxRange: 4.5
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: Building Sides 5
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: bba6c9d06dec34b499e3e54bfd990418, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 2
+        MinHeight: 0
+        MaxHeight: 0
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: scale_rank
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 4.5
+      MaxRange: 5.5
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 0
+  - name: Building Roofs 1
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 746c04070ccf64634aced6922593d6c6, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: scale_rank
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 0.5
+      MaxRange: 1.5
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: Building Roofs 2
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: cfe493c553ef043ecae259e7f4a79672, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: scale_rank
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 1.5
+      MaxRange: 2.5
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: Building Roofs 3
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 75c9cc6207328411a97d1af361c8ecce, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: scale_rank
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 2.5
+      MaxRange: 3.5
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: Building Roofs 4
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 5792baacfc7a944d3aae895b1c597f56, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: scale_rank
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 3.5
+      MaxRange: 4.5
+      MinRangeEnabled: 1
+      MaxRangeEnabled: 1
+  - name: Building Roofs 5
+    layerStyles:
+    - layerName: buildings
+      Material: {fileID: 2100000, guid: 8a14ae188af6a45c58753931787a749f, type: 2}
+      PolygonBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0
+        TileUVs: 1
+        Enabled: 1
+        offset: {x: 0, y: 0}
+      PolylineBuilderOptions:
+        Material: {fileID: 0}
+        Extrusion: 1
+        MinHeight: 0
+        MaxHeight: 3
+        Width: 15
+        MiterLimit: 3
+        Enabled: 0
+    filter:
+      CollectionNameSet: []
+    Matcher:
+      type: 5
+      matchers: []
+      HasProperty: scale_rank
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 4.5
+      MaxRange: 5.5
       MinRangeEnabled: 1
       MaxRangeEnabled: 1
