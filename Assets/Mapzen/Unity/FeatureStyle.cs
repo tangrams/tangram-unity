@@ -37,6 +37,19 @@ namespace Mapzen.Unity
 
                 options.Material = this.Material;
 
+                if (options.MinHeight > 0.0f)
+                {
+                    options.MinHeight *= inverseTileScale;
+                }
+                else
+                {
+                    object heightValue;
+                    if (feature.TryGetProperty("min_height", out heightValue) && heightValue is double)
+                    {
+                        options.MinHeight = (float)((double)heightValue * inverseTileScale);
+                    }
+                }
+
                 if (options.MaxHeight > 0.0f)
                 {
                     options.MaxHeight *= inverseTileScale;
