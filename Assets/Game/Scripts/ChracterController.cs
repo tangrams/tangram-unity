@@ -42,6 +42,7 @@ public class ChracterController : MonoBehaviour {
 
                 Vector3 move = new Vector3(moveH, 0.0f, moveV);
                 move = Camera.main.transform.TransformDirection(move);
+                move.y = 0.0f;
                 rb.AddForce(move * maxVelocity);
             }
         }

@@ -80,7 +80,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!81 &81065426997647106
 AudioListener:
   m_ObjectHideFlags: 1
@@ -119,7 +118,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FollowedObject: {fileID: 0}
   InputSensitivity: 100
-  Distance: 75
+  Distance: 7.5
   CameraPitchAngle: 45
   CameraPitchAngleMin: 10
   CameraPitchAngleMax: 120
