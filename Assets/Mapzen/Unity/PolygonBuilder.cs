@@ -25,6 +25,7 @@ namespace Mapzen.Unity
             public float MaxHeight;
             public bool TileUVs;
             public bool Enabled;
+            public Vector2 offset;
         }
 
         public PolygonBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)
@@ -65,6 +66,9 @@ namespace Mapzen.Unity
             bool buildWalls =
                 options.Extrusion == ExtrusionType.TopAndSides ||
                 options.Extrusion == ExtrusionType.SidesOnly;
+
+            point.X += options.offset.x;
+            point.Y += options.offset.y;
 
             // For all but the first point in each ring, create a quad extending from the
             // previous point to the current point and from MinHeight to MaxHeight.

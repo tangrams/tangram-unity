@@ -63,6 +63,19 @@ namespace Mapzen.Unity
                     }
                 }
 
+                // FIXME: This is a hack to avoid building side z-fighting.
+                object identifier;
+                if (feature.TryGetProperty("id", out identifier) && identifier is double)
+                {
+                    double modx = 10;
+                    double mody = 100;
+                    double modz = 1000;
+                    options.offset.x = (float)((double)identifier % modx / modx);
+                    options.offset.y = (float)((double)identifier % mody / mody);
+                    options.offset *= inverseTileScale;
+                    options.MaxHeight += (float)((double)identifier % modz / modz) * inverseTileScale;
+                }
+
                 return options;
             }
 
