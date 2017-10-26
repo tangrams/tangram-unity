@@ -77,25 +77,6 @@ namespace Mapzen.Unity
                     }
                     mesh.RecalculateNormals();
 
-                    if (options.IsStatic)
-                    {
-#if UNITY_EDITOR
-                        // Generate default uvs for this mesh
-                        var UVs = Unwrapping.GeneratePerTriangleUV(mesh);
-                        var mergedUVs = new Vector2[mesh.vertices.Length];
-                        for (int index = 0; index < UVs.Length; ++index)
-                        {
-                            Vector2 uv = UVs[index];
-                            int vertexIndex = mesh.triangles[index];
-                            mergedUVs[vertexIndex] = uv;
-                        }
-                        mesh.uv = mergedUVs;
-                        Unwrapping.GenerateSecondaryUVSet(mesh);
-#else
-                        Debug.LogError("Static meshes not supported in non-editor mode");
-#endif
-                    }
-
                     // Associate the mesh filter and mesh renderer components with this game object
                     var materials = meshBucket.Submeshes.Select(s => s.Material).ToArray();
                     var meshFilterComponent = gameObject.AddComponent<MeshFilter>();
