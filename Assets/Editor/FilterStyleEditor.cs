@@ -10,22 +10,6 @@ using UnityEngine;
 [Serializable]
 public class FilterStyleEditor : EditorBase
 {
-    private static List<string> defaultLayers = new List<string>(new string[]
-        {
-            "boundaries",
-            "buildings",
-            "earth",
-            "landuse",
-            "places",
-            "pois",
-            "roads",
-            "transit",
-            "water",
-        });
-
-    [SerializeField]
-    private string customFeatureCollection = "";
-
     [SerializeField]
     private int selectedLayer;
 
@@ -98,21 +82,14 @@ public class FilterStyleEditor : EditorBase
         EditorConfig.ResetColor();
     }
 
-    public void OnInspectorGUI()
+    public void OnInspectorGUI(List<string> layers)
     {
-        // Default layers
         EditorGUILayout.BeginHorizontal();
         {
-            selectedLayer = EditorGUILayout.Popup("Default layer:", selectedLayer, defaultLayers.ToArray());
-            AddLayerStyleLayout(filterStyle, defaultLayers[selectedLayer]);
-        }
-        EditorGUILayout.EndHorizontal();
-
-        // Custom layer entry
-        EditorGUILayout.BeginHorizontal();
-        {
-            customFeatureCollection = EditorGUILayout.TextField("Custom layer:", customFeatureCollection);
-            AddLayerStyleLayout(filterStyle, customFeatureCollection);
+            selectedLayer = EditorGUILayout.Popup("Layer:", selectedLayer, layers.ToArray());
+            if (layers.Count > 0) {
+                AddLayerStyleLayout(filterStyle, layers[selectedLayer]);
+            }
         }
         EditorGUILayout.EndHorizontal();
 

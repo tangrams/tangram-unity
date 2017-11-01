@@ -19,6 +19,16 @@ public class StyleEditor : EditorBase
     [SerializeField]
     private FeatureStyle style;
 
+    [SerializeField]
+    private bool showLayerFoldout;
+
+    private List<string> mapzenLayers = new List<string>(new string[] {
+        "boundaries", "buildings", "earth", "landuse", "places", "pois", "roads", "transit", "water",
+    });
+
+    [SerializeField]
+    private List<string> customLayers = new List<string>();
+
     public FeatureStyle Style
     {
         get { return style; }
@@ -78,7 +88,12 @@ public class StyleEditor : EditorBase
 
             if (state.show)
             {
-                editor.OnInspectorGUI();
+                List<string> layers = new List<string>();
+                // Merge custom and mapzen layers
+                layers.AddRange(mapzenLayers);
+                layers.AddRange(customLayers);
+
+                editor.OnInspectorGUI(layers);
             }
 
             if (state.markedForDeletion)
