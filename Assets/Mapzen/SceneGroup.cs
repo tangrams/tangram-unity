@@ -7,7 +7,7 @@ namespace Mapzen
     public class SceneGroup
     {
         [Flags]
-        public enum Type
+        public enum GroupType
         {
             None = 0,
             Tile = 1 << 0,
@@ -24,9 +24,9 @@ namespace Mapzen
         // The mesh data, may be empty
         public MeshData meshData;
 
-        public Type type;
+        public GroupType type;
 
-        public SceneGroup(Type type, string name)
+        public SceneGroup(GroupType type, string name)
         {
             this.childs = new Dictionary<string, SceneGroup>();
             this.type = type;
@@ -39,7 +39,7 @@ namespace Mapzen
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="options">The group type options.</param>
-        public static bool Test(Type type, Type options)
+        public static bool Test(GroupType type, GroupType options)
         {
             return ((int)type & (int)options) == (int)type;
         }
@@ -49,14 +49,14 @@ namespace Mapzen
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="options">The group type options.</param>
-        public static bool IsLeaf(Type type, Type options)
+        public static bool IsLeaf(GroupType type, GroupType options)
         {
             return ((int)type ^ (int)options) < (int)type;
         }
 
         public override string ToString()
         {
-            if (type == Type.None || type == Type.All)
+            if (type == GroupType.None || type == GroupType.All)
             {
                 return name;
             }

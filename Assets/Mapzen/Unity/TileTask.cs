@@ -13,11 +13,11 @@ public class TileTask
     private TileAddress address;
     private byte[] response;
     private bool ready;
-    private SceneGroup.Type groupOptions;
+    private SceneGroup.GroupType groupOptions;
     private float inverseTileScale;
     private Matrix4x4 transform;
 
-    public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY, float regionScaleRatio)
+    public TileTask(TileAddress address, SceneGroup.GroupType groupOptions, byte[] response, float offsetX, float offsetY, float regionScaleRatio)
     {
         this.address = address;
         this.response = response;
@@ -40,7 +40,7 @@ public class TileTask
         // The leaf currently used (will hold the mesh data for the currently matched group)
         SceneGroup leaf = root;
 
-        var tileGroup = OnSceneGroupData(SceneGroup.Type.Tile, address.ToString(), root, ref leaf);
+        var tileGroup = OnSceneGroupData(SceneGroup.GroupType.Tile, address.ToString(), root, ref leaf);
 
         foreach (var style in featureStyling)
         {
@@ -51,11 +51,11 @@ public class TileTask
 
             foreach (var filterStyle in style.FilterStyles)
             {
-                var filterGroup = OnSceneGroupData(SceneGroup.Type.Filter, filterStyle.Name, tileGroup, ref leaf);
+                var filterGroup = OnSceneGroupData(SceneGroup.GroupType.Filter, filterStyle.Name, tileGroup, ref leaf);
 
                 foreach (var layer in tileData.FeatureCollections)
                 {
-                    var layerGroup = OnSceneGroupData(SceneGroup.Type.Layer, layer.Name, filterGroup, ref leaf);
+                    var layerGroup = OnSceneGroupData(SceneGroup.GroupType.Layer, layer.Name, filterGroup, ref leaf);
 
                     foreach (var feature in filterStyle.GetFilter().Filter(layer))
                     {
@@ -69,7 +69,7 @@ public class TileTask
                             featureName += identifier.ToString();
                         }
 
-                        OnSceneGroupData(SceneGroup.Type.Feature, featureName, layerGroup, ref leaf);
+                        OnSceneGroupData(SceneGroup.GroupType.Feature, featureName, layerGroup, ref leaf);
 
                         if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                         {
@@ -100,7 +100,7 @@ public class TileTask
         ready = true;
     }
 
-    private SceneGroup OnSceneGroupData(SceneGroup.Type type, string name, SceneGroup parent, ref SceneGroup leaf)
+    private SceneGroup OnSceneGroupData(SceneGroup.GroupType type, string name, SceneGroup parent, ref SceneGroup leaf)
     {
         SceneGroup group = null;
 
