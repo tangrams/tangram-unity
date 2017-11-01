@@ -85,16 +85,5 @@ namespace Mapzen.Unity
                 submesh.Indices.Add(index + offset);
             }
         }
-
-        public void FlipIndices()
-        {
-            foreach (var bucket in Meshes)
-            {
-                foreach (var submesh in bucket.Submeshes)
-                {
-                    submesh.Indices.Reverse();
-                }
-            }
-        }
     }
 }

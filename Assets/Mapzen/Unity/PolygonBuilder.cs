@@ -86,10 +86,10 @@ namespace Mapzen.Unity
                 extrusionUVs.Add(new Vector2(0.0f, 0.0f));
 
                 extrusionIndices.Add(indexOffset + 1);
+                extrusionIndices.Add(indexOffset + 2);
                 extrusionIndices.Add(indexOffset + 3);
                 extrusionIndices.Add(indexOffset + 2);
                 extrusionIndices.Add(indexOffset + 1);
-                extrusionIndices.Add(indexOffset + 2);
                 extrusionIndices.Add(indexOffset + 0);
             }
 
@@ -152,8 +152,6 @@ namespace Mapzen.Unity
             {
                 // Then tesselate polygon interior and add vertices and indices.
                 var indices = EarcutLibrary.Earcut(coordinates, holes, 2);
-
-                indices.Reverse();
 
                 var vertices = new List<Vector3>(coordinates.Count / 2);
 
