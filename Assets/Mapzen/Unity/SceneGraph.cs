@@ -41,8 +41,6 @@ namespace Mapzen.Unity
             }
             else
             {
-                group.meshData.FlipIndices();
-
                 if (group.meshData.Meshes.Count > 1)
                 {
                     var gameObject = new GameObject(group.ToString());

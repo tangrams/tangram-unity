@@ -31,14 +31,6 @@ namespace Mapzen.Unity
             this.transform = transform;
             this.outputMeshData = outputMeshData;
             this.options = options;
-            this.coordinates = new List<float>();
-            this.lastPoint = new Point();
-            this.rings = new List<int>();
-            this.pointsInRing = 0;
-            this.extrusionVertices = new List<Vector3>();
-            this.extrusionUVs = new List<Vector2>();
-            this.extrusionIndices = new List<int>();
-            this.polygonUVs = new List<Vector2>();
         }
 
         private Matrix4x4 transform;
@@ -46,16 +38,17 @@ namespace Mapzen.Unity
         private Options options;
 
         // Values for the tesselator.
-        private List<float> coordinates;
-        private List<int> rings;
-        private int pointsInRing;
+        private List<float> coordinates = new List<float>();
+        private List<int> holes = new List<int>();
+        private int pointsInRing = 0;
+        private int pointsInPolygon = 0;
 
         // Values for extrusions.
-        private Point lastPoint;
-        private List<Vector3> extrusionVertices;
-        private List<Vector2> extrusionUVs;
-        private List<Vector2> polygonUVs;
-        private List<int> extrusionIndices;
+        private Point lastPoint = new Point();
+        private List<Vector3> extrusionVertices = new List<Vector3>();
+        private List<Vector2> extrusionUVs = new List<Vector2>();
+        private List<Vector2> polygonUVs = new List<Vector2>();
+        private List<int> extrusionIndices = new List<int>();
 
         public void OnPoint(Point point)
         {
@@ -93,10 +86,10 @@ namespace Mapzen.Unity
                 extrusionUVs.Add(new Vector2(0.0f, 0.0f));
 
                 extrusionIndices.Add(indexOffset + 1);
+                extrusionIndices.Add(indexOffset + 2);
                 extrusionIndices.Add(indexOffset + 3);
                 extrusionIndices.Add(indexOffset + 2);
                 extrusionIndices.Add(indexOffset + 1);
-                extrusionIndices.Add(indexOffset + 2);
                 extrusionIndices.Add(indexOffset + 0);
             }
 
@@ -110,6 +103,7 @@ namespace Mapzen.Unity
             }
 
             pointsInRing++;
+            pointsInPolygon++;
         }
 
         public void AddUV(Vector2 uv)
@@ -128,21 +122,25 @@ namespace Mapzen.Unity
         public void OnBeginLinearRing()
         {
             pointsInRing = 0;
+            if (pointsInPolygon > 0)
+            {
+                holes.Add(pointsInPolygon);
+            }
         }
 
         public void OnEndLinearRing()
         {
-            rings.Add(pointsInRing);
         }
 
         public void OnBeginPolygon()
         {
             coordinates.Clear();
-            rings.Clear();
+            holes.Clear();
             extrusionVertices.Clear();
             extrusionUVs.Clear();
             extrusionIndices.Clear();
             polygonUVs.Clear();
+            pointsInPolygon = 0;
         }
 
         public void OnEndPolygon()
@@ -152,29 +150,8 @@ namespace Mapzen.Unity
 
             if (coordinates.Count > 0)
             {
-                List<List<Vector3>> polygon = new List<List<Vector3>>();
-                int ringOffset = 0;
-
-                for (int i = 0; i < rings.Count; ++i)
-                {
-                    polygon.Add(new List<Vector3>());
-                    for (int ring = 0; ring < rings[i]; ++ring)
-                    {
-                        float x = coordinates[(ring + ringOffset) * 2];
-                        float y = coordinates[(ring + ringOffset) * 2 + 1];
-
-                        polygon[i].Add(new Vector3(x, 0.0f, y));
-                    }
-
-                    ringOffset += rings[i];
-                }
-
-                var flatData = EarcutLibrary.Flatten(polygon);
-
                 // Then tesselate polygon interior and add vertices and indices.
-                var indices = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim);
-
-                indices.Reverse();
+                var indices = EarcutLibrary.Earcut(coordinates, holes, 2);
 
                 var vertices = new List<Vector3>(coordinates.Count / 2);
 
