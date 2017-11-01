@@ -11,7 +11,7 @@ using UnityEngine;
 public class MatcherEditor : EditorBase
 {
     [SerializeField]
-    private FeatureStyle.Matcher.Type selectedMatcherType;
+    private FeatureStyle.Matcher.MatcherType selectedMatcherType;
 
     [SerializeField]
     private FeatureStyle.Matcher matcher;
@@ -42,17 +42,13 @@ public class MatcherEditor : EditorBase
 
         EditorGUILayout.BeginHorizontal();
         {
-            var matcherTypeList = Enum.GetValues(typeof(FeatureStyle.Matcher.Type)).Cast<FeatureStyle.Matcher.Type>();
-            var matcherTypeStringList = matcherTypeList.Select(type => type.ToString());
-
-            selectedMatcherType = (FeatureStyle.Matcher.Type)EditorGUILayout.Popup("Matcher:",
-                (int)selectedMatcherType, matcherTypeStringList.ToArray());
+            selectedMatcherType = (FeatureStyle.Matcher.MatcherType)EditorGUILayout.EnumPopup("Matcher:", selectedMatcherType);
 
             EditorConfig.SetColor(EditorConfig.AddButtonColor);
             if (GUILayout.Button(EditorConfig.AddButtonContent, EditorConfig.SmallButtonWidth)
-                && selectedMatcherType != FeatureStyle.Matcher.Type.None)
+                && selectedMatcherType != FeatureStyle.Matcher.MatcherType.None)
             {
-                var matcherType = (FeatureStyle.Matcher.Type)selectedMatcherType;
+                var matcherType = (FeatureStyle.Matcher.MatcherType)selectedMatcherType;
                 var newMatcher = new FeatureStyle.Matcher(matcherType);
 
                 editor = new MatcherEditor(newMatcher);
@@ -79,13 +75,13 @@ public class MatcherEditor : EditorBase
         }
         else
         {
-            switch (matcher.MatcherType)
+            switch (matcher.Type)
             {
-                case FeatureStyle.Matcher.Type.Property:
+                case FeatureStyle.Matcher.MatcherType.Property:
                     matcher.HasProperty = EditorGUILayout.TextField("Has property:", matcher.HasProperty);
                     break;
 
-                case FeatureStyle.Matcher.Type.PropertyRange:
+                case FeatureStyle.Matcher.MatcherType.PropertyRange:
                     matcher.HasProperty = EditorGUILayout.TextField("Property:", matcher.HasProperty);
                     EditorGUILayout.BeginHorizontal();
                     matcher.MinRange = EditorGUILayout.FloatField("min:", matcher.MinRange);
@@ -97,12 +93,12 @@ public class MatcherEditor : EditorBase
                     EditorGUILayout.EndHorizontal();
                     break;
 
-                case FeatureStyle.Matcher.Type.PropertyValue:
+                case FeatureStyle.Matcher.MatcherType.PropertyValue:
                     matcher.HasProperty = EditorGUILayout.TextField("Property:", matcher.HasProperty);
                     matcher.PropertyValue = EditorGUILayout.TextField("Property value:", matcher.PropertyValue);
                     break;
 
-                case FeatureStyle.Matcher.Type.PropertyRegex:
+                case FeatureStyle.Matcher.MatcherType.PropertyRegex:
                     matcher.HasProperty = EditorGUILayout.TextField("Property:", matcher.HasProperty);
                     matcher.RegexPattern = EditorGUILayout.TextField("Regex:", matcher.RegexPattern);
                     break;
@@ -113,7 +109,7 @@ public class MatcherEditor : EditorBase
         {
             var editor = matcherEditors[i];
 
-            var state = FoldoutEditor.OnInspectorGUI(editor.GUID.ToString(), editor.Matcher.MatcherType.ToString());
+            var state = FoldoutEditor.OnInspectorGUI(editor.GUID.ToString(), editor.Matcher.Type.ToString());
 
             if (state.show)
             {

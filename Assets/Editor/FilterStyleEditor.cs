@@ -30,7 +30,7 @@ public class FilterStyleEditor : EditorBase
     private int selectedLayer;
 
     [SerializeField]
-    private FeatureStyle.Matcher.Type selectedMatcherType;
+    private FeatureStyle.Matcher.MatcherType selectedMatcherType;
 
     [SerializeField]
     private List<LayerStyleEditor> layerStyleEditors;
@@ -59,7 +59,7 @@ public class FilterStyleEditor : EditorBase
 
         if (filterStyle.Matcher != null)
         {
-            selectedMatcherType = filterStyle.Matcher.MatcherType;
+            selectedMatcherType = filterStyle.Matcher.Type;
             this.matcherEditor = new MatcherEditor(filterStyle.Matcher);
         }
     }
@@ -142,12 +142,9 @@ public class FilterStyleEditor : EditorBase
 
         EditorGUI.indentLevel--;
 
-        var matcherTypeList = Enum.GetValues(typeof(FeatureStyle.Matcher.Type)).Cast<FeatureStyle.Matcher.Type>();
-        var matcherTypeStringList = matcherTypeList.Select(type => type.ToString());
         var oldType = selectedMatcherType;
 
-        selectedMatcherType = (FeatureStyle.Matcher.Type)EditorGUILayout.Popup("Matcher:",
-            (int)selectedMatcherType, matcherTypeStringList.ToArray());
+        selectedMatcherType = (FeatureStyle.Matcher.MatcherType)EditorGUILayout.EnumPopup("Matcher:", selectedMatcherType);
 
         if (selectedMatcherType != oldType)
         {
@@ -155,7 +152,7 @@ public class FilterStyleEditor : EditorBase
         }
         else
         {
-            if (selectedMatcherType == FeatureStyle.Matcher.Type.None)
+            if (selectedMatcherType == FeatureStyle.Matcher.MatcherType.None)
             {
                 matcherEditor = null;
             }
