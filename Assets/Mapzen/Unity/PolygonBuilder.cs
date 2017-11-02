@@ -151,7 +151,7 @@ namespace Mapzen.Unity
             if (coordinates.Count > 0)
             {
                 // Then tesselate polygon interior and add vertices and indices.
-                var indices = EarcutLibrary.Earcut(coordinates, holes, 2);
+                var indices = Mapbox.EarcutLibrary.Earcut(coordinates, holes, 2);
 
                 var vertices = new List<Vector3>(coordinates.Count / 2);
 
