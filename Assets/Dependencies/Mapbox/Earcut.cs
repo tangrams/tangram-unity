@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Mapzen.Unity
+namespace Mapbox
 {
     public static class EarcutLibrary
     {
