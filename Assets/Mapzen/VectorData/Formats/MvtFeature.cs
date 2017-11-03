@@ -1,6 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Mvtcs;
+
+#if UNITY_EDITOR
+using UnityEngine;
+#else
+using System.Diagnostics;
+#endif
 
 namespace Mapzen.VectorData.Formats
 {
@@ -95,67 +102,55 @@ namespace Mapzen.VectorData.Formats
         protected struct GeometryDecoder
         {
             // Feature geometry is encoded in a buffer of uints.
-            Google.Protobuf.Collections.RepeatedField<uint> data;
-            int index;
+            public Google.Protobuf.Collections.RepeatedField<uint> Data;
+            public int Position;
 
             // Geometry is encoded in integer positions from 0 to extent-1.
-            uint extent;
-            float scale;
+            public uint Extent;
+            public float Scale;
 
             // A cursor position tracks the state of geometry decoding.
-            long x;
-            long y;
+            public long X;
+            public long Y;
 
-            CommandType command;
-            int repeat;
-
-            public CommandType Command { get { return command; } }
-
-            public int Repeat { get { return repeat; } }
+            public CommandType Command;
+            public int Repeat;
 
             public GeometryDecoder(PbfFeature feature, PbfLayer layer)
             {
-                data = feature.Geometry;
-                index = 0;
-                extent = layer.Extent;
-                scale = 1.0f / (extent - 1);
-                x = 0;
-                y = 0;
-                command = CommandType.MoveTo;
-                repeat = 0;
+                Data = feature.Geometry;
+                Position = 0;
+                Extent = layer.Extent;
+                Scale = 1.0f / (Extent - 1);
+                X = 0;
+                Y = 0;
+                Command = CommandType.MoveTo;
+                Repeat = 0;
             }
 
-            public bool AdvanceCommand()
+            public void AdvanceCommand()
             {
-                if (index >= data.Count)
-                {
-                    return false;
-                }
-                uint cmd = data[index++];
+                uint commandData = Data[Position++];
                 // The 3 lowest bits of the command encode the type, the rest are the repeat count.
-                command = (CommandType)(cmd & 0x7);
-                repeat = (int)(cmd >> 3);
-                return true;
+                Command = (CommandType)(commandData & 0x7);
+                Repeat = (int)(commandData >> 3);
             }
 
-            public bool AdvanceCursor()
+            public Point AdvanceCursor()
             {
-                if (index + 1 >= data.Count)
-                {
-                    return false;
-                }
                 // For each MoveTo and LineTo repetition there are 2 parameter integers.
-                uint param0 = data[index++];
-                uint param1 = data[index++];
+                uint param0 = Data[Position++];
+                uint param1 = Data[Position++];
                 // The parameters are zigzag-encoded deltas for x and y of the cursor.
-                x += ((param0 >> 1) ^ (-(param0 & 1)));
-                y += ((param1 >> 1) ^ (-(param1 & 1)));
-                return true;
+                X += ((param0 >> 1) ^ (-(param0 & 1)));
+                Y += ((param1 >> 1) ^ (-(param1 & 1)));
+                // The coordinates are normalized and Y is flipped to match our expected axes.
+                return new Point(X * Scale, (Extent - Y) * Scale);
             }
 
-            public Point CurrentPoint()
+            public bool HasData()
             {
-                return new Point(x * scale, (extent - y) * scale);
+                return Position < Data.Count;
             }
         }
 
@@ -186,61 +181,89 @@ namespace Mapzen.VectorData.Formats
             switch (feature.Type)
             {
                 case PbfGeomType.Point:
-                    if (decoder.AdvanceCommand() && decoder.Command == CommandType.MoveTo)
+                    while (decoder.HasData())
                     {
-                        for (int i = 0; i < decoder.Repeat; i++)
+                        decoder.AdvanceCommand();
+                        Debug.Assert(decoder.Command == CommandType.MoveTo && decoder.Repeat > 0);
+                        for (int i = decoder.Repeat; i > 0; i--)
                         {
-                            decoder.AdvanceCursor();
-                            handler.OnPoint(decoder.CurrentPoint());
+                            handler.OnPoint(decoder.AdvanceCursor());
                         }
                     }
                     break;
                 case PbfGeomType.LineString:
-                    while (decoder.AdvanceCommand() && (decoder.Command == CommandType.MoveTo && decoder.Repeat == 1))
+                    while (decoder.HasData())
                     {
-                        decoder.AdvanceCursor();
-                        if (decoder.AdvanceCommand() && (decoder.Command == CommandType.LineTo && decoder.Repeat > 0))
+                        handler.OnBeginLineString();
+                        decoder.AdvanceCommand();
+                        Debug.Assert(decoder.Command == CommandType.MoveTo && decoder.Repeat == 1);
+                        handler.OnPoint(decoder.AdvanceCursor());
+                        decoder.AdvanceCommand();
+                        Debug.Assert(decoder.Command == CommandType.LineTo && decoder.Repeat > 0);
+                        for (int i = decoder.Repeat; i > 0; i--)
                         {
-                            handler.OnBeginLineString();
-                            handler.OnPoint(decoder.CurrentPoint());
-                            for (int i = 0; i < decoder.Repeat; i++)
-                            {
-                                decoder.AdvanceCursor();
-                                handler.OnPoint(decoder.CurrentPoint());
-                            }
-                            handler.OnEndLineString();
+                            handler.OnPoint(decoder.AdvanceCursor());
                         }
+                        handler.OnEndLineString();
                     }
                     break;
                 case PbfGeomType.Polygon:
-                    while (decoder.AdvanceCommand() && (decoder.Command == CommandType.MoveTo && decoder.Repeat == 1))
+                    // Create temporary storage to hold rings until we determine whether they are interior or exterior.
+                    var ring = new List<Point>();
+                    var isPolygonStarted = false;
+                    while (decoder.HasData())
                     {
-                        handler.OnBeginPolygon();
-                        decoder.AdvanceCursor();
-                        if (decoder.AdvanceCommand() && (decoder.Command == CommandType.LineTo && decoder.Repeat > 0))
+                        // Read out the coordinates of the next ring.
+                        decoder.AdvanceCommand();
+                        Debug.Assert(decoder.Command == CommandType.MoveTo && decoder.Repeat == 1);
+                        ring.Add(decoder.AdvanceCursor());
+                        decoder.AdvanceCommand();
+                        for (int i = decoder.Repeat; i > 0; i--)
                         {
-                            handler.OnBeginLinearRing();
-                            var start = decoder.CurrentPoint();
-                            handler.OnPoint(start);
-                            for (int i = 0; i < decoder.Repeat; i++)
+                            ring.Add(decoder.AdvanceCursor());
+                        }
+                        ring.Add(ring.First());
+                        decoder.AdvanceCommand();
+                        Debug.Assert(decoder.Command == CommandType.ClosePath && decoder.Repeat == 1);
+                        // If ring is exterior, end the current polygon, start a new one, add ring to new polygon.
+                        // If ring is interior, add the ring to current polygon.
+                        var area = SignedArea(ring);
+                        if (area > 0)
+                        {
+                            if (isPolygonStarted)
                             {
-                                decoder.AdvanceCursor();
-                                handler.OnPoint(decoder.CurrentPoint());
+                                handler.OnEndPolygon();
                             }
-                            handler.OnPoint(start);
-                            handler.OnEndLinearRing();
+                            handler.OnBeginPolygon();
+                            isPolygonStarted = true;
+
                         }
-                        if (decoder.AdvanceCommand() && decoder.Command == CommandType.ClosePath)
+                        handler.OnBeginLinearRing();
+                        foreach (var point in ring)
                         {
-                            // We should assert that this condition holds.
+                            handler.OnPoint(point);
                         }
-                        handler.OnEndPolygon();
+                        handler.OnEndLinearRing();
+                        ring.Clear();
                     }
+                    handler.OnEndPolygon();
                     break;
                 case PbfGeomType.Unknown:
-                    break;
+                    return false;
             }
             return true;
+        }
+
+        private float SignedArea(List<Point> ring)
+        {
+            var area = 0f;
+            var prev = ring.LastOrDefault();
+            foreach (var curr in ring)
+            {
+                area += curr.X * prev.Y - curr.Y * prev.X;
+                prev = curr;
+            }
+            return 0.5f * area;
         }
     }
 }
