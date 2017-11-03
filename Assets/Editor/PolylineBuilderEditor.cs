@@ -26,6 +26,7 @@ public class PolylineBuilderEditor : EditorBase
         defaultOptions.MaxHeight = 3.0f;
         defaultOptions.MiterLimit = 3.0f;
         defaultOptions.Width = 15.0f;
+        defaultOptions.Material = new Material(Shader.Find("Diffuse"));
 
         return defaultOptions;
     }
@@ -55,6 +56,10 @@ public class PolylineBuilderEditor : EditorBase
         options.Width = EditorGUILayout.FloatField("Width: ", options.Width);
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
         options.Extrusion = (PolygonBuilder.ExtrusionType)EditorGUILayout.EnumPopup("Extrusion type: ", options.Extrusion);
+        options.Material = EditorGUILayout.ObjectField("Material:", options.Material, typeof(Material)) as Material;
+        if (options.Material.name != "Legacy Shaders/Diffuse") {
+            int breakhere = 0;
+        }
         options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
 
         SavePreferences();

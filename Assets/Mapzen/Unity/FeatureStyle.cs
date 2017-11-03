@@ -17,9 +17,21 @@ namespace Mapzen.Unity
             [SerializeField]
             private string layerName;
 
-            public Material Material;
-            public PolygonBuilder.Options PolygonBuilderOptions;
-            public PolylineBuilder.Options PolylineBuilderOptions;
+            [Serializable]
+            public class PolygonBuilderEditorData {
+                public Guid editorGUID;
+                public PolygonBuilder.Options option;
+            }
+
+            [Serializable]
+            public class PolylineBuilderEditorData {
+                public Guid editorGUID;
+                public PolylineBuilder.Options option;
+            }
+
+            public List<PolygonBuilderEditorData> PolygonBuilderEditorDatas;
+            
+            public List<PolylineBuilderEditorData> PolylineBuilderEditorDatas;
 
             public string LayerName
             {
@@ -29,39 +41,50 @@ namespace Mapzen.Unity
             public LayerStyle(string layerName)
             {
                 this.layerName = layerName;
+                this.PolygonBuilderEditorDatas = new List<PolygonBuilderEditorData>();
+                this.PolylineBuilderEditorDatas = new List<PolylineBuilderEditorData>();
             }
 
-            public PolygonBuilder.Options GetPolygonOptions(Feature feature, float inverseTileScale)
+            public List<PolygonBuilder.Options> GetPolygonOptions(Feature feature, float inverseTileScale)
             {
-                var options = PolygonBuilderOptions;
+                List<PolygonBuilder.Options> polygonBuilderOptions = new List<PolygonBuilder.Options>();
 
-                options.Material = this.Material;
+                foreach (var editorData in PolygonBuilderEditorDatas) {
+                    var options = editorData.option;
 
-                if (options.MaxHeight > 0.0f)
-                {
-                    options.MaxHeight *= inverseTileScale;
-                }
-                else
-                {
-                    object heightValue;
-                    if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
+                    if (options.MaxHeight > 0.0f)
                     {
-                        options.MaxHeight = (float)((double)heightValue * inverseTileScale);
+                        options.MaxHeight *= inverseTileScale;
                     }
+                    else
+                    {
+                        object heightValue;
+                        if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
+                        {
+                            options.MaxHeight = (float)((double)heightValue * inverseTileScale);
+                        }
+                    }
+
+                    polygonBuilderOptions.Add(options);
                 }
 
-                return options;
+                return polygonBuilderOptions;
             }
 
-            public PolylineBuilder.Options GetPolylineOptions(Feature feature, float inverseTileScale)
+            public List<PolylineBuilder.Options> GetPolylineOptions(Feature feature, float inverseTileScale)
             {
-                var options = PolylineBuilderOptions;
+                List<PolylineBuilder.Options> polylineBuilderOptions = new List<PolylineBuilder.Options>();
 
-                options.Material = this.Material;
-                options.Width *= inverseTileScale;
-                options.MaxHeight *= inverseTileScale;
+                foreach (var editorData in PolylineBuilderEditorDatas) {
+                    var options = editorData.option;
 
-                return options;
+                    options.Width *= inverseTileScale;
+                    options.MaxHeight *= inverseTileScale;
+
+                    polylineBuilderOptions.Add(options);
+                }
+
+                return polylineBuilderOptions;
             }
         }
 

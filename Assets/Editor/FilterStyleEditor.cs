@@ -82,12 +82,7 @@ public class FilterStyleEditor : EditorBase
             }
             else
             {
-                var layerStyle = new FeatureStyle.LayerStyle(name);
-
-                // Default configuration for the layer
-                layerStyle.PolygonBuilderOptions = PolygonBuilderEditor.DefaultOptions();
-                layerStyle.PolylineBuilderOptions = PolylineBuilderEditor.DefaultOptions();
-                layerStyle.Material = new Material(Shader.Find("Diffuse"));
+                var layerStyle = new FeatureStyle.LayerStyle(name); 
 
                 filterStyle.LayerStyles.Add(layerStyle);
 

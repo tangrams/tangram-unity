@@ -24,6 +24,7 @@ public class PolygonBuilderEditor : EditorBase
         defaultOptions.Extrusion = PolygonBuilder.ExtrusionType.TopAndSides;
         defaultOptions.Enabled = true;
         defaultOptions.MaxHeight = 0.0f;
+        defaultOptions.Material = new Material(Shader.Find("Diffuse"));
 
         return defaultOptions;
     }
@@ -52,6 +53,7 @@ public class PolygonBuilderEditor : EditorBase
 
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
         options.Extrusion = (PolygonBuilder.ExtrusionType)EditorGUILayout.EnumPopup("Extrusion type: ", options.Extrusion);
+        options.Material = EditorGUILayout.ObjectField("Material:", options.Material, typeof(Material)) as Material;
         options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
 
         SavePreferences();

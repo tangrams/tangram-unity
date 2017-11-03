@@ -73,10 +73,13 @@ public class TileTask
 
                         if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                         {
-                            var polygonOptions = layerStyle.GetPolygonOptions(feature, inverseTileScale);
-
-                            if (polygonOptions.Enabled)
+                            foreach (var polygonOptions in layerStyle.GetPolygonOptions(feature, inverseTileScale)) 
                             {
+                                if (!polygonOptions.Enabled) 
+                                {
+                                    continue;
+                                }
+
                                 var builder = new PolygonBuilder(leaf.meshData, polygonOptions, transform);
                                 feature.HandleGeometry(builder);
                             }
@@ -84,10 +87,13 @@ public class TileTask
 
                         if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
                         {
-                            var polylineOptions = layerStyle.GetPolylineOptions(feature, inverseTileScale);
-
-                            if (polylineOptions.Enabled)
+                            foreach (var polylineOptions in layerStyle.GetPolylineOptions(feature, inverseTileScale)) 
                             {
+                                if (!polylineOptions.Enabled) 
+                                {
+                                    continue;
+                                }
+
                                 var builder = new PolylineBuilder(leaf.meshData, polylineOptions, transform);
                                 feature.HandleGeometry(builder);
                             }
