@@ -12,26 +12,25 @@ namespace Mapzen.Unity
     public class FeatureStyle : ScriptableObject
     {
         [Serializable]
+        public class PolygonBuilderEditorOption {
+            public Guid editorGUID;
+            public PolygonBuilder.Options option;
+        }
+
+        [Serializable]
+        public class PolylineBuilderEditorOption {
+            public Guid editorGUID;
+            public PolylineBuilder.Options option;
+        }
+
+        [Serializable]
         public class LayerStyle
         {
             [SerializeField]
             private string layerName;
 
-            [Serializable]
-            public class PolygonBuilderEditorData {
-                public Guid editorGUID;
-                public PolygonBuilder.Options option;
-            }
-
-            [Serializable]
-            public class PolylineBuilderEditorData {
-                public Guid editorGUID;
-                public PolylineBuilder.Options option;
-            }
-
-            public List<PolygonBuilderEditorData> PolygonBuilderEditorDatas;
-            
-            public List<PolylineBuilderEditorData> PolylineBuilderEditorDatas;
+            public List<PolygonBuilderEditorOption> PolygonBuilderEditorOptions;
+            public List<PolylineBuilderEditorOption> PolylineBuilderEditorOptions;
 
             public string LayerName
             {
@@ -41,16 +40,16 @@ namespace Mapzen.Unity
             public LayerStyle(string layerName)
             {
                 this.layerName = layerName;
-                this.PolygonBuilderEditorDatas = new List<PolygonBuilderEditorData>();
-                this.PolylineBuilderEditorDatas = new List<PolylineBuilderEditorData>();
+                this.PolygonBuilderEditorOptions = new List<PolygonBuilderEditorOption>();
+                this.PolylineBuilderEditorOptions = new List<PolylineBuilderEditorOption>();
             }
 
             public List<PolygonBuilder.Options> GetPolygonOptions(Feature feature, float inverseTileScale)
             {
                 List<PolygonBuilder.Options> polygonBuilderOptions = new List<PolygonBuilder.Options>();
 
-                foreach (var editorData in PolygonBuilderEditorDatas) {
-                    var options = editorData.option;
+                foreach (var editorOption in PolygonBuilderEditorOptions) {
+                    var options = editorOption.option;
 
                     if (options.MaxHeight > 0.0f)
                     {
@@ -75,8 +74,8 @@ namespace Mapzen.Unity
             {
                 List<PolylineBuilder.Options> polylineBuilderOptions = new List<PolylineBuilder.Options>();
 
-                foreach (var editorData in PolylineBuilderEditorDatas) {
-                    var options = editorData.option;
+                foreach (var editorOption in PolylineBuilderEditorOptions) {
+                    var options = editorOption.option;
 
                     options.Width *= inverseTileScale;
                     options.MaxHeight *= inverseTileScale;

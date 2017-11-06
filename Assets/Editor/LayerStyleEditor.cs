@@ -33,14 +33,14 @@ public class LayerStyleEditor : EditorBase
         this.layerStyle = layerStyle;
         this.builderEditors = new List<EditorBase>();
  
-        foreach (var editorData in layerStyle.PolygonBuilderEditorDatas)
+        foreach (var editorData in layerStyle.PolygonBuilderEditorOptions)
         {
             var editor = new PolygonBuilderEditor();
             editorData.editorGUID = editor.GUID;
             this.builderEditors.Add(editor);
         }
 
-        foreach (var editorData in layerStyle.PolylineBuilderEditorDatas)
+        foreach (var editorData in layerStyle.PolylineBuilderEditorOptions)
         {
             var editor = new PolylineBuilderEditor();
             editorData.editorGUID = editor.GUID;
@@ -62,19 +62,23 @@ public class LayerStyleEditor : EditorBase
                 {
                     case BuilderType.polygon: {
                         editor = new PolygonBuilderEditor();
-                        FeatureStyle.LayerStyle.PolygonBuilderEditorData editorData 
-                            = new FeatureStyle.LayerStyle.PolygonBuilderEditorData();
-                        editorData.editorGUID = editor.GUID;
-                        editorData.option = PolygonBuilderEditor.DefaultOptions();
-                        layerStyle.PolygonBuilderEditorDatas.Add(editorData);
+
+                        var editorOption = new FeatureStyle.PolygonBuilderEditorOption();
+
+                        editorOption.editorGUID = editor.GUID;
+                        editorOption.option = PolygonBuilderEditor.DefaultOptions();
+
+                        layerStyle.PolygonBuilderEditorOptions.Add(editorOption);
                     } break;
                     case BuilderType.polyline: {
                         editor = new PolylineBuilderEditor();
-                        FeatureStyle.LayerStyle.PolylineBuilderEditorData editorData 
-                            = new FeatureStyle.LayerStyle.PolylineBuilderEditorData();
-                        editorData.editorGUID = editor.GUID;
-                        editorData.option = PolylineBuilderEditor.DefaultOptions();
-                        layerStyle.PolylineBuilderEditorDatas.Add(editorData);
+
+                        var editorOption = new FeatureStyle.PolylineBuilderEditorOption();
+
+                        editorOption.editorGUID = editor.GUID;
+                        editorOption.option = PolylineBuilderEditor.DefaultOptions();
+
+                        layerStyle.PolylineBuilderEditorOptions.Add(editorOption);
                      } break;
                 }
                 
@@ -85,20 +89,20 @@ public class LayerStyleEditor : EditorBase
         EditorGUILayout.EndHorizontal();
 
         EditorGUI.indentLevel++;
-        foreach (var builderEditor in builderEditors) 
+        foreach (var builderEditor in builderEditors)
         {
-            if (builderEditor is PolygonBuilderEditor) 
+            if (builderEditor is PolygonBuilderEditor)
             {
-                var editorData = layerStyle.PolygonBuilderEditorDatas.Find(data => data.editorGUID == builderEditor.GUID);
-                if (editorData != null) {
-                    editorData.option = ((PolygonBuilderEditor)builderEditor).OnInspectorGUI(editorData.option);
+                var editorOption = layerStyle.PolygonBuilderEditorOptions.Find(data => data.editorGUID == builderEditor.GUID);
+                if (editorOption != null) {
+                    editorOption.option = ((PolygonBuilderEditor)builderEditor).OnInspectorGUI(editorOption.option);
                 }
-            } 
+            }
             else if (builderEditor is PolylineBuilderEditor)
             {
-                var editorData = layerStyle.PolylineBuilderEditorDatas.Find(data => data.editorGUID == builderEditor.GUID);
-                if (editorData != null) {
-                    editorData.option = ((PolylineBuilderEditor)builderEditor).OnInspectorGUI(editorData.option);
+                var editorOption = layerStyle.PolylineBuilderEditorOptions.Find(data => data.editorGUID == builderEditor.GUID);
+                if (editorOption != null) {
+                    editorOption.option = ((PolylineBuilderEditor)builderEditor).OnInspectorGUI(editorOption.option);
                 }
             }
         }
