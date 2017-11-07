@@ -17,7 +17,7 @@ namespace Mapzen.Unity
         }
 
         [Serializable]
-        public struct Options
+        public class Options
         {
             public Material Material;
             public ExtrusionType Extrusion;
@@ -26,16 +26,20 @@ namespace Mapzen.Unity
             public bool Enabled;
         }
 
-        public PolygonBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)
+        public PolygonBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform, float inverseTileScale, float featureHeight)
         {
             this.transform = transform;
             this.outputMeshData = outputMeshData;
             this.options = options;
+            this.inverseTileScale = inverseTileScale;
+            this.featureHeight = featureHeight;
         }
 
         private Matrix4x4 transform;
         private MeshData outputMeshData;
-        private Options options;
+        private readonly Options options;
+        private float inverseTileScale;
+        private float featureHeight;
 
         // Values for the tesselator.
         private List<float> coordinates = new List<float>();
@@ -50,11 +54,34 @@ namespace Mapzen.Unity
         private List<Vector2> polygonUVs = new List<Vector2>();
         private List<int> extrusionIndices = new List<int>();
 
+        private float GetMinHeight()
+        {
+            float minHeight = 0.0f;
+            if (options.MinHeight != 0.0f)
+            {
+                minHeight = options.MinHeight * inverseTileScale;
+            }
+            return minHeight;
+        }
+
+        private float GetMaxHeight()
+        {
+            float maxHeight = featureHeight * inverseTileScale;
+            if (options.MaxHeight != 0.0f)
+            {
+                maxHeight = options.MaxHeight * inverseTileScale;
+            }
+            return maxHeight;
+        }
+
         public void OnPoint(Point point)
         {
             bool buildWalls =
                 options.Extrusion == ExtrusionType.TopAndSides ||
                 options.Extrusion == ExtrusionType.SidesOnly;
+
+            float minHeight = GetMinHeight();
+            float maxHeight = GetMaxHeight();
 
             // For all but the first point in each ring, create a quad extending from the
             // previous point to the current point and from MinHeight to MaxHeight.
@@ -65,10 +92,10 @@ namespace Mapzen.Unity
 
                 var indexOffset = extrusionVertices.Count;
 
-                var v0 = new Vector3(p0.X, options.MaxHeight, p0.Y);
-                var v1 = new Vector3(p1.X, options.MaxHeight, p1.Y);
-                var v2 = new Vector3(p0.X, options.MinHeight, p0.Y);
-                var v3 = new Vector3(p1.X, options.MinHeight, p1.Y);
+                var v0 = new Vector3(p0.X, maxHeight, p0.Y);
+                var v1 = new Vector3(p1.X, maxHeight, p1.Y);
+                var v2 = new Vector3(p0.X, minHeight, p0.Y);
+                var v3 = new Vector3(p1.X, minHeight, p1.Y);
 
                 v0 = this.transform.MultiplyPoint(v0);
                 v1 = this.transform.MultiplyPoint(v1);
@@ -145,6 +172,8 @@ namespace Mapzen.Unity
 
         public void OnEndPolygon()
         {
+            float maxHeight = GetMaxHeight();
+
             // First add vertices and indices for extrusions.
             outputMeshData.AddElements(extrusionVertices, extrusionUVs, extrusionIndices, options.Material);
 
@@ -172,7 +201,7 @@ namespace Mapzen.Unity
 
                 for (int i = 0; i < coordinates.Count; i += 2)
                 {
-                    var v = new Vector3(coordinates[i], options.MaxHeight, coordinates[i + 1]);
+                    var v = new Vector3(coordinates[i], maxHeight, coordinates[i + 1]);
                     v = this.transform.MultiplyPoint(v);
                     vertices.Add(v);
                 }
