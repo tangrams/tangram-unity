@@ -5,107 +5,80 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 
-[SerializeField]
-public class LayerStyleEditor : EditorBase
+namespace PluginEditor
 {
-    private enum BuilderType {
-        polygon,
-        polyline,
-    };
-
     [SerializeField]
-    private List<EditorBase> builderEditors;
-
-    [SerializeField]
-    private FeatureStyle.LayerStyle layerStyle;
-
-    [SerializeField]
-    private BuilderType selectedBuilderType;
-
-    public FeatureStyle.LayerStyle LayerStyle
+    public class LayerStyleEditor : EditorBase
     {
-        get { return layerStyle; }
-    }
+        private enum BuilderType {
+            polygon,
+            polyline,
+        };
 
-    public LayerStyleEditor(FeatureStyle.LayerStyle layerStyle)
-        : base()
-    {
-        this.layerStyle = layerStyle;
-        this.builderEditors = new List<EditorBase>();
- 
-        foreach (var editorData in layerStyle.PolygonBuilderEditorOptions)
+        [SerializeField]
+        private List<IEditor> builderEditors;
+
+        [SerializeField]
+        private FeatureStyle.LayerStyle layerStyle;
+
+        [SerializeField]
+        private BuilderType selectedBuilderType;
+
+        public FeatureStyle.LayerStyle LayerStyle
         {
-            var editor = new PolygonBuilderEditor();
-            editorData.editorGUID = editor.GUID;
-            this.builderEditors.Add(editor);
+            get { return layerStyle; }
         }
 
-        foreach (var editorData in layerStyle.PolylineBuilderEditorOptions)
+        public LayerStyleEditor(FeatureStyle.LayerStyle layerStyle)
+            : base()
         {
-            var editor = new PolylineBuilderEditor();
-            editorData.editorGUID = editor.GUID;
-            this.builderEditors.Add(editor);
-        }
-    }
+            this.layerStyle = layerStyle;
+            this.builderEditors = new List<IEditor>();
 
-    public void OnInspectorGUI()
-    {
-        EditorGUILayout.BeginHorizontal();
-        {
-            selectedBuilderType = (BuilderType)EditorGUILayout.EnumPopup("Add builder", selectedBuilderType);
-
-            EditorConfig.SetColor(EditorConfig.AddButtonColor);
-            if (GUILayout.Button(EditorConfig.AddButtonContent, EditorConfig.SmallButtonWidth))
+            foreach (var options in layerStyle.PolygonBuilderOptions)
             {
-                EditorBase editor = null;
-                switch (selectedBuilderType) 
+                this.builderEditors.Add(new PolygonBuilderEditor(options));
+            }
+
+            foreach (var options in layerStyle.PolylineBuilderOptions)
+            {
+                this.builderEditors.Add(new PolylineBuilderEditor(options));
+            }
+        }
+
+        public override void OnInspectorGUI()
+        {
+            EditorGUILayout.BeginHorizontal();
+            {
+                selectedBuilderType = (BuilderType)EditorGUILayout.EnumPopup("Add builder", selectedBuilderType);
+
+                EditorConfig.SetColor(EditorConfig.AddButtonColor);
+                if (GUILayout.Button(EditorConfig.AddButtonContent, EditorConfig.SmallButtonWidth))
                 {
-                    case BuilderType.polygon: {
-                        editor = new PolygonBuilderEditor();
-
-                        var editorOption = new FeatureStyle.PolygonBuilderEditorOption();
-
-                        editorOption.editorGUID = editor.GUID;
-                        editorOption.option = PolygonBuilderEditor.DefaultOptions();
-
-                        layerStyle.PolygonBuilderEditorOptions.Add(editorOption);
-                    } break;
-                    case BuilderType.polyline: {
-                        editor = new PolylineBuilderEditor();
-
-                        var editorOption = new FeatureStyle.PolylineBuilderEditorOption();
-
-                        editorOption.editorGUID = editor.GUID;
-                        editorOption.option = PolylineBuilderEditor.DefaultOptions();
-
-                        layerStyle.PolylineBuilderEditorOptions.Add(editorOption);
-                     } break;
+                    switch (selectedBuilderType)
+                    {
+                        case BuilderType.polygon: {
+                            var editor = new PolygonBuilderEditor();
+                            layerStyle.PolygonBuilderOptions.Add(editor.Options);
+                            builderEditors.Add(editor);
+                        } break;
+                        case BuilderType.polyline: {
+                            var editor = new PolylineBuilderEditor();
+                            layerStyle.PolylineBuilderOptions.Add(editor.Options);
+                            builderEditors.Add(editor);
+                        } break;
+                    }
                 }
-                
-                builderEditors.Add(editor);
+                EditorConfig.ResetColor();
             }
-            EditorConfig.ResetColor();
-        }
-        EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndHorizontal();
 
-        EditorGUI.indentLevel++;
-        foreach (var builderEditor in builderEditors)
-        {
-            if (builderEditor is PolygonBuilderEditor)
+            EditorGUI.indentLevel++;
+            foreach (var builderEditor in builderEditors)
             {
-                var editorOption = layerStyle.PolygonBuilderEditorOptions.Find(data => data.editorGUID == builderEditor.GUID);
-                if (editorOption != null) {
-                    editorOption.option = ((PolygonBuilderEditor)builderEditor).OnInspectorGUI(editorOption.option);
-                }
+                builderEditor.OnInspectorGUI();
             }
-            else if (builderEditor is PolylineBuilderEditor)
-            {
-                var editorOption = layerStyle.PolylineBuilderEditorOptions.Find(data => data.editorGUID == builderEditor.GUID);
-                if (editorOption != null) {
-                    editorOption.option = ((PolylineBuilderEditor)builderEditor).OnInspectorGUI(editorOption.option);
-                }
-            }
+            EditorGUI.indentLevel--;
         }
-        EditorGUI.indentLevel--;
     }
 }

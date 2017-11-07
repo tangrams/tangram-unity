@@ -5,59 +5,67 @@ using System.Linq;
 using Mapzen.Unity;
 using System;
 
-[Serializable]
-public class PolygonBuilderEditor : EditorBase
+namespace PluginEditor
 {
-    [SerializeField]
-    private bool show;
-
-    public PolygonBuilderEditor()
-        : base()
+    [Serializable]
+    public class PolygonBuilderEditor : EditorBase
     {
-        this.show = false;
-    }
+        [SerializeField]
+        private bool show;
 
-    public static PolygonBuilder.Options DefaultOptions()
-    {
-        var defaultOptions = new PolygonBuilder.Options();
+        [SerializeField]
+        private PolygonBuilder.Options options;
 
-        defaultOptions.Extrusion = PolygonBuilder.ExtrusionType.TopAndSides;
-        defaultOptions.Enabled = true;
-        defaultOptions.MaxHeight = 0.0f;
-        defaultOptions.Material = new Material(Shader.Find("Diffuse"));
-
-        return defaultOptions;
-    }
-
-    private void LoadPreferences()
-    {
-        show = EditorPrefs.GetBool(guid + ".show");
-    }
-
-    private void SavePreferences()
-    {
-        EditorPrefs.SetBool(guid + ".show", show);
-    }
-
-    public PolygonBuilder.Options OnInspectorGUI(PolygonBuilder.Options options)
-    {
-        LoadPreferences();
-
-        show = EditorGUILayout.Foldout(show, "Polygon builder options");
-
-        if (!show)
+        public PolygonBuilder.Options Options
         {
-            SavePreferences();
-            return options;
+            get { return options; }
         }
 
-        options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
-        options.Extrusion = (PolygonBuilder.ExtrusionType)EditorGUILayout.EnumPopup("Extrusion type: ", options.Extrusion);
-        options.Material = EditorGUILayout.ObjectField("Material:", options.Material, typeof(Material)) as Material;
-        options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
+        public PolygonBuilderEditor(PolygonBuilder.Options options)
+            : base()
+        {
+            this.show = false;
+            this.options = options;
+        }
 
-        SavePreferences();
+        public PolygonBuilderEditor()
+            : base()
+        {
+            this.show = false;
+            this.options = new PolygonBuilder.Options();
+            this.options.Extrusion = PolygonBuilder.ExtrusionType.TopAndSides;
+            this.options.Enabled = true;
+            this.options.MaxHeight = 0.0f;
+            this.options.Material = new Material(Shader.Find("Diffuse"));
+        }
 
-        return options;
+        private void LoadPreferences()
+        {
+            show = EditorPrefs.GetBool(guid + ".show");
+        }
+
+        private void SavePreferences()
+        {
+            EditorPrefs.SetBool(guid + ".show", show);
+        }
+
+        public override void OnInspectorGUI()
+        {
+            LoadPreferences();
+
+            show = EditorGUILayout.Foldout(show, "Polygon builder options");
+
+            if (!show)
+            {
+                SavePreferences();
+            }
+
+            options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
+            options.Extrusion = (PolygonBuilder.ExtrusionType)EditorGUILayout.EnumPopup("Extrusion type: ", options.Extrusion);
+            options.Material = EditorGUILayout.ObjectField("Material:", options.Material, typeof(Material)) as Material;
+            options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
+
+            SavePreferences();
+        }
     }
 }

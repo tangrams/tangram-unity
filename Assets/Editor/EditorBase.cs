@@ -1,20 +1,25 @@
 ﻿using System;
 
-/// <summary>
-/// Base class for editor, each editor has a unique guid used
-/// for saving custom preferences in the Unity editor prefs.
-/// </summary>
-public class EditorBase
+namespace PluginEditor
 {
-    protected Guid guid;
-
-    public EditorBase()
+    /// <summary>
+    /// Base class for editor, each editor has a unique guid used
+    /// for saving custom preferences in the Unity editor prefs.
+    /// </summary>
+    public abstract class EditorBase : IEditor
     {
-        guid = Guid.NewGuid();
-    }
+        protected Guid guid;
 
-    public Guid GUID
-    {
-        get { return guid; }
+        public EditorBase()
+        {
+            guid = Guid.NewGuid();
+        }
+
+        public Guid GUID
+        {
+            get { return guid; }
+        }
+
+        public abstract void OnInspectorGUI();
     }
 }

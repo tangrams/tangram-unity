@@ -5,65 +5,70 @@ using Mapzen.Unity;
 using System.Linq;
 using System;
 
-[Serializable]
-public class PolylineBuilderEditor : EditorBase
+namespace PluginEditor
 {
-    [SerializeField]
-    private bool show;
-
-    public PolylineBuilderEditor()
-        : base()
+    [Serializable]
+    public class PolylineBuilderEditor : EditorBase
     {
-        this.show = false;
-    }
+        [SerializeField]
+        private bool show;
 
-    public static PolylineBuilder.Options DefaultOptions()
-    {
-        var defaultOptions = new PolylineBuilder.Options();
+        [SerializeField]
+        private PolylineBuilder.Options options;
 
-        defaultOptions.Extrusion = PolygonBuilder.ExtrusionType.TopAndSides;
-        defaultOptions.Enabled = true;
-        defaultOptions.MaxHeight = 3.0f;
-        defaultOptions.MiterLimit = 3.0f;
-        defaultOptions.Width = 15.0f;
-        defaultOptions.Material = new Material(Shader.Find("Diffuse"));
-
-        return defaultOptions;
-    }
-
-    private void LoadPreferences()
-    {
-        show = EditorPrefs.GetBool(guid + ".show");
-    }
-
-    private void SavePreferences()
-    {
-        EditorPrefs.SetBool(guid + ".show", show);
-    }
-
-    public PolylineBuilder.Options OnInspectorGUI(PolylineBuilder.Options options)
-    {
-        LoadPreferences();
-
-        show = EditorGUILayout.Foldout(show, "Polyline builder options");
-
-        if (!show)
+        public PolylineBuilder.Options Options
         {
+            get { return options; }
+        }
+
+        public PolylineBuilderEditor(PolylineBuilder.Options options)
+            : base()
+        {
+            this.show = false;
+            this.options = options;
+        }
+
+        public PolylineBuilderEditor()
+            : base()
+        {
+            this.show = false;
+            this.options = new PolylineBuilder.Options();
+            this.options.Extrusion = PolygonBuilder.ExtrusionType.TopAndSides;
+            this.options.Enabled = true;
+            this.options.MaxHeight = 3.0f;
+            this.options.MiterLimit = 3.0f;
+            this.options.Width = 15.0f;
+            this.options.Material = new Material(Shader.Find("Diffuse"));
+        }
+
+        private void LoadPreferences()
+        {
+            show = EditorPrefs.GetBool(guid + ".show");
+        }
+
+        private void SavePreferences()
+        {
+            EditorPrefs.SetBool(guid + ".show", show);
+        }
+
+        public override void OnInspectorGUI()
+        {
+            LoadPreferences();
+
+            show = EditorGUILayout.Foldout(show, "Polyline builder options");
+
+            if (!show)
+            {
+                SavePreferences();
+            }
+
+            options.Width = EditorGUILayout.FloatField("Width: ", options.Width);
+            options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
+            options.Extrusion = (PolygonBuilder.ExtrusionType)EditorGUILayout.EnumPopup("Extrusion type: ", options.Extrusion);
+            options.Material = EditorGUILayout.ObjectField("Material:", options.Material, typeof(Material)) as Material;
+            options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
+
             SavePreferences();
-            return options;
         }
-
-        options.Width = EditorGUILayout.FloatField("Width: ", options.Width);
-        options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
-        options.Extrusion = (PolygonBuilder.ExtrusionType)EditorGUILayout.EnumPopup("Extrusion type: ", options.Extrusion);
-        options.Material = EditorGUILayout.ObjectField("Material:", options.Material, typeof(Material)) as Material;
-        if (options.Material.name != "Legacy Shaders/Diffuse") {
-            int breakhere = 0;
-        }
-        options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
-
-        SavePreferences();
-
-        return options;
     }
 }

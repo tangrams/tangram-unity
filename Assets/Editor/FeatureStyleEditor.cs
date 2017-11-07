@@ -4,28 +4,31 @@ using System;
 using Mapzen;
 using Mapzen.Unity;
 
-[CustomEditor(typeof(FeatureStyle))]
-public class FeatureStyleEditor : Editor
+namespace PluginEditor
 {
-    private FeatureStyle featureStyle;
-    private StyleEditor styleEditor;
-
-    void OnEnable()
+    [CustomEditor(typeof(FeatureStyle))]
+    public class FeatureStyleEditor : Editor
     {
-        featureStyle = (FeatureStyle)target;
-        styleEditor = featureStyle.Editor as StyleEditor;
+        private FeatureStyle featureStyle;
+        private StyleEditor styleEditor;
 
-        if (styleEditor == null)
+        void OnEnable()
         {
-            styleEditor = new StyleEditor(featureStyle);
-            featureStyle.Editor = styleEditor;
+            featureStyle = (FeatureStyle)target;
+            styleEditor = featureStyle.Editor as StyleEditor;
+
+            if (styleEditor == null)
+            {
+                styleEditor = new StyleEditor(featureStyle);
+                featureStyle.Editor = styleEditor;
+            }
         }
-    }
 
-    public override void OnInspectorGUI()
-    {
-        styleEditor.OnInspectorGUI();
+        public override void OnInspectorGUI()
+        {
+            styleEditor.OnInspectorGUI();
 
-        EditorUtility.SetDirty(featureStyle);
+            EditorUtility.SetDirty(featureStyle);
+        }
     }
 }

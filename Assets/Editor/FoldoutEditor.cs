@@ -2,53 +2,56 @@
 using UnityEditor;
 using UnityEngine;
 
-public class FoldoutEditor
+namespace PluginEditor
 {
-    public class State
+    public class FoldoutEditor
     {
-        // Whether the foldout panel is shown
-        public bool show;
-        // Whether the foldout panel is marked for deletion
-        public bool markedForDeletion;
-
-        public State()
+        public class State
         {
-            this.markedForDeletion = false;
-            this.show = false;
-        }
-    }
+            // Whether the foldout panel is shown
+            public bool show;
+            // Whether the foldout panel is marked for deletion
+            public bool markedForDeletion;
 
-    public static bool LoadPreferences(string editorIdentifier)
-    {
-        return EditorPrefs.GetBool(editorIdentifier + ".show");
-    }
-
-    public static void SavePrefences(string editorIdentifier, bool show)
-    {
-        EditorPrefs.SetBool(editorIdentifier + ".show", show);
-    }
-
-    public static State OnInspectorGUI(string editorIdentifier, string foldoutName)
-    {
-        var state = new State();
-
-        state.show = LoadPreferences(editorIdentifier);
-
-        EditorGUILayout.BeginHorizontal();
-        {
-            state.show = EditorGUILayout.Foldout(state.show, foldoutName);
-
-            EditorConfig.SetColor(EditorConfig.RemoveButtonColor);
-            if (GUILayout.Button(EditorConfig.RemoveButtonContent, EditorConfig.SmallButtonWidth))
+            public State()
             {
-                state.markedForDeletion = true;
+                this.markedForDeletion = false;
+                this.show = false;
             }
-            EditorConfig.ResetColor();
         }
-        EditorGUILayout.EndHorizontal();
 
-        SavePrefences(editorIdentifier, state.show);
+        public static bool LoadPreferences(string editorIdentifier)
+        {
+            return EditorPrefs.GetBool(editorIdentifier + ".show");
+        }
 
-        return state;
+        public static void SavePrefences(string editorIdentifier, bool show)
+        {
+            EditorPrefs.SetBool(editorIdentifier + ".show", show);
+        }
+
+        public static State OnInspectorGUI(string editorIdentifier, string foldoutName)
+        {
+            var state = new State();
+
+            state.show = LoadPreferences(editorIdentifier);
+
+            EditorGUILayout.BeginHorizontal();
+            {
+                state.show = EditorGUILayout.Foldout(state.show, foldoutName);
+
+                EditorConfig.SetColor(EditorConfig.RemoveButtonColor);
+                if (GUILayout.Button(EditorConfig.RemoveButtonContent, EditorConfig.SmallButtonWidth))
+                {
+                    state.markedForDeletion = true;
+                }
+                EditorConfig.ResetColor();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            SavePrefences(editorIdentifier, state.show);
+
+            return state;
+        }
     }
 }
