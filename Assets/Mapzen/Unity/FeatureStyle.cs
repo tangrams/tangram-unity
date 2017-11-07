@@ -68,7 +68,7 @@ namespace Mapzen.Unity
         [Serializable]
         public class Matcher
         {
-            public enum Type
+            public enum MatcherType
             {
                 None,
                 AllOf,
@@ -81,7 +81,7 @@ namespace Mapzen.Unity
             }
 
             [SerializeField]
-            private Type type;
+            private MatcherType type;
 
             [SerializeField]
             private List<Matcher> matchers;
@@ -96,7 +96,7 @@ namespace Mapzen.Unity
 
             public bool IsCompound()
             {
-                return type == Type.AllOf || type == Type.NoneOf || type == Type.AnyOf;
+                return type == MatcherType.AllOf || type == MatcherType.NoneOf || type == MatcherType.AnyOf;
             }
 
             public List<Matcher> Matchers
@@ -123,13 +123,13 @@ namespace Mapzen.Unity
 
                     switch (type)
                     {
-                        case FeatureStyle.Matcher.Type.AllOf:
+                        case MatcherType.AllOf:
                             matcher = FeatureMatcher.AllOf(predicates.ToArray());
                             break;
-                        case FeatureStyle.Matcher.Type.NoneOf:
+                        case FeatureStyle.Matcher.MatcherType.NoneOf:
                             matcher = FeatureMatcher.NoneOf(predicates.ToArray());
                             break;
-                        case FeatureStyle.Matcher.Type.AnyOf:
+                        case FeatureStyle.Matcher.MatcherType.AnyOf:
                             matcher = FeatureMatcher.AnyOf(predicates.ToArray());
                             break;
                     }
@@ -138,19 +138,19 @@ namespace Mapzen.Unity
                 {
                     switch (type)
                     {
-                        case FeatureStyle.Matcher.Type.PropertyRange:
+                        case MatcherType.PropertyRange:
                             double? min = MinRangeEnabled ? (double)MinRange : (double?)null;
                             double? max = MaxRangeEnabled ? (double)MaxRange : (double?)null;
 
                             matcher = FeatureMatcher.HasPropertyInRange(HasProperty, min, max);
                             break;
-                        case FeatureStyle.Matcher.Type.Property:
+                        case MatcherType.Property:
                             matcher = FeatureMatcher.HasProperty(HasProperty);
                             break;
-                        case FeatureStyle.Matcher.Type.PropertyValue:
+                        case MatcherType.PropertyValue:
                             matcher = FeatureMatcher.HasPropertyWithValue(HasProperty, PropertyValue);
                             break;
-                        case FeatureStyle.Matcher.Type.PropertyRegex:
+                        case MatcherType.PropertyRegex:
                             try
                             {
                                 matcher = FeatureMatcher.HasPropertyWithRegex(HasProperty, RegexPattern);
@@ -166,12 +166,12 @@ namespace Mapzen.Unity
                 return matcher;
             }
 
-            public Type MatcherType
+            public MatcherType Type
             {
                 get { return type; }
             }
 
-            public Matcher(Type type)
+            public Matcher(MatcherType type)
             {
                 this.matchers = new List<Matcher>();
                 this.type = type;

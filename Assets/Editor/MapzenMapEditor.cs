@@ -51,7 +51,7 @@ public class MapzenMapEditor : Editor
         SavePreferences();
     }
 
-    private void SceneGroupToggle(MapzenMap mapzenMap, SceneGroup.Type type)
+    private void SceneGroupToggle(MapzenMap mapzenMap, SceneGroup.GroupType type)
     {
         bool isSet = SceneGroup.Test(type, mapzenMap.GroupOptions);
         isSet = EditorGUILayout.Toggle(type.ToString(), isSet);
@@ -74,13 +74,13 @@ public class MapzenMapEditor : Editor
         EditorGUI.indentLevel++;
 
         EditorGUILayout.BeginHorizontal();
-        SceneGroupToggle(mapzenMap, SceneGroup.Type.Feature);
-        SceneGroupToggle(mapzenMap, SceneGroup.Type.Filter);
+        SceneGroupToggle(mapzenMap, SceneGroup.GroupType.Feature);
+        SceneGroupToggle(mapzenMap, SceneGroup.GroupType.Filter);
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
-        SceneGroupToggle(mapzenMap, SceneGroup.Type.Layer);
-        SceneGroupToggle(mapzenMap, SceneGroup.Type.Tile);
+        SceneGroupToggle(mapzenMap, SceneGroup.GroupType.Layer);
+        SceneGroupToggle(mapzenMap, SceneGroup.GroupType.Tile);
         EditorGUILayout.EndHorizontal();
 
         EditorGUI.indentLevel--;

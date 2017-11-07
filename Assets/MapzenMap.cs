@@ -33,7 +33,7 @@ public class MapzenMap : MonoBehaviour
 
     [HideInInspector]
     [SerializeField]
-    private SceneGroup.Type groupOptions;
+    private SceneGroup.GroupType groupOptions;
 
     [HideInInspector]
     [SerializeField]
@@ -52,7 +52,7 @@ public class MapzenMap : MonoBehaviour
         tasks.Clear();
         nTasksForArea = 0;
 
-        regionMap = new SceneGroup(SceneGroup.Type.None, RegionName);
+        regionMap = new SceneGroup(SceneGroup.GroupType.None, RegionName);
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -142,7 +142,7 @@ public class MapzenMap : MonoBehaviour
         set { regionScaleRatio = value; }
     }
 
-    public SceneGroup.Type GroupOptions
+    public SceneGroup.GroupType GroupOptions
     {
         get { return groupOptions; }
         set { groupOptions = value; }
