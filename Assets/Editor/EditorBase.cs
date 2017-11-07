@@ -9,10 +9,17 @@ namespace PluginEditor
     public abstract class EditorBase : IEditor
     {
         protected Guid guid;
+        public string Name;
 
         public EditorBase()
         {
-            guid = Guid.NewGuid();
+            this.guid = Guid.NewGuid();
+        }
+
+        public EditorBase(string name)
+        {
+            this.Name = name;
+            this.guid = Guid.NewGuid();
         }
 
         public Guid GUID

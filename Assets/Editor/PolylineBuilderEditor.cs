@@ -11,27 +11,24 @@ namespace PluginEditor
     public class PolylineBuilderEditor : EditorBase
     {
         [SerializeField]
-        private bool show;
-
-        [SerializeField]
         private PolylineBuilder.Options options;
+
+        public int OptionIndex;
 
         public PolylineBuilder.Options Options
         {
             get { return options; }
         }
 
-        public PolylineBuilderEditor(PolylineBuilder.Options options)
-            : base()
+        public PolylineBuilderEditor(PolylineBuilder.Options options, string name)
+            : base(name)
         {
-            this.show = false;
             this.options = options;
         }
 
-        public PolylineBuilderEditor()
-            : base()
+        public PolylineBuilderEditor(string name)
+            : base(name)
         {
-            this.show = false;
             this.options = new PolylineBuilder.Options();
             this.options.Extrusion = PolygonBuilder.ExtrusionType.TopAndSides;
             this.options.Enabled = true;
@@ -41,34 +38,13 @@ namespace PluginEditor
             this.options.Material = new Material(Shader.Find("Diffuse"));
         }
 
-        private void LoadPreferences()
-        {
-            show = EditorPrefs.GetBool(guid + ".show");
-        }
-
-        private void SavePreferences()
-        {
-            EditorPrefs.SetBool(guid + ".show", show);
-        }
-
         public override void OnInspectorGUI()
         {
-            LoadPreferences();
-
-            show = EditorGUILayout.Foldout(show, "Polyline builder options");
-
-            if (!show)
-            {
-                SavePreferences();
-            }
-
             options.Width = EditorGUILayout.FloatField("Width: ", options.Width);
             options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
             options.Extrusion = (PolygonBuilder.ExtrusionType)EditorGUILayout.EnumPopup("Extrusion type: ", options.Extrusion);
             options.Material = EditorGUILayout.ObjectField("Material:", options.Material, typeof(Material)) as Material;
             options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
-
-            SavePreferences();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace PluginEditor
         };
 
         [SerializeField]
-        private List<IEditor> builderEditors;
+        private List<EditorBase> builderEditors;
 
         [SerializeField]
         private FeatureStyle.LayerStyle layerStyle;
@@ -33,16 +33,16 @@ namespace PluginEditor
             : base()
         {
             this.layerStyle = layerStyle;
-            this.builderEditors = new List<IEditor>();
+            this.builderEditors = new List<EditorBase>();
 
             foreach (var options in layerStyle.PolygonBuilderOptions)
             {
-                this.builderEditors.Add(new PolygonBuilderEditor(options));
+                this.builderEditors.Add(new PolygonBuilderEditor(options, "Polygon builder options"));
             }
 
             foreach (var options in layerStyle.PolylineBuilderOptions)
             {
-                this.builderEditors.Add(new PolylineBuilderEditor(options));
+                this.builderEditors.Add(new PolylineBuilderEditor(options, "Polyline builder options"));
             }
         }
 
@@ -58,12 +58,14 @@ namespace PluginEditor
                     switch (selectedBuilderType)
                     {
                         case BuilderType.polygon: {
-                            var editor = new PolygonBuilderEditor();
+                            var editor = new PolygonBuilderEditor("Polygon builder options");
+                            editor.OptionIndex = layerStyle.PolygonBuilderOptions.Count;
                             layerStyle.PolygonBuilderOptions.Add(editor.Options);
                             builderEditors.Add(editor);
                         } break;
                         case BuilderType.polyline: {
-                            var editor = new PolylineBuilderEditor();
+                            var editor = new PolylineBuilderEditor("Polyline builder options");
+                            editor.OptionIndex = layerStyle.PolylineBuilderOptions.Count;
                             layerStyle.PolylineBuilderOptions.Add(editor.Options);
                             builderEditors.Add(editor);
                         } break;
@@ -74,9 +76,28 @@ namespace PluginEditor
             EditorGUILayout.EndHorizontal();
 
             EditorGUI.indentLevel++;
-            foreach (var builderEditor in builderEditors)
+            for (int i = builderEditors.Count - 1; i >= 0; --i)
             {
-                builderEditor.OnInspectorGUI();
+                var editor = builderEditors[i];
+                var state = FoldoutEditor.OnInspectorGUI(editor.GUID.ToString(), editor.Name);
+
+                if (state.show)
+                {
+                    editor.OnInspectorGUI();
+                }
+
+                if (state.markedForDeletion)
+                {
+                    // Remove the editor and its associated options
+                    builderEditors.RemoveAt(i);
+
+                    if (editor is PolygonBuilderEditor)
+                        layerStyle.PolygonBuilderOptions.RemoveAt((
+                            (PolygonBuilderEditor)editor).OptionIndex);
+                    else if (editor is PolylineBuilderEditor)
+                        layerStyle.PolylineBuilderOptions.RemoveAt((
+                            (PolylineBuilderEditor)editor).OptionIndex);
+                }
             }
             EditorGUI.indentLevel--;
         }
