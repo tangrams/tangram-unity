@@ -75,7 +75,7 @@ public class TileTask
 
                         if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
                         {
-                            featureHeight = (float)heightValue;
+                            featureHeight = (float)((double)heightValue);
                         }
 
                         if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)

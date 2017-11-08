@@ -6,19 +6,12 @@ namespace PluginEditor
     /// Base class for editor, each editor has a unique guid used
     /// for saving custom preferences in the Unity editor prefs.
     /// </summary>
-    public abstract class EditorBase : IEditor
+    public abstract class EditorBase
     {
-        protected Guid guid;
-        public string Name;
+        protected Guid guid; 
 
         public EditorBase()
         {
-            this.guid = Guid.NewGuid();
-        }
-
-        public EditorBase(string name)
-        {
-            this.Name = name;
             this.guid = Guid.NewGuid();
         }
 

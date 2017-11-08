@@ -10,19 +10,14 @@ namespace PluginEditor
     [SerializeField]
     public class LayerStyleEditor : EditorBase
     {
-        private enum BuilderType {
-            polygon,
-            polyline,
-        };
-
         [SerializeField]
-        private List<EditorBase> builderEditors;
+        private List<BuilderEditor> builderEditors;
 
         [SerializeField]
         private FeatureStyle.LayerStyle layerStyle;
 
         [SerializeField]
-        private BuilderType selectedBuilderType;
+        private BuilderEditor.BuilderType selectedBuilderType;
 
         public FeatureStyle.LayerStyle LayerStyle
         {
@@ -33,16 +28,16 @@ namespace PluginEditor
             : base()
         {
             this.layerStyle = layerStyle;
-            this.builderEditors = new List<EditorBase>();
+            this.builderEditors = new List<BuilderEditor>();
 
             foreach (var options in layerStyle.PolygonBuilderOptions)
             {
-                this.builderEditors.Add(new PolygonBuilderEditor(options, "Polygon builder options"));
+                this.builderEditors.Add(new BuilderEditor(options));
             }
 
             foreach (var options in layerStyle.PolylineBuilderOptions)
             {
-                this.builderEditors.Add(new PolylineBuilderEditor(options, "Polyline builder options"));
+                this.builderEditors.Add(new BuilderEditor(options));
             }
         }
 
@@ -50,26 +45,15 @@ namespace PluginEditor
         {
             EditorGUILayout.BeginHorizontal();
             {
-                selectedBuilderType = (BuilderType)EditorGUILayout.EnumPopup("Add builder", selectedBuilderType);
+                selectedBuilderType = (BuilderEditor.BuilderType)EditorGUILayout.EnumPopup("Add builder", selectedBuilderType);
 
                 EditorConfig.SetColor(EditorConfig.AddButtonColor);
                 if (GUILayout.Button(EditorConfig.AddButtonContent, EditorConfig.SmallButtonWidth))
                 {
-                    switch (selectedBuilderType)
-                    {
-                        case BuilderType.polygon: {
-                            var editor = new PolygonBuilderEditor("Polygon builder options");
-                            editor.OptionIndex = layerStyle.PolygonBuilderOptions.Count;
-                            layerStyle.PolygonBuilderOptions.Add(editor.Options);
-                            builderEditors.Add(editor);
-                        } break;
-                        case BuilderType.polyline: {
-                            var editor = new PolylineBuilderEditor("Polyline builder options");
-                            editor.OptionIndex = layerStyle.PolylineBuilderOptions.Count;
-                            layerStyle.PolylineBuilderOptions.Add(editor.Options);
-                            builderEditors.Add(editor);
-                        } break;
-                    }
+                    var editor = new BuilderEditor(selectedBuilderType);
+                    layerStyle.PolygonBuilderOptions.Add(editor.PolygonBuilderOptions);
+                    layerStyle.PolylineBuilderOptions.Add(editor.PolylineBuilderOptions);
+                    builderEditors.Add(editor);
                 }
                 EditorConfig.ResetColor();
             }
@@ -88,15 +72,9 @@ namespace PluginEditor
 
                 if (state.markedForDeletion)
                 {
-                    // Remove the editor and its associated options
                     builderEditors.RemoveAt(i);
-
-                    if (editor is PolygonBuilderEditor)
-                        layerStyle.PolygonBuilderOptions.RemoveAt((
-                            (PolygonBuilderEditor)editor).OptionIndex);
-                    else if (editor is PolylineBuilderEditor)
-                        layerStyle.PolylineBuilderOptions.RemoveAt((
-                            (PolylineBuilderEditor)editor).OptionIndex);
+                    layerStyle.PolygonBuilderOptions.Remove(editor.PolygonBuilderOptions);
+                    layerStyle.PolylineBuilderOptions.Remove(editor.PolylineBuilderOptions);
                 }
             }
             EditorGUI.indentLevel--;
