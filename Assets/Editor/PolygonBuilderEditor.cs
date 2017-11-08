@@ -22,6 +22,7 @@ public class PolygonBuilderEditor : EditorBase
         var defaultOptions = new PolygonBuilder.Options();
 
         defaultOptions.Extrusion = PolygonBuilder.ExtrusionType.TopAndSides;
+        defaultOptions.UVMode = UVMode.Tile;
         defaultOptions.Enabled = true;
         defaultOptions.MaxHeight = 0.0f;
 
@@ -52,6 +53,7 @@ public class PolygonBuilderEditor : EditorBase
 
         options.MaxHeight = EditorGUILayout.FloatField("Max Height: ", options.MaxHeight);
         options.Extrusion = (PolygonBuilder.ExtrusionType)EditorGUILayout.EnumPopup("Extrusion type: ", options.Extrusion);
+        options.UVMode = (UVMode)EditorGUILayout.EnumPopup("UV Mode:", options.UVMode);
         options.Enabled = EditorGUILayout.Toggle("Enabled: ", options.Enabled);
 
         SavePreferences();

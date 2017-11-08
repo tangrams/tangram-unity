@@ -21,8 +21,10 @@ namespace Mapzen.Unity
         {
             public Material Material;
             public ExtrusionType Extrusion;
+            public UVMode UVMode;
             public float MinHeight;
             public float MaxHeight;
+
             public bool Enabled;
         }
 
@@ -49,6 +51,7 @@ namespace Mapzen.Unity
         private List<Vector2> extrusionUVs = new List<Vector2>();
         private List<Vector2> polygonUVs = new List<Vector2>();
         private List<int> extrusionIndices = new List<int>();
+        private float uCoordinateTotal = 0;
 
         public void OnPoint(Point point)
         {
@@ -65,6 +68,9 @@ namespace Mapzen.Unity
 
                 var indexOffset = extrusionVertices.Count;
 
+                // Increase the u coordinate by the 2D distance between the points.
+                var uCoordinateNext = uCoordinateTotal + new Vector2(p1.X - p0.X, p1.Y - p0.Y).magnitude;
+
                 var v0 = new Vector3(p0.X, options.MaxHeight, p0.Y);
                 var v1 = new Vector3(p1.X, options.MaxHeight, p1.Y);
                 var v2 = new Vector3(p0.X, options.MinHeight, p0.Y);
@@ -80,10 +86,25 @@ namespace Mapzen.Unity
                 extrusionVertices.Add(v2);
                 extrusionVertices.Add(v3);
 
-                extrusionUVs.Add(new Vector2(1.0f, 1.0f));
-                extrusionUVs.Add(new Vector2(0.0f, 1.0f));
-                extrusionUVs.Add(new Vector2(1.0f, 0.0f));
-                extrusionUVs.Add(new Vector2(0.0f, 0.0f));
+                var vBottom = 0.0f;
+                var vTop = 1.0f;
+                var uLeft = 0.0f;
+                var uRight = 1.0f;
+                if (options.UVMode == UVMode.Tile || options.UVMode == UVMode.TileUStretchV)
+                {
+                    uLeft = uCoordinateTotal;
+                    uRight = uCoordinateNext;
+                }
+                if (options.UVMode == UVMode.Tile || options.UVMode == UVMode.StretchUTileV)
+                {
+                    vBottom = options.MinHeight;
+                    vTop = options.MaxHeight;
+                }
+
+                extrusionUVs.Add(new Vector2(uRight, vTop));
+                extrusionUVs.Add(new Vector2(uLeft, vTop));
+                extrusionUVs.Add(new Vector2(uRight, vBottom));
+                extrusionUVs.Add(new Vector2(uLeft, vBottom));
 
                 extrusionIndices.Add(indexOffset + 1);
                 extrusionIndices.Add(indexOffset + 2);
@@ -91,6 +112,8 @@ namespace Mapzen.Unity
                 extrusionIndices.Add(indexOffset + 2);
                 extrusionIndices.Add(indexOffset + 1);
                 extrusionIndices.Add(indexOffset + 0);
+
+                uCoordinateTotal = uCoordinateNext;
             }
 
             lastPoint = point;
@@ -122,6 +145,7 @@ namespace Mapzen.Unity
         public void OnBeginLinearRing()
         {
             pointsInRing = 0;
+            uCoordinateTotal = 0;
             if (pointsInPolygon > 0)
             {
                 holes.Add(pointsInPolygon);
