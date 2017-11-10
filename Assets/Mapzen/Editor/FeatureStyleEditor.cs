@@ -4,10 +4,10 @@ using System;
 using Mapzen;
 using Mapzen.Unity;
 
-namespace PluginEditor
+namespace Mapzen.Editor
 {
     [CustomEditor(typeof(FeatureStyle))]
-    public class FeatureStyleEditor : Editor
+    public class FeatureStyleEditor : UnityEditor.Editor
     {
         private FeatureStyle featureStyle;
         private StyleEditor styleEditor;

@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace PluginEditor
+namespace Mapzen.Editor
 {
     public class FoldoutEditor
     {

@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using Mapzen;
 using UnityEditor;
 
-namespace PluginEditor
+namespace Mapzen.Editor
 {
     [CustomEditor(typeof(MapzenMap))]
-    public class MapzenMapEditor : Editor
+    public class MapzenMapEditor : UnityEditor.Editor
     {
         private MapzenMap mapzenMap;
         private bool showTileDataFoldout = false;

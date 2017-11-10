@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace PluginEditor
+namespace Mapzen.Editor
 {
     [SerializeField]
     public class LayerStyleEditor : EditorBase

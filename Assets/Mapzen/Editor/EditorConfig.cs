@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace PluginEditor
+namespace Mapzen.Editor
 {
     /// <summary>
     /// Styling configuration for the editor.

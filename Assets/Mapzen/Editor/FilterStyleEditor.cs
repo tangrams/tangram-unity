@@ -7,7 +7,7 @@ using Mapzen.VectorData.Filters;
 using UnityEditor;
 using UnityEngine;
 
-namespace PluginEditor
+namespace Mapzen.Editor
 {
     [SerializeField]
     public class FilterStyleEditor : EditorBase

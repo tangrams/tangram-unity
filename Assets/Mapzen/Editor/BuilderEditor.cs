@@ -5,7 +5,7 @@ using Mapzen.Unity;
 using System.Linq;
 using System;
 
-namespace PluginEditor
+namespace Mapzen.Editor
 {
     [Serializable]
     public class BuilderEditor : EditorBase
@@ -92,7 +92,7 @@ namespace PluginEditor
                     polygonBuilderOptions.Extrusion = (PolygonBuilder.ExtrusionType)EditorGUILayout.EnumPopup("Extrusion type: ", polygonBuilderOptions.Extrusion);
                     polygonBuilderOptions.Material = EditorGUILayout.ObjectField("Material:", polygonBuilderOptions.Material, typeof(Material)) as Material;
                     polygonBuilderOptions.UVMode = (UVMode)EditorGUILayout.EnumPopup("UV Mode:", polygonBuilderOptions.UVMode);
-                    polygonBuilderOptions.Enabled = EditorGUILayout.Toggle("Enabled: ", polygonBuilderOptions.Enabled); 
+                    polygonBuilderOptions.Enabled = EditorGUILayout.Toggle("Enabled: ", polygonBuilderOptions.Enabled);
                 break;
             }
         }

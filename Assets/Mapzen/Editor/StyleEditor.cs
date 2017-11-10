@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-namespace PluginEditor
+namespace Mapzen.Editor
 {
     [Serializable]
     public class StyleEditor : EditorBase

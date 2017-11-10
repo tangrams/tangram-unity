@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PluginEditor
+namespace Mapzen.Editor
 {
     /// <summary>
     /// Base class for editor, each editor has a unique guid used
@@ -8,7 +8,7 @@ namespace PluginEditor
     /// </summary>
     public abstract class EditorBase
     {
-        protected Guid guid; 
+        protected Guid guid;
 
         public EditorBase()
         {
