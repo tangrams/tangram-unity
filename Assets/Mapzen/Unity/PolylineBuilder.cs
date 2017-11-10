@@ -10,13 +10,13 @@ namespace Mapzen.Unity
     {
         private PolygonBuilder polygonBuilder;
         private List<Vector2> polyline;
-        private Options options;
+        private readonly Options options;
 
         private float uvDistance;
-
+        private float inverseTileScale;
 
         [Serializable]
-        public struct Options
+        public class Options
         {
             public Material Material;
             public PolygonBuilder.ExtrusionType Extrusion;
@@ -27,9 +27,10 @@ namespace Mapzen.Unity
             public bool Enabled;
         }
 
-        public PolylineBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)
+        public PolylineBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform, float inverseTileScale, float featureHeight)
         {
             this.options = options;
+            this.inverseTileScale = inverseTileScale;
 
             var polygonOptions = new PolygonBuilder.Options();
             polygonOptions.Material = options.Material;
@@ -37,7 +38,7 @@ namespace Mapzen.Unity
             polygonOptions.MinHeight = options.MinHeight;
             polygonOptions.MaxHeight = options.MaxHeight;
 
-            polygonBuilder = new PolygonBuilder(outputMeshData, polygonOptions, transform);
+            polygonBuilder = new PolygonBuilder(outputMeshData, polygonOptions, transform, inverseTileScale, featureHeight);
             polyline = new List<Vector2>();
             uvDistance = 0.0f;
         }
@@ -72,8 +73,8 @@ namespace Mapzen.Unity
                 return;
             }
 
-            float extrude = options.Width * 0.5f;
-            float invWidth = 1.0f / options.Width;
+            float extrude = options.Width * inverseTileScale * 0.5f;
+            float invWidth = 1.0f / (options.Width * inverseTileScale);
 
             if (polyline.Count == 2)
             {

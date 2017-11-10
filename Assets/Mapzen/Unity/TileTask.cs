@@ -61,8 +61,10 @@ public class TileTask
                     {
                         var layerStyle = filterStyle.LayerStyles.Find(ls => ls.LayerName == layer.Name);
 
+                        float featureHeight = 0.0f;
                         string featureName = "";
                         object identifier;
+                        object heightValue;
 
                         if (feature.TryGetProperty("id", out identifier))
                         {
@@ -71,24 +73,37 @@ public class TileTask
 
                         OnSceneGroupData(SceneGroup.Type.Feature, featureName, layerGroup, ref leaf);
 
+                        if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
+                        {
+                            featureHeight = (float)((double)heightValue);
+                        }
+
                         if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                         {
-                            var polygonOptions = layerStyle.GetPolygonOptions(feature, inverseTileScale);
-
-                            if (polygonOptions.Enabled)
+                            foreach (var polygonOptions in layerStyle.PolygonBuilderOptions)
                             {
-                                var builder = new PolygonBuilder(leaf.meshData, polygonOptions, transform);
+                                if (!polygonOptions.Enabled)
+                                {
+                                    continue;
+                                }
+
+                                var builder = new PolygonBuilder(leaf.meshData, polygonOptions,
+                                    transform, inverseTileScale, featureHeight);
                                 feature.HandleGeometry(builder);
                             }
                         }
 
                         if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
                         {
-                            var polylineOptions = layerStyle.GetPolylineOptions(feature, inverseTileScale);
-
-                            if (polylineOptions.Enabled)
+                            foreach (var polylineOptions in layerStyle.PolylineBuilderOptions)
                             {
-                                var builder = new PolylineBuilder(leaf.meshData, polylineOptions, transform);
+                                if (!polylineOptions.Enabled)
+                                {
+                                    continue;
+                                }
+
+                                var builder = new PolylineBuilder(leaf.meshData, polylineOptions,
+                                    transform, inverseTileScale, featureHeight);
                                 feature.HandleGeometry(builder);
                             }
                         }

@@ -17,9 +17,8 @@ namespace Mapzen.Unity
             [SerializeField]
             private string layerName;
 
-            public Material Material;
-            public PolygonBuilder.Options PolygonBuilderOptions;
-            public PolylineBuilder.Options PolylineBuilderOptions;
+            public List<PolygonBuilder.Options> PolygonBuilderOptions;
+            public List<PolylineBuilder.Options> PolylineBuilderOptions;
 
             public string LayerName
             {
@@ -29,39 +28,8 @@ namespace Mapzen.Unity
             public LayerStyle(string layerName)
             {
                 this.layerName = layerName;
-            }
-
-            public PolygonBuilder.Options GetPolygonOptions(Feature feature, float inverseTileScale)
-            {
-                var options = PolygonBuilderOptions;
-
-                options.Material = this.Material;
-
-                if (options.MaxHeight > 0.0f)
-                {
-                    options.MaxHeight *= inverseTileScale;
-                }
-                else
-                {
-                    object heightValue;
-                    if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
-                    {
-                        options.MaxHeight = (float)((double)heightValue * inverseTileScale);
-                    }
-                }
-
-                return options;
-            }
-
-            public PolylineBuilder.Options GetPolylineOptions(Feature feature, float inverseTileScale)
-            {
-                var options = PolylineBuilderOptions;
-
-                options.Material = this.Material;
-                options.Width *= inverseTileScale;
-                options.MaxHeight *= inverseTileScale;
-
-                return options;
+                this.PolygonBuilderOptions = new List<PolygonBuilder.Options>();
+                this.PolylineBuilderOptions = new List<PolylineBuilder.Options>();
             }
         }
 
