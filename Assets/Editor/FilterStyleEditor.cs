@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace PluginEditor
 {
+    [SerializeField]
     public class FilterStyleEditor : EditorBase
     {
         [SerializeField]
@@ -45,6 +46,41 @@ namespace PluginEditor
             {
                 layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
             }
+
+            if (filterStyle.Matcher != null)
+            {
+                selectedMatcherType = filterStyle.Matcher.MatcherType;
+                this.matcherEditor = new MatcherEditor(filterStyle.Matcher);
+            }
+        }
+
+        private void AddLayerStyleLayout(FeatureStyle.FilterStyle filterStyle, string name)
+        {
+            EditorConfig.SetColor(EditorConfig.AddButtonColor);
+            if (GUILayout.Button(EditorConfig.AddButtonContent, EditorConfig.SmallButtonWidth))
+            {
+                // Layers within a filter are identifier by their layer name
+                var queryLayer = filterStyle.LayerStyles.Where(layerStyle => name == layerStyle.LayerName);
+
+                if (name.Length == 0)
+                {
+                    Debug.LogError("Layer name can't be empty");
+                }
+                else if (queryLayer.Count() > 0)
+                {
+                    Debug.LogError("A layer with name " + name + " already exists");
+                }
+                else
+                {
+                    var layerStyle = new FeatureStyle.LayerStyle(name);
+
+                    filterStyle.LayerStyles.Add(layerStyle);
+
+                    // Create the associated layer editor
+                    layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
+                }
+            }
+            EditorConfig.ResetColor();
         }
 
         public override void OnInspectorGUI()
@@ -54,14 +90,6 @@ namespace PluginEditor
             {
                 selectedLayer = EditorGUILayout.Popup("Default layer:", selectedLayer, mapzenLayers.ToArray());
                 AddLayerStyleLayout(filterStyle, mapzenLayers[selectedLayer]);
-            }
-            EditorGUILayout.EndHorizontal();
-
-            // Custom layer entry
-            EditorGUILayout.BeginHorizontal();
-            {
-                customFeatureCollection = EditorGUILayout.TextField("Custom layer:", customFeatureCollection);
-                AddLayerStyleLayout(filterStyle, customFeatureCollection);
             }
             EditorGUILayout.EndHorizontal();
 

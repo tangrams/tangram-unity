@@ -69,6 +69,7 @@ namespace PluginEditor
                     this.polygonBuilderOptions = new PolygonBuilder.Options();
                     this.polygonBuilderOptions.Extrusion = PolygonBuilder.ExtrusionType.TopAndSides;
                     this.polygonBuilderOptions.Enabled = true;
+                    this.polygonBuilderOptions.UVMode = UVMode.Tile;
                     this.polygonBuilderOptions.MaxHeight = 0.0f;
                     this.polygonBuilderOptions.Material = new Material(Shader.Find("Diffuse"));
                 break;
@@ -90,6 +91,7 @@ namespace PluginEditor
                     polygonBuilderOptions.MaxHeight = EditorGUILayout.FloatField("Max Height: ", polygonBuilderOptions.MaxHeight);
                     polygonBuilderOptions.Extrusion = (PolygonBuilder.ExtrusionType)EditorGUILayout.EnumPopup("Extrusion type: ", polygonBuilderOptions.Extrusion);
                     polygonBuilderOptions.Material = EditorGUILayout.ObjectField("Material:", polygonBuilderOptions.Material, typeof(Material)) as Material;
+                    polygonBuilderOptions.UVMode = (UVMode)EditorGUILayout.EnumPopup("UV Mode:", polygonBuilderOptions.UVMode);
                     polygonBuilderOptions.Enabled = EditorGUILayout.Toggle("Enabled: ", polygonBuilderOptions.Enabled); 
                 break;
             }
