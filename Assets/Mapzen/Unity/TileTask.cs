@@ -31,7 +31,7 @@ public class TileTask
         this.transform = translate * scale;
     }
 
-    public void Start(List<FeatureStyle> featureStyling, SceneGroup root)
+    public void Start(List<MapStyle> featureStyling, SceneGroup root)
     {
         // Parse the GeoJSON
         // var tileData = new GeoJsonTile(address, response);
@@ -49,7 +49,7 @@ public class TileTask
                 continue;
             }
 
-            foreach (var filterStyle in style.FilterStyles)
+            foreach (var filterStyle in style.Layers)
             {
                 var filterGroup = OnSceneGroupData(SceneGroup.Type.Filter, filterStyle.Name, tileGroup, ref leaf);
 
@@ -57,10 +57,14 @@ public class TileTask
                 {
                     var layerGroup = OnSceneGroupData(SceneGroup.Type.Layer, layer.Name, filterGroup, ref leaf);
 
+                    if (filterStyle.FeatureCollections.IndexOf(layer.Name) == -1)
+                    {
+                        continue;
+                    }
+
                     foreach (var feature in filterStyle.GetFilter().Filter(layer))
                     {
-                        var layerStyle = filterStyle.LayerStyles.Find(ls => ls.LayerName == layer.Name);
-
+                        var layerStyle = filterStyle.Style;
                         string featureName = "";
                         object identifier;
 

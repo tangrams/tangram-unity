@@ -29,7 +29,7 @@ public class MapzenMap : MonoBehaviour
     private IO tileIO = new IO();
 
     [SerializeField]
-    private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
+    private List<MapStyle> featureStyling = new List<MapStyle>();
 
     [HideInInspector]
     [SerializeField]
@@ -132,7 +132,7 @@ public class MapzenMap : MonoBehaviour
         get { return tiles; }
     }
 
-    public List<FeatureStyle> FeatureStyling
+    public List<MapStyle> FeatureStyling
     {
         get { return featureStyling; }
     }

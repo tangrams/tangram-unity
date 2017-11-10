@@ -147,12 +147,12 @@ public class MapzenMapEditor : Editor
                 continue;
             }
 
-            if (style.FilterStyles.Count == 0)
+            if (style.Layers.Count == 0)
             {
                 Debug.LogWarning("The style " + style.name + " has no filter");
             }
 
-            foreach (var filterStyle in style.FilterStyles)
+            foreach (var filterStyle in style.Layers)
             {
                 if (filterStyle.GetFilter().CollectionNameSet.Count == 0)
                 {

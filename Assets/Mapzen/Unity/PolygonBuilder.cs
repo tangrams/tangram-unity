@@ -8,27 +8,7 @@ namespace Mapzen.Unity
 {
     public class PolygonBuilder : IGeometryHandler
     {
-        [Serializable]
-        public enum ExtrusionType
-        {
-            TopOnly,
-            TopAndSides,
-            SidesOnly,
-        }
-
-        [Serializable]
-        public struct Options
-        {
-            public Material Material;
-            public ExtrusionType Extrusion;
-            public UVMode UVMode;
-            public float MinHeight;
-            public float MaxHeight;
-
-            public bool Enabled;
-        }
-
-        public PolygonBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)
+        public PolygonBuilder(MeshData outputMeshData, PolygonOptions options, Matrix4x4 transform)
         {
             this.transform = transform;
             this.outputMeshData = outputMeshData;
@@ -37,7 +17,7 @@ namespace Mapzen.Unity
 
         private Matrix4x4 transform;
         private MeshData outputMeshData;
-        private Options options;
+        private PolygonOptions options;
 
         // Values for the tesselator.
         private List<float> coordinates = new List<float>();
