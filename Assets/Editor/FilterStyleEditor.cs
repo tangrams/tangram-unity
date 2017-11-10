@@ -9,25 +9,8 @@ using UnityEngine;
 
 namespace PluginEditor
 {
-    [Serializable]
     public class FilterStyleEditor : EditorBase
     {
-        private static List<string> defaultLayers = new List<string>(new string[]
-            {
-                "boundaries",
-                "buildings",
-                "earth",
-                "landuse",
-                "places",
-                "pois",
-                "roads",
-                "transit",
-                "water",
-            });
-
-        [SerializeField]
-        private string customFeatureCollection = "";
-
         [SerializeField]
         private int selectedLayer;
 
@@ -48,6 +31,10 @@ namespace PluginEditor
             get { return filterStyle; }
         }
 
+        private static List<string> mapzenLayers = new List<string>(new string[] {
+            "boundaries", "buildings", "earth", "landuse", "places", "pois", "roads", "transit", "water",
+        });
+
         public FilterStyleEditor(FeatureStyle.FilterStyle filterStyle)
             : base()
         {
@@ -58,41 +45,6 @@ namespace PluginEditor
             {
                 layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
             }
-
-            if (filterStyle.Matcher != null)
-            {
-                selectedMatcherType = filterStyle.Matcher.MatcherType;
-                this.matcherEditor = new MatcherEditor(filterStyle.Matcher);
-            }
-        }
-
-        private void AddLayerStyleLayout(FeatureStyle.FilterStyle filterStyle, string name)
-        {
-            EditorConfig.SetColor(EditorConfig.AddButtonColor);
-            if (GUILayout.Button(EditorConfig.AddButtonContent, EditorConfig.SmallButtonWidth))
-            {
-                // Layers within a filter are identifier by their layer name
-                var queryLayer = filterStyle.LayerStyles.Where(layerStyle => name == layerStyle.LayerName);
-
-                if (name.Length == 0)
-                {
-                    Debug.LogError("Layer name can't be empty");
-                }
-                else if (queryLayer.Count() > 0)
-                {
-                    Debug.LogError("A layer with name " + name + " already exists");
-                }
-                else
-                {
-                    var layerStyle = new FeatureStyle.LayerStyle(name);
-
-                    filterStyle.LayerStyles.Add(layerStyle);
-
-                    // Create the associated layer editor
-                    layerStyleEditors.Add(new LayerStyleEditor(layerStyle));
-                }
-            }
-            EditorConfig.ResetColor();
         }
 
         public override void OnInspectorGUI()
@@ -100,8 +52,8 @@ namespace PluginEditor
             // Default layers
             EditorGUILayout.BeginHorizontal();
             {
-                selectedLayer = EditorGUILayout.Popup("Default layer:", selectedLayer, defaultLayers.ToArray());
-                AddLayerStyleLayout(filterStyle, defaultLayers[selectedLayer]);
+                selectedLayer = EditorGUILayout.Popup("Default layer:", selectedLayer, mapzenLayers.ToArray());
+                AddLayerStyleLayout(filterStyle, mapzenLayers[selectedLayer]);
             }
             EditorGUILayout.EndHorizontal();
 

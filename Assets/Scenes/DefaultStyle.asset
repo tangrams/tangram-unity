@@ -15,27 +15,24 @@ MonoBehaviour:
   - name: filter_0
     layerStyles:
     - layerName: roads
-      PolygonBuilderOptions:
-      - Material: {fileID: 0}
-        Extrusion: 0
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 0
-      PolylineBuilderOptions:
-      - Material: {fileID: 0}
-        Extrusion: 2
-        MinHeight: 0
-        MaxHeight: 3
-        Width: 15
-        MiterLimit: 3
-        Enabled: 1
-      - Material: {fileID: 2100000, guid: ce1f4d2f66c614a9489e5ee52bbe34da, type: 2}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 3
-        Width: 15
-        MiterLimit: 3
-        Enabled: 1
+      PolygonBuilderEditorDatas: []
+      PolylineBuilderEditorDatas:
+      - option:
+          Material: {fileID: 2100000, guid: ca945bef7446a48c3a7e6c2241195361, type: 2}
+          Extrusion: 2
+          MinHeight: 0
+          MaxHeight: 3
+          Width: 15
+          MiterLimit: 3
+          Enabled: 1
+      - option:
+          Material: {fileID: 2100000, guid: ce1f4d2f66c614a9489e5ee52bbe34da, type: 2}
+          Extrusion: 0
+          MinHeight: 0
+          MaxHeight: 3
+          Width: 15
+          MiterLimit: 3
+          Enabled: 1
     filter:
       CollectionNameSet: []
     Matcher:
@@ -51,13 +48,15 @@ MonoBehaviour:
   - name: filter_2
     layerStyles:
     - layerName: buildings
-      PolygonBuilderOptions:
-      - Material: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 1
-      PolylineBuilderOptions: []
+      PolygonBuilderEditorDatas:
+      - option:
+          Material: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
+          Extrusion: 1
+          UVMode: 1
+          MinHeight: 0
+          MaxHeight: 0
+          Enabled: 1
+      PolylineBuilderEditorDatas: []
     filter:
       CollectionNameSet: []
     Matcher:
@@ -82,13 +81,15 @@ MonoBehaviour:
   - name: filter_3
     layerStyles:
     - layerName: buildings
-      PolygonBuilderOptions:
-      - Material: {fileID: 2100000, guid: c583580183f69476bbe6cda2361da21e, type: 2}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 1
-      PolylineBuilderOptions: []
+      PolygonBuilderEditorDatas:
+      - option:
+          Material: {fileID: 2100000, guid: c583580183f69476bbe6cda2361da21e, type: 2}
+          Extrusion: 1
+          UVMode: 1
+          MinHeight: 0
+          MaxHeight: 0
+          Enabled: 1
+      PolylineBuilderEditorDatas: []
     filter:
       CollectionNameSet: []
     Matcher:
@@ -104,27 +105,24 @@ MonoBehaviour:
   - name: filter_4
     layerStyles:
     - layerName: roads
-      PolygonBuilderOptions:
-      - Material: {fileID: 0}
-        Extrusion: 0
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 0
-      PolylineBuilderOptions:
-      - Material: {fileID: 2100000, guid: ca945bef7446a48c3a7e6c2241195361, type: 2}
-        Extrusion: 2
-        MinHeight: 0
-        MaxHeight: 3
-        Width: 15
-        MiterLimit: 3
-        Enabled: 1
-      - Material: {fileID: 2100000, guid: f776709bfa7fa4d3a88a6b24cd6c7429, type: 2}
-        Extrusion: 0
-        MinHeight: 0
-        MaxHeight: 3
-        Width: 15
-        MiterLimit: 3
-        Enabled: 1
+      PolygonBuilderEditorDatas: []
+      PolylineBuilderEditorDatas:
+      - option:
+          Material: {fileID: 2100000, guid: ca945bef7446a48c3a7e6c2241195361, type: 2}
+          Extrusion: 2
+          MinHeight: 0
+          MaxHeight: 3
+          Width: 15
+          MiterLimit: 3
+          Enabled: 1
+      - option:
+          Material: {fileID: 2100000, guid: f776709bfa7fa4d3a88a6b24cd6c7429, type: 2}
+          Extrusion: 1
+          MinHeight: 0
+          MaxHeight: 3
+          Width: 15
+          MiterLimit: 3
+          Enabled: 1
     filter:
       CollectionNameSet: []
     Matcher:
@@ -140,35 +138,25 @@ MonoBehaviour:
   - name: filter_1
     layerStyles:
     - layerName: earth
-      PolygonBuilderOptions:
-      - Material: {fileID: 2100000, guid: 0cdfce05273914dd4823f77af6b71663, type: 2}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 1
-      PolylineBuilderOptions:
-      - Material: {fileID: 0}
-        Extrusion: 0
-        MinHeight: 0
-        MaxHeight: 0
-        Width: 0
-        MiterLimit: 0
-        Enabled: 0
+      PolygonBuilderEditorDatas:
+      - option:
+          Material: {fileID: 2100000, guid: 0cdfce05273914dd4823f77af6b71663, type: 2}
+          Extrusion: 1
+          UVMode: 1
+          MinHeight: 0
+          MaxHeight: 0
+          Enabled: 1
+      PolylineBuilderEditorDatas: []
     - layerName: water
-      PolygonBuilderOptions:
-      - Material: {fileID: 2100000, guid: bb0267789bf4345c7916b57b125fc6ca, type: 2}
-        Extrusion: 1
-        MinHeight: 0
-        MaxHeight: 0
-        Enabled: 1
-      PolylineBuilderOptions:
-      - Material: {fileID: 0}
-        Extrusion: 0
-        MinHeight: 0
-        MaxHeight: 0
-        Width: 0
-        MiterLimit: 0
-        Enabled: 0
+      PolygonBuilderEditorDatas:
+      - option:
+          Material: {fileID: 2100000, guid: bb0267789bf4345c7916b57b125fc6ca, type: 2}
+          Extrusion: 1
+          UVMode: 1
+          MinHeight: 0
+          MaxHeight: 0
+          Enabled: 1
+      PolylineBuilderEditorDatas: []
     filter:
       CollectionNameSet: []
     Matcher:
