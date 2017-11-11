@@ -6,7 +6,7 @@ namespace Mapzen.Unity.Editor
 {
     public class FeatureLayerTreeView : TreeView
     {
-        public IEnumerable<FeatureLayer> Layers;
+        public IList<FeatureLayer> Layers;
 
         public FeatureLayerTreeView(TreeViewState state)
             : base(state)
@@ -38,6 +38,20 @@ namespace Mapzen.Unity.Editor
 
             // Return root of the tree
             return root;
+        }
+
+        protected override bool CanRename(TreeViewItem item)
+        {
+            return true;
+        }
+
+        protected override void RenameEnded(RenameEndedArgs args)
+        {
+            if (Layers != null)
+            {
+                var layer = Layers[args.itemID];
+                layer.Name = args.newName;
+            }
         }
     }
 }
