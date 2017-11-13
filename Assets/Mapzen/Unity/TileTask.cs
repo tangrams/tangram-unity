@@ -57,11 +57,6 @@ public class TileTask
                 {
                     var layerGroup = OnSceneGroupData(SceneGroup.Type.Layer, layer.Name, filterGroup, ref leaf);
 
-                    if (filterStyle.FeatureCollections.IndexOf(layer.Name) == -1)
-                    {
-                        continue;
-                    }
-
                     foreach (var feature in filterStyle.GetFilter().Filter(layer))
                     {
                         var layerStyle = filterStyle.Style;

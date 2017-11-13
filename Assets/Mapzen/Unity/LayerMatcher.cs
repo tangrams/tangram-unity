@@ -11,9 +11,6 @@ namespace Mapzen.Unity
         public enum Kind
         {
             None,
-            AllOf,
-            NoneOf,
-            AnyOf,
             Property,
             PropertyRange,
             PropertyRegex,
@@ -22,9 +19,7 @@ namespace Mapzen.Unity
 
         public Kind MatcherKind;
 
-        public List<LayerMatcher> Matchers = new List<LayerMatcher>();
-
-        public string HasProperty = "";
+        public string PropertyKey = "";
         public string PropertyValue = "";
         public string RegexPattern = "";
         public float MinRange;
@@ -37,68 +32,33 @@ namespace Mapzen.Unity
             MatcherKind = type;
         }
 
-        public bool IsCompound()
-        {
-            return MatcherKind == Kind.AllOf || MatcherKind == Kind.NoneOf || MatcherKind == Kind.AnyOf;
-        }
-
         public IFeatureMatcher GetFeatureMatcher()
         {
             IFeatureMatcher matcher = new FeatureMatcher();
 
-            if (IsCompound() && Matchers.Count > 0)
+            switch (MatcherKind)
             {
-                var predicates = new List<IFeatureMatcher>();
-
-                for (int i = 0; i < Matchers.Count; ++i)
-                {
-                    var predicate = Matchers[i].GetFeatureMatcher();
-                    if (predicate != null)
+                case LayerMatcher.Kind.PropertyRange:
+                    double? min = MinRangeEnabled ? (double)MinRange : (double?)null;
+                    double? max = MaxRangeEnabled ? (double)MaxRange : (double?)null;
+                    matcher = FeatureMatcher.HasPropertyInRange(PropertyKey, min, max);
+                    break;
+                case LayerMatcher.Kind.Property:
+                    matcher = FeatureMatcher.HasProperty(PropertyKey);
+                    break;
+                case LayerMatcher.Kind.PropertyValue:
+                    matcher = FeatureMatcher.HasPropertyWithValue(PropertyKey, PropertyValue);
+                    break;
+                case LayerMatcher.Kind.PropertyRegex:
+                    try
                     {
-                        predicates.Add(predicate);
+                        matcher = FeatureMatcher.HasPropertyWithRegex(PropertyKey, RegexPattern);
                     }
-                }
-
-                switch (MatcherKind)
-                {
-                    case LayerMatcher.Kind.AllOf:
-                        matcher = FeatureMatcher.AllOf(predicates.ToArray());
-                        break;
-                    case LayerMatcher.Kind.NoneOf:
-                        matcher = FeatureMatcher.NoneOf(predicates.ToArray());
-                        break;
-                    case LayerMatcher.Kind.AnyOf:
-                        matcher = FeatureMatcher.AnyOf(predicates.ToArray());
-                        break;
-                }
-            }
-            else
-            {
-                switch (MatcherKind)
-                {
-                    case LayerMatcher.Kind.PropertyRange:
-                        double? min = MinRangeEnabled ? (double)MinRange : (double?)null;
-                        double? max = MaxRangeEnabled ? (double)MaxRange : (double?)null;
-
-                        matcher = FeatureMatcher.HasPropertyInRange(HasProperty, min, max);
-                        break;
-                    case LayerMatcher.Kind.Property:
-                        matcher = FeatureMatcher.HasProperty(HasProperty);
-                        break;
-                    case LayerMatcher.Kind.PropertyValue:
-                        matcher = FeatureMatcher.HasPropertyWithValue(HasProperty, PropertyValue);
-                        break;
-                    case LayerMatcher.Kind.PropertyRegex:
-                        try
-                        {
-                            matcher = FeatureMatcher.HasPropertyWithRegex(HasProperty, RegexPattern);
-                        }
-                        catch (ArgumentException ae)
-                        {
-                            Debug.LogError(ae.Message);
-                        }
-                        break;
-                }
+                    catch (ArgumentException ae)
+                    {
+                        Debug.LogError(ae.Message);
+                    }
+                    break;
             }
 
             return matcher;

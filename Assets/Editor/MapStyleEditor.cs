@@ -14,6 +14,9 @@ namespace Mapzen.Unity.Editor
 
         FeatureLayerTreeView layerTreeView;
 
+        GUIStyle labelBoldStyle;
+        GUIStyle labelItalicCenteredStyle;
+
         void OnEnable()
         {
             // Check whether we already had a serialized tree view state.
@@ -22,6 +25,9 @@ namespace Mapzen.Unity.Editor
                 layerTreeViewState = new TreeViewState();
             }
             layerTreeView = new FeatureLayerTreeView(layerTreeViewState);
+
+            labelBoldStyle = new GUIStyle { fontStyle = FontStyle.Bold };
+            labelItalicCenteredStyle = new GUIStyle { fontStyle = FontStyle.Italic, alignment = TextAnchor.MiddleCenter };
         }
 
         public override void OnInspectorGUI()
@@ -34,6 +40,8 @@ namespace Mapzen.Unity.Editor
                 // ????
                 return;
             }
+
+            GUILayout.Label("Layers", labelBoldStyle);
 
             layerTreeView.Layers = mapStyle.Layers;
             layerTreeView.Reload();
@@ -60,15 +68,38 @@ namespace Mapzen.Unity.Editor
             }
             GUILayout.EndHorizontal();
 
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+
             if (!deletingLayers && selectedLayers.Count == 1)
             {
                 var index = selectedLayers[0];
 
                 var layerProperty = layerArrayProperty.GetArrayElementAtIndex(index);
-                EditorGUILayout.PropertyField(layerProperty, true, null);
+
+                layerProperty.isExpanded = true;
+
+                GUILayout.Label("Layer Properties", labelBoldStyle);
+
+                // EditorGUILayout.PropertyField(layerProperty, true);
+                DrawSelectedLayer(layerProperty);
+            }
+            else
+            {
+                GUILayout.Label("Select a layer to see properties", labelItalicCenteredStyle);
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        void DrawSelectedLayer(SerializedProperty layerProperty)
+        {
+            EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("FeatureCollection"));
+
+            EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("Combiner"));
+
+            EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("Matchers"), true);
+
+            EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("Style"), true);
         }
     }
 }
