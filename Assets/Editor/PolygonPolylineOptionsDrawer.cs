@@ -6,7 +6,7 @@ namespace Mapzen.Unity.Editor
 {
     [CustomPropertyDrawer(typeof(PolygonOptions))]
     [CustomPropertyDrawer(typeof(PolylineOptions))]
-    public class PolygonPolylineOptionsDrawer : UnityEditor.PropertyDrawer
+    public class PolygonPolylineOptionsDrawer : PropertyDrawer
     {
         static string enabledPropertyName = "Enabled";
 
@@ -49,11 +49,17 @@ namespace Mapzen.Unity.Editor
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
+            bool enabled = property.FindPropertyRelative(enabledPropertyName).boolValue;
             // Set 'isExpanded' according to the enabled property. When 'isExpended' is true, CountInProperty() counts
             // the child properties along with this property, otherwise it just counts this property.
-            property.isExpanded = property.FindPropertyRelative(enabledPropertyName).boolValue;
+            property.isExpanded = enabled;
             // Reserve space for the total visible properties.
-            int rows = property.CountInProperty();
+            int rows = 1;
+            if (enabled)
+            {
+                // Subtract a row for 'Enabled', since we skip it above.
+                rows = property.CountInProperty() - 1;
+            }
             return rows * lineHeight;
         }
     }
