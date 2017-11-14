@@ -59,6 +59,9 @@ namespace Mapzen.Unity
                 IFeatureMatcher[] predicates = Matchers.Select(m => m.GetFeatureMatcher()).ToArray();
                 switch (Combiner)
                 {
+                    case MatcherCombiner.None:
+                        filter.Matcher = predicates.First();
+                        break;
                     case MatcherCombiner.AllOf:
                         filter.Matcher = FeatureMatcher.AllOf(predicates);
                         break;
