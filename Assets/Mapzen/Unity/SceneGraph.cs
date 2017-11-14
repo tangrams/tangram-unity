@@ -12,102 +12,153 @@ namespace Mapzen.Unity
 {
     public class SceneGraph
     {
-        /// <summary>
-        /// Visits the scene group root recursively and generate a scene graph hierarchy in the Unity scene
-        /// </summary>
-        /// <param name="group">The scene group to visit.</param>
-        /// <param name="parent">The parent transform of the generated game object for the current scene group.</param>
-        public static void Generate(SceneGroup group, Transform parent, GameObjectOptions options)
+        private static GameObject AddGameObjectGroupToHierarchy(SceneGroup.Type groupType, GameObject parentGameObject, SceneGroup.Type groupOptions, FeatureMesh featureMesh)
         {
-            if (group.meshData.Meshes.Count == 0 && group.childs.Count == 0)
+            GameObject gameObject = null;
+
+            string name = featureMesh.GetName(groupType);
+
+			if (name.Length == 0) 
+			{
+				name = parentGameObject.name;
+			}
+
+            if (SceneGroup.Test(groupType, groupOptions))
             {
-                return;
+				if (groupOptions == SceneGroup.Type.None) 
+				{
+					gameObject = parentGameObject;
+				}
+				else 
+				{
+					if (parentGameObject != null) {
+						for (int i = 0; i < parentGameObject.transform.childCount; ++i) 
+						{
+							var child = parentGameObject.transform.GetChild (i);
+
+							if (child.name == name) 
+							{
+								gameObject = child.gameObject;
+								break;
+							}
+						}
+					}
+
+					if (!gameObject) 
+					{
+						gameObject = new GameObject(name);
+						gameObject.transform.parent = parentGameObject.transform;
+					}
+				}
             }
 
-            if (group.childs.Count > 0)
+            return gameObject;
+        }
+
+		public static void MergeGameObjectGroupMeshData(Dictionary<GameObject, MeshData> gameObjects, SceneGroup.Type groupType, 
+			GameObject gameObject, SceneGroup.Type groupOptions, FeatureMesh featureMesh)
+		{
+			// Merge the mesh data from the feature for the game object
+			if (gameObject != null && groupType == SceneGroup.Leaf(groupOptions))
+			{
+				if (gameObjects.ContainsKey(gameObject))
+				{
+					gameObjects[gameObject].Merge(featureMesh.Mesh);
+				}
+				else
+				{
+					MeshData data = new MeshData();
+					data.Merge(featureMesh.Mesh);
+					gameObjects.Add(gameObject, data);
+				}
+			}
+		}
+ 
+        public static void Generate(List<FeatureMesh> features, GameObject mapRegion, SceneGroup.Type groupOptions, GameObjectOptions gameObjectOptions)
+        {
+            Dictionary<GameObject, MeshData> gameObjectMeshData = new Dictionary<GameObject, MeshData>();
+
+            GameObject none, tile, layer, filter, feature;
+
+            // Generate all game object with the appropriate hiarchy
+            foreach (var featureMesh in features)
             {
-                var gameObject = new GameObject(group.ToString());
-                gameObject.isStatic = options.IsStatic;
+				GameObject parent = mapRegion;
 
-                if (parent != null)
-                {
-                    gameObject.transform.parent = parent;
-                }
+				// Group 'none'
+				none = AddGameObjectGroupToHierarchy(SceneGroup.Type.None, parent, groupOptions, featureMesh);
+				MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroup.Type.None, none, groupOptions, featureMesh);
 
-                foreach (var child in group.childs)
-                {
-                    Generate(child.Value, gameObject.transform, options);
-                }
+				// Group 'tile'
+				tile = AddGameObjectGroupToHierarchy(SceneGroup.Type.Tile, parent, groupOptions, featureMesh);
+				MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroup.Type.Tile, tile, groupOptions, featureMesh);
+
+				// group 'filter'
+				parent = tile == null ? parent : tile;
+				filter = AddGameObjectGroupToHierarchy(SceneGroup.Type.Filter, parent, groupOptions, featureMesh);
+				MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroup.Type.Filter, filter, groupOptions, featureMesh);
+
+				// group 'layer'
+				parent = filter == null ? parent : filter;
+				layer = AddGameObjectGroupToHierarchy(SceneGroup.Type.Layer, parent, groupOptions, featureMesh);
+				MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroup.Type.Layer, layer, groupOptions, featureMesh);
+
+				// group 'feature'
+				parent = layer == null ? parent : layer;
+				feature = AddGameObjectGroupToHierarchy(SceneGroup.Type.Feature, parent, groupOptions, featureMesh);
+				MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroup.Type.Feature, feature, groupOptions, featureMesh);
             }
-            else
-            {
-                if (group.meshData.Meshes.Count > 1)
-                {
-                    var gameObject = new GameObject(group.ToString());
-                    gameObject.transform.parent = parent;
-                    parent = gameObject.transform;
-                    gameObject.isStatic = options.IsStatic;
-                }
 
-                // Create one game object per mesh object 'bucket', each bucket is ensured to
-                // have less that 65535 vertices (valid under Unity mesh max vertex count).
-                for (int i = 0; i < group.meshData.Meshes.Count; ++i)
-                {
-                    var meshBucket = group.meshData.Meshes[i];
-                    var gameObject = new GameObject(group.ToString());
-                    gameObject.isStatic = options.IsStatic;
+            // Initialize game objects and associate their components (physics, rendering)
+			foreach (var pair in gameObjectMeshData)
+			{
+				var meshData = pair.Value;
+				var root = pair.Key;
 
-                    if (group.meshData.Meshes.Count > 1)
-                    {
-                        gameObject.name += "_Part" + i;
-                    }
+				// Create one game object per mesh object 'bucket', each bucket is ensured to
+				// have less that 65535 vertices (valid under Unity mesh max vertex count).
+				for (int i = 0; i < meshData.Meshes.Count; ++i)
+				{
+					var meshBucket = meshData.Meshes[i];
+					GameObject gameObject;
 
-                    gameObject.transform.parent = parent;
+					if (meshData.Meshes.Count > 1)
+					{
+						gameObject = new GameObject(root.name + "_Part" + i);
+						gameObject.transform.parent = root.transform;
+					}
+					else
+					{
+						gameObject = root.gameObject;
+					}
 
-                    var mesh = new Mesh();
+					gameObject.isStatic = gameObjectOptions.IsStatic;
 
-                    mesh.SetVertices(meshBucket.Vertices);
-                    mesh.SetUVs(0, meshBucket.UVs);
-                    mesh.subMeshCount = meshBucket.Submeshes.Count;
-                    for (int s = 0; s < meshBucket.Submeshes.Count; s++)
-                    {
-                        mesh.SetTriangles(meshBucket.Submeshes[s].Indices, s);
-                    }
-                    mesh.RecalculateNormals();
+					var mesh = new Mesh();
 
-                    if (options.IsStatic)
-                    {
-#if UNITY_EDITOR
-                        // Generate default uvs for this mesh
-                        var UVs = Unwrapping.GeneratePerTriangleUV(mesh);
-                        var mergedUVs = new Vector2[mesh.vertices.Length];
-                        for (int index = 0; index < UVs.Length; ++index)
-                        {
-                            Vector2 uv = UVs[index];
-                            int vertexIndex = mesh.triangles[index];
-                            mergedUVs[vertexIndex] = uv;
-                        }
-                        mesh.uv = mergedUVs;
-                        Unwrapping.GenerateSecondaryUVSet(mesh);
-#else
-                        Debug.LogError("Static meshes not supported in non-editor mode");
-#endif
-                    }
+					mesh.SetVertices(meshBucket.Vertices);
+					mesh.SetUVs(0, meshBucket.UVs);
+					mesh.subMeshCount = meshBucket.Submeshes.Count;
+					for (int s = 0; s < meshBucket.Submeshes.Count; s++)
+					{
+						mesh.SetTriangles(meshBucket.Submeshes[s].Indices, s);
+					}
+					mesh.RecalculateNormals();
 
-                    // Associate the mesh filter and mesh renderer components with this game object
-                    var materials = meshBucket.Submeshes.Select(s => s.Material).ToArray();
-                    var meshFilterComponent = gameObject.AddComponent<MeshFilter>();
-                    var meshRendererComponent = gameObject.AddComponent<MeshRenderer>();
-                    meshRendererComponent.materials = materials;
-                    meshFilterComponent.mesh = mesh;
+					// Associate the mesh filter and mesh renderer components with this game object
+					var materials = meshBucket.Submeshes.Select(s => s.Material).ToArray();
+					var meshFilterComponent = gameObject.AddComponent<MeshFilter>();
+					var meshRendererComponent = gameObject.AddComponent<MeshRenderer>();
+					meshRendererComponent.materials = materials;
+					meshFilterComponent.mesh = mesh;
 
-                    if (options.GeneratePhysicMeshCollider)
-                    {
-                        var meshColliderComponent = gameObject.AddComponent<MeshCollider>();
-                        meshColliderComponent.material = options.PhysicMaterial;
-                        meshColliderComponent.sharedMesh = mesh;
-                    }
-                }
+					if (gameObjectOptions.GeneratePhysicMeshCollider)
+					{
+						var meshColliderComponent = gameObject.AddComponent<MeshCollider>();
+						meshColliderComponent.material = gameObjectOptions.PhysicMaterial;
+						meshColliderComponent.sharedMesh = mesh;
+					}
+				}
             }
         }
     }

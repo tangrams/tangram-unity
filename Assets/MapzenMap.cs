@@ -43,8 +43,6 @@ public class MapzenMap : MonoBehaviour
 
     private int nTasksForArea = 0;
 
-    private SceneGroup regionMap;
-
     public void DownloadTiles()
     {
         TileBounds bounds = new TileBounds(Area);
@@ -52,7 +50,6 @@ public class MapzenMap : MonoBehaviour
         tasks.Clear();
         nTasksForArea = 0;
 
-        regionMap = new SceneGroup(SceneGroup.Type.None, RegionName);
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -105,7 +102,7 @@ public class MapzenMap : MonoBehaviour
 
                 TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY, regionScaleRatio * unitConverter);
 
-                task.Start(featureStyling, regionMap);
+                task.Start(featureStyling);
 
                 OnTaskReady(task);
             };
@@ -121,9 +118,18 @@ public class MapzenMap : MonoBehaviour
 
         if (tasks.Count == nTasksForArea)
         {
-            tasks.Clear();
+            var regionMap = new SceneGroup(SceneGroup.Type.None, RegionName);
 
-            SceneGraph.Generate(regionMap, null, gameObjectOptions);
+            List<FeatureMesh> features = new List<FeatureMesh>();
+            foreach (var task in tasks)
+            {
+                features.AddRange(task.Data);
+            }
+
+            GameObject mapRegion = new GameObject(RegionName);
+            SceneGraph.Generate(features, mapRegion, groupOptions, gameObjectOptions);
+
+            tasks.Clear();
         }
     }
 

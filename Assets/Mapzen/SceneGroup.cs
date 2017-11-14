@@ -41,17 +41,32 @@ namespace Mapzen
         /// <param name="options">The group type options.</param>
         public static bool Test(Type type, Type options)
         {
-            return ((int)type & (int)options) == (int)type;
+			return type == Type.None ? type == options : ((int)type & (int)options) == (int)type;
         }
 
         /// <summary>
-        /// Whether this group is the deepest group type in the hierarchy of group type options.
+        /// Returns the leaf for the hierarchy of group type options
         /// </summary>
-        /// <param name="type">The type to check.</param>
+        /// <returns>The leaf type for the group options.</returns>
         /// <param name="options">The group type options.</param>
-        public static bool IsLeaf(Type type, Type options)
+        public static Type Leaf(Type options)
         {
-            return ((int)type ^ (int)options) < (int)type;
+            if (options == Type.None)
+            {
+                return options;
+            }
+
+            int val = (int)options;
+            int enumCount = Enum.GetNames(typeof(Type)).Length;
+
+            int leftMost = 1 << enumCount;
+
+            while (!SceneGroup.Test((Type)leftMost, options))
+            {
+                leftMost >>= 1;
+            }
+
+            return (Type)leftMost;
         }
 
         public override string ToString()

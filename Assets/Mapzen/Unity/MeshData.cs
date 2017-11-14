@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace Mapzen.Unity
 {
@@ -33,6 +34,36 @@ namespace Mapzen.Unity
         public MeshData()
         {
             Meshes = new List<MeshBucket>();
+        }
+
+        public void Merge(MeshData other)
+        {
+            foreach (var bucket in other.Meshes)
+            {
+                foreach (var submesh in bucket.Submeshes)
+                {
+                    int minIndex = int.MaxValue;
+                    int maxIndex = int.MinValue;
+
+                    foreach (var index in submesh.Indices)
+                    {
+                        minIndex = Math.Min(minIndex, index);
+                        maxIndex = Math.Max(maxIndex, index);
+                    }
+
+                    int nIndices = maxIndex - minIndex + 1;
+                    var uvs = bucket.UVs.GetRange(minIndex, nIndices);
+                    var vertices = bucket.Vertices.GetRange(minIndex, nIndices);
+                    var indices = submesh.Indices as IEnumerable<int>;
+
+                    if (minIndex > 0)
+                    {
+                        indices = indices.Select(i => i - minIndex);
+                    }
+
+                    AddElements(vertices, uvs, indices, submesh.Material);
+                }
+            }
         }
 
         public void AddElements(IEnumerable<Vector3> vertices, IEnumerable<Vector2> uvs, IEnumerable<int> indices, Material material)

@@ -16,9 +16,16 @@ public class TileTask
     private SceneGroup.Type groupOptions;
     private float inverseTileScale;
     private Matrix4x4 transform;
+    private List<FeatureMesh> data;
+
+    public List<FeatureMesh> Data
+    {
+        get { return data; }
+    }
 
     public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY, float regionScaleRatio)
     {
+        this.data = new List<FeatureMesh>();
         this.address = address;
         this.response = response;
         this.ready = false;
@@ -31,16 +38,11 @@ public class TileTask
         this.transform = translate * scale;
     }
 
-    public void Start(List<FeatureStyle> featureStyling, SceneGroup root)
+    public void Start(List<FeatureStyle> featureStyling)
     {
-        // Parse the GeoJSON
+        // TODO: Reuse tile parsing data
         // var tileData = new GeoJsonTile(address, response);
         var tileData = new MvtTile(address, response);
-
-        // The leaf currently used (will hold the mesh data for the currently matched group)
-        SceneGroup leaf = root;
-
-        var tileGroup = OnSceneGroupData(SceneGroup.Type.Tile, address.ToString(), root, ref leaf);
 
         foreach (var style in featureStyling)
         {
@@ -51,12 +53,8 @@ public class TileTask
 
             foreach (var filterStyle in style.FilterStyles)
             {
-                var filterGroup = OnSceneGroupData(SceneGroup.Type.Filter, filterStyle.Name, tileGroup, ref leaf);
-
                 foreach (var layer in tileData.FeatureCollections)
                 {
-                    var layerGroup = OnSceneGroupData(SceneGroup.Type.Layer, layer.Name, filterGroup, ref leaf);
-
                     foreach (var feature in filterStyle.GetFilter().Filter(layer))
                     {
                         var layerStyle = filterStyle.LayerStyles.Find(ls => ls.LayerName == layer.Name);
@@ -69,7 +67,9 @@ public class TileTask
                             featureName += identifier.ToString();
                         }
 
-                        OnSceneGroupData(SceneGroup.Type.Feature, featureName, layerGroup, ref leaf);
+                        FeatureMesh featureMesh = new FeatureMesh(address.ToString(), layer.Name, filterStyle.Name, featureName);
+
+                        IGeometryHandler handler = null;
 
                         if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
                         {
@@ -77,8 +77,7 @@ public class TileTask
 
                             if (polygonOptions.Enabled)
                             {
-                                var builder = new PolygonBuilder(leaf.meshData, polygonOptions, transform);
-                                feature.HandleGeometry(builder);
+                                handler = new PolygonBuilder(featureMesh.Mesh, polygonOptions, transform);
                             }
                         }
 
@@ -88,9 +87,14 @@ public class TileTask
 
                             if (polylineOptions.Enabled)
                             {
-                                var builder = new PolylineBuilder(leaf.meshData, polylineOptions, transform);
-                                feature.HandleGeometry(builder);
+                                handler = new PolylineBuilder(featureMesh.Mesh, polylineOptions, transform);
                             }
+                        }
+
+                        if (handler != null)
+                        {
+                            feature.HandleGeometry(handler);
+                            data.Add(featureMesh);
                         }
                     }
                 }
@@ -98,38 +102,6 @@ public class TileTask
         }
 
         ready = true;
-    }
-
-    private SceneGroup OnSceneGroupData(SceneGroup.Type type, string name, SceneGroup parent, ref SceneGroup leaf)
-    {
-        SceneGroup group = null;
-
-        if (SceneGroup.Test(type, groupOptions))
-        {
-            if (parent.childs.ContainsKey(name))
-            {
-                group = parent.childs[name];
-            }
-
-            // No group found for this idenfier
-            if (group == null)
-            {
-                group = new SceneGroup(type, name);
-                parent.childs[name] = group;
-            }
-
-            // Update the leaf
-            if (SceneGroup.IsLeaf(type, groupOptions))
-            {
-                leaf = group;
-            }
-        }
-        else
-        {
-            group = parent;
-        }
-
-        return group;
     }
 
     public bool IsReady()
