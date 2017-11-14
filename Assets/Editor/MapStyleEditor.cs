@@ -51,8 +51,6 @@ namespace Mapzen.Unity.Editor
 
             var layerArrayProperty = serializedObject.FindProperty("Layers");
 
-            var deletingLayers = false;
-
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Add Layer"))
             {
@@ -64,13 +62,14 @@ namespace Mapzen.Unity.Editor
                 {
                     layerArrayProperty.DeleteArrayElementAtIndex(index);
                 }
-                deletingLayers = true;
+                selectedLayers = new int[0];
+                layerTreeView.SetSelection(selectedLayers);
             }
             GUILayout.EndHorizontal();
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-            if (!deletingLayers && selectedLayers.Count == 1)
+            if (selectedLayers.Count == 1)
             {
                 var index = selectedLayers[0];
 
