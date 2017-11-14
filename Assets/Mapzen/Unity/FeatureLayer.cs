@@ -9,17 +9,18 @@ namespace Mapzen.Unity
     [Serializable]
     public class FeatureLayer
     {
-        public enum MapzenFeatureCollection
+        [Flags]
+        public enum MapzenFeatureCollection : int
         {
-            Boundaries,
-            Buildings,
-            Earth,
-            Landuse,
-            Places,
-            POIs,
-            Roads,
-            Transit,
-            Water,
+            Boundaries = 1,
+            Buildings = 2,
+            Earth = 4,
+            Landuse = 8,
+            Places = 16,
+            POIs = 32,
+            Roads = 64,
+            Transit = 128,
+            Water = 256,
         }
 
         public enum MatcherCombiner
@@ -32,9 +33,9 @@ namespace Mapzen.Unity
 
         public string Name;
 
-        public MapzenFeatureCollection FeatureCollection;
+        public MapzenFeatureCollection FeatureCollection = 0;
 
-        public MatcherCombiner Combiner;
+        public MatcherCombiner Combiner = 0;
 
         public List<LayerMatcher> Matchers;
 
@@ -48,7 +49,14 @@ namespace Mapzen.Unity
         public FeatureFilter GetFilter()
         {
             var filter = new FeatureFilter();
-            filter.CollectionNameSet.Add(FeatureCollection.ToString().ToLower());
+
+            foreach (MapzenFeatureCollection collection in Enum.GetValues(typeof(MapzenFeatureCollection)))
+            {
+                if ((FeatureCollection & collection) != 0)
+                {
+                    filter.CollectionNameSet.Add(collection.ToString().ToLower());
+                }
+            }
 
             if (Matchers == null || Matchers.Count == 0)
             {

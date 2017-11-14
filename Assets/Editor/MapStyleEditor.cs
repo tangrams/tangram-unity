@@ -79,7 +79,10 @@ namespace Mapzen.Unity.Editor
 
                 GUILayout.Label("Layer Properties", labelBoldStyle);
 
-                // EditorGUILayout.PropertyField(layerProperty, true);
+                var layer = mapStyle.Layers[index];
+
+                layer.FeatureCollection = (FeatureLayer.MapzenFeatureCollection)EditorGUILayout.EnumMaskPopup("Feature Collections", layer.FeatureCollection);
+
                 DrawSelectedLayer(layerProperty);
             }
             else
@@ -92,7 +95,7 @@ namespace Mapzen.Unity.Editor
 
         void DrawSelectedLayer(SerializedProperty layerProperty)
         {
-            EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("FeatureCollection"));
+            // EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("FeatureCollection"));
 
             EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("Combiner"));
 
