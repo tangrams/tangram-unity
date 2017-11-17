@@ -1,7 +1,7 @@
 
 namespace Mapzen.Unity
 {
-    public class FeatureMesh 
+    public class FeatureMesh
     {
         private string identifier;
         private string tile;

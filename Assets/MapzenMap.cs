@@ -8,7 +8,9 @@ using Mapzen.VectorData;
 using Mapzen.Unity;
 using Mapzen.VectorData.Filters;
 using Mapzen;
+using System.Threading;
 
+[ExecuteInEditMode]
 public class MapzenMap : MonoBehaviour
 {
     public GameObjectOptions gameObjectOptions;
@@ -18,9 +20,9 @@ public class MapzenMap : MonoBehaviour
     public string ApiKey = "vector-tiles-tyHL4AY";
 
     public TileArea Area = new TileArea(
-                               new LngLat(-74.014892578125, 40.70562793820589),
-                               new LngLat(-74.00390625, 40.713955826286046),
-                               16);
+            new LngLat(-74.014892578125, 40.70562793820589),
+            new LngLat(-74.00390625, 40.713955826286046),
+            16);
 
     public string RegionName = "";
 
@@ -29,7 +31,7 @@ public class MapzenMap : MonoBehaviour
     private IO tileIO = new IO();
 
     [SerializeField]
-    private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
+        private List<FeatureStyle> featureStyling = new List<FeatureStyle>();
 
     [HideInInspector]
     [SerializeField]
@@ -39,17 +41,20 @@ public class MapzenMap : MonoBehaviour
     [SerializeField]
     private RegionScaleUnits.Units regionScaleUnit = RegionScaleUnits.Units.Meters;
 
-    private List<TileTask> tasks = new List<TileTask>();
+    private List<TileTask> readyTasks = new List<TileTask>();
 
     private int nTasksForArea = 0;
 
+    private AsyncWorker worker = new AsyncWorker(2);
+
     public void DownloadTiles()
     {
+        // TODO: cancel worker tasks
+
         TileBounds bounds = new TileBounds(Area);
 
-        tasks.Clear();
+        readyTasks.Clear();
         nTasksForArea = 0;
-
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -60,7 +65,7 @@ public class MapzenMap : MonoBehaviour
         {
             var wrappedTileAddress = tileAddress.Wrapped();
             var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
-                              wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey));
+                        wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey));
 
             IO.IORequestCallback onTileFetched = (response) =>
             {
@@ -78,7 +83,6 @@ public class MapzenMap : MonoBehaviour
 
                 float offsetX = (tileAddress.x - bounds.min.x);
                 float offsetY = (-tileAddress.y + bounds.min.y);
-
 
                 float unitConverter = 1.0f;
                 switch (regionScaleUnit)
@@ -98,13 +102,20 @@ public class MapzenMap : MonoBehaviour
                     default:
                         unitConverter = 0.0f;
                         break;
-                 }
+                }
 
-                TileTask task = new TileTask(tileAddress, groupOptions, response.data, offsetX, offsetY, regionScaleRatio * unitConverter);
+                float scaleRatio = (float)tileAddress.GetSizeMercatorMeters() * regionScaleRatio * unitConverter;
+                Matrix4x4 scale = Matrix4x4.Scale(new Vector3(scaleRatio, scaleRatio, scaleRatio));
+                Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
+                Matrix4x4 transform = translate * scale;
 
-                task.Start(featureStyling);
+                TileTask task = new TileTask(featureStyling, tileAddress, transform, response.data);
 
-                OnTaskReady(task);
+                worker.RunAsync(() =>
+                        {
+                        task.Start();
+                        readyTasks.Add(task);
+                        });
             };
 
             // Starts the HTTP request
@@ -112,25 +123,31 @@ public class MapzenMap : MonoBehaviour
         }
     }
 
-    void OnTaskReady(TileTask readyTask)
+    public void CheckPendingTasks()
     {
-        tasks.Add(readyTask);
-
-        if (tasks.Count == nTasksForArea)
+        if (readyTasks.Count < nTasksForArea)
         {
-            var regionMap = new SceneGroup(SceneGroup.Type.None, RegionName);
-
-            List<FeatureMesh> features = new List<FeatureMesh>();
-            foreach (var task in tasks)
-            {
-                features.AddRange(task.Data);
-            }
-
-            GameObject mapRegion = new GameObject(RegionName);
-            SceneGraph.Generate(features, mapRegion, groupOptions, gameObjectOptions);
-
-            tasks.Clear();
+            return;
         }
+
+        var regionMap = new SceneGroup(SceneGroup.Type.None, RegionName);
+
+        List<FeatureMesh> features = new List<FeatureMesh>();
+        foreach (var task in readyTasks)
+        {
+            features.AddRange(task.Data);
+        }
+
+        GameObject mapRegion = new GameObject(RegionName);
+        SceneGraph.Generate(features, mapRegion, groupOptions, gameObjectOptions);
+
+        readyTasks.Clear();
+        nTasksForArea = 0;
+    }
+
+    public int PendingTasks
+    {
+        get { return nTasksForArea; }
     }
 
     public List<GameObject> Tiles

@@ -48,6 +48,12 @@ public class MapzenMapEditor : Editor
 
         EditorConfig.ResetColor();
 
+		if (mapzenMap.PendingTasks > 0) 
+		{
+			Repaint();
+			mapzenMap.CheckPendingTasks();
+		}
+
         SavePreferences();
     }
 

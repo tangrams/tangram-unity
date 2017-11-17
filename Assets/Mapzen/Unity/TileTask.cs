@@ -1,48 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mapzen;
 using Mapzen.Unity;
 using Mapzen.VectorData;
 using Mapzen.VectorData.Formats;
 using Mapzen.VectorData.Filters;
 using UnityEngine;
-using System.Linq;
 
 public class TileTask
 {
     private TileAddress address;
-    private byte[] response;
+    private byte[] tileData;
     private bool ready;
-    private SceneGroup.Type groupOptions;
-    private float inverseTileScale;
     private Matrix4x4 transform;
     private List<FeatureMesh> data;
+    private List<FeatureStyle> featureStyling;
 
     public List<FeatureMesh> Data
     {
         get { return data; }
     }
 
-    public TileTask(TileAddress address, SceneGroup.Type groupOptions, byte[] response, float offsetX, float offsetY, float regionScaleRatio)
+    public bool Ready
+    {
+        get { return ready; }
+    }
+
+    public TileTask(List<FeatureStyle> featureStyling, TileAddress address, Matrix4x4 transform, byte[] tileData)
     {
         this.data = new List<FeatureMesh>();
         this.address = address;
-        this.response = response;
+        this.tileData = tileData;
+        this.transform = transform;
         this.ready = false;
-        this.groupOptions = groupOptions;
-        this.inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
-
-        float scaleRatio = (float)address.GetSizeMercatorMeters() * regionScaleRatio;
-        Matrix4x4 scale = Matrix4x4.Scale(new Vector3(scaleRatio, scaleRatio, scaleRatio));
-        Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
-        this.transform = translate * scale;
+        this.featureStyling = featureStyling;
     }
 
-    public void Start(List<FeatureStyle> featureStyling)
+    public void Start()
     {
+        float inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
+
         // TODO: Reuse tile parsing data
         // var tileData = new GeoJsonTile(address, response);
-        var tileData = new MvtTile(address, response);
+        var mvtTile = new MvtTile(address, tileData);
 
         foreach (var style in featureStyling)
         {
@@ -53,7 +52,7 @@ public class TileTask
 
             foreach (var filterStyle in style.FilterStyles)
             {
-                foreach (var layer in tileData.FeatureCollections)
+                foreach (var layer in mvtTile.FeatureCollections)
                 {
                     foreach (var feature in filterStyle.GetFilter().Filter(layer))
                     {
@@ -102,10 +101,5 @@ public class TileTask
         }
 
         ready = true;
-    }
-
-    public bool IsReady()
-    {
-        return ready;
     }
 }
