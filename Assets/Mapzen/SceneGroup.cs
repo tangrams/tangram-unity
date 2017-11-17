@@ -6,29 +6,20 @@ namespace Mapzen
 {
     public class SceneGroup
     {
-        [Flags]
-        public enum Type
-        {
-            None = 0,
-            Tile = 1 << 0,
-            Filter = 1 << 1,
-            Layer = 1 << 2,
-            Feature = 1 << 3,
-            All = ~None,
-        }
+        // Children of this scene group, identified by their name
+        public List<SceneGroup> children;
 
-        // Childs of this scene group, identifier by their name
-        public Dictionary<string, SceneGroup> childs;
         // A name identifer
         public string name;
+
         // The mesh data, may be empty
         public MeshData meshData;
 
-        public Type type;
+        public SceneGroupType type;
 
-        public SceneGroup(Type type, string name)
+        public SceneGroup(SceneGroupType type, string name)
         {
-            this.childs = new Dictionary<string, SceneGroup>();
+            this.children = new List<SceneGroup>();
             this.type = type;
             this.name = name;
             this.meshData = new MeshData();
@@ -39,7 +30,7 @@ namespace Mapzen
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="options">The group type options.</param>
-        public static bool Test(Type type, Type options)
+        public static bool Test(SceneGroupType type, SceneGroupType options)
         {
             return ((int)type & (int)options) == (int)type;
         }
@@ -49,14 +40,14 @@ namespace Mapzen
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="options">The group type options.</param>
-        public static bool IsLeaf(Type type, Type options)
+        public static bool IsLeaf(SceneGroupType type, SceneGroupType options)
         {
             return ((int)type ^ (int)options) < (int)type;
         }
 
         public override string ToString()
         {
-            if (type == Type.None || type == Type.All)
+            if (type == 0)
             {
                 return name;
             }
