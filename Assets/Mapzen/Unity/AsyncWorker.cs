@@ -87,6 +87,14 @@ namespace Mapzen.Unity
             }
         }
 
+        public void ClearTasks()
+        {
+            lock (this)
+            {
+                tasks.Clear();
+            }
+        }
+
         private void ThreadMain()
         {
             while (!stopped)

@@ -29,8 +29,8 @@ public class MapzenMapEditor : Editor
         bool valid = IsValid();
 
         EditorConfig.SetColor(valid ?
-            EditorConfig.DownloadButtonEnabledColor :
-            EditorConfig.DownloadButtonDisabledColor);
+                EditorConfig.DownloadButtonEnabledColor :
+                EditorConfig.DownloadButtonDisabledColor);
 
         if (GUILayout.Button("Download"))
         {
@@ -48,11 +48,11 @@ public class MapzenMapEditor : Editor
 
         EditorConfig.ResetColor();
 
-		if (mapzenMap.PendingTasks > 0) 
-		{
-			Repaint();
-			mapzenMap.CheckPendingTasks();
-		}
+        if (mapzenMap.PendingTasks > 0)
+        {
+            Repaint();
+            mapzenMap.CheckPendingTasks();
+        }
 
         SavePreferences();
     }

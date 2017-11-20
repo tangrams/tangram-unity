@@ -14,6 +14,12 @@ public class TileTask
     private Matrix4x4 transform;
     private List<FeatureMesh> data;
     private List<FeatureStyle> featureStyling;
+    private int generation;
+
+    public int Generation
+    {
+        get { return generation; }
+    }
 
     public List<FeatureMesh> Data
     {
@@ -25,7 +31,7 @@ public class TileTask
         get { return ready; }
     }
 
-    public TileTask(List<FeatureStyle> featureStyling, TileAddress address, Matrix4x4 transform, byte[] tileData)
+    public TileTask(List<FeatureStyle> featureStyling, TileAddress address, Matrix4x4 transform, byte[] tileData, int generation)
     {
         this.data = new List<FeatureMesh>();
         this.address = address;
@@ -33,6 +39,7 @@ public class TileTask
         this.transform = transform;
         this.ready = false;
         this.featureStyling = featureStyling;
+        this.generation = generation;
     }
 
     public void Start()

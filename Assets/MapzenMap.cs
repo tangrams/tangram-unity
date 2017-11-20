@@ -45,16 +45,18 @@ public class MapzenMap : MonoBehaviour
 
     private int nTasksForArea = 0;
 
+    private int generation = 0;
+
     private AsyncWorker worker = new AsyncWorker(2);
 
     public void DownloadTiles()
     {
-        // TODO: cancel worker tasks
-
         TileBounds bounds = new TileBounds(Area);
 
+        worker.ClearTasks();
         readyTasks.Clear();
         nTasksForArea = 0;
+        generation++;
 
         foreach (var tileAddress in bounds.TileAddressRange)
         {
@@ -109,13 +111,17 @@ public class MapzenMap : MonoBehaviour
                 Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
                 Matrix4x4 transform = translate * scale;
 
-                TileTask task = new TileTask(featureStyling, tileAddress, transform, response.data);
+                TileTask task = new TileTask(featureStyling, tileAddress, transform, response.data, generation);
 
                 worker.RunAsync(() =>
-                        {
+                {
+                    // Skip any task that has been generated for a different generation
+                    if (generation == task.Generation)
+                    {
                         task.Start();
                         readyTasks.Add(task);
-                        });
+                    }
+                });
             };
 
             // Starts the HTTP request
@@ -125,7 +131,18 @@ public class MapzenMap : MonoBehaviour
 
     public void CheckPendingTasks()
     {
-        if (readyTasks.Count < nTasksForArea)
+        // Number of tasks ready for the current generation
+        int nTasksReady = 0;
+
+        foreach (var task in readyTasks)
+        {
+            if (task.Generation == generation)
+            {
+                nTasksReady++;
+            }
+        }
+
+        if (nTasksReady < nTasksForArea)
         {
             return;
         }
