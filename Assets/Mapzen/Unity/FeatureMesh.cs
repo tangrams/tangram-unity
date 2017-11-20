@@ -20,16 +20,16 @@ namespace Mapzen.Unity
             this.mesh = new MeshData();
         }
 
-        public string GetName(SceneGroup.Type groupType)
+        public string GetName(SceneGroupType groupType)
         {
             string name = "";
 
             switch (groupType)
             {
-                case SceneGroup.Type.Feature: name = identifier; break;
-                case SceneGroup.Type.Filter: name = filter; break;
-                case SceneGroup.Type.Layer: name = layer; break;
-                case SceneGroup.Type.Tile: name = tile; break;
+                case SceneGroupType.Feature: name = identifier; break;
+                case SceneGroupType.Filter: name = filter; break;
+                case SceneGroupType.Layer: name = layer; break;
+                case SceneGroupType.Tile: name = tile; break;
             }
 
             return name;

@@ -38,7 +38,7 @@ public class MapzenMapEditor : Editor
             {
                 LogWarnings();
 
-                mapzenMap.DownloadTiles();
+                mapzenMap.DownloadTilesAsync();
             }
             else
             {
@@ -48,16 +48,21 @@ public class MapzenMapEditor : Editor
 
         EditorConfig.ResetColor();
 
-        if (mapzenMap.PendingTasks > 0)
+        if (mapzenMap.HasPendingTasks())
         {
+            // Go through another OnInspectorGUI cycle
             Repaint();
-            mapzenMap.CheckPendingTasks();
+
+            if (mapzenMap.FinishedRunningTasks())
+            {
+                mapzenMap.GenerateSceneGraph();
+            }
         }
 
         SavePreferences();
     }
 
-    private void SceneGroupToggle(MapzenMap mapzenMap, SceneGroup.Type type)
+    private void SceneGroupToggle(MapzenMap mapzenMap, SceneGroupType type)
     {
         bool isSet = SceneGroup.Test(type, mapzenMap.GroupOptions);
         isSet = EditorGUILayout.Toggle(type.ToString(), isSet);
@@ -80,13 +85,13 @@ public class MapzenMapEditor : Editor
         EditorGUI.indentLevel++;
 
         EditorGUILayout.BeginHorizontal();
-        SceneGroupToggle(mapzenMap, SceneGroup.Type.Feature);
-        SceneGroupToggle(mapzenMap, SceneGroup.Type.Filter);
+        SceneGroupToggle(mapzenMap, SceneGroupType.Feature);
+        SceneGroupToggle(mapzenMap, SceneGroupType.Filter);
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
-        SceneGroupToggle(mapzenMap, SceneGroup.Type.Layer);
-        SceneGroupToggle(mapzenMap, SceneGroup.Type.Tile);
+        SceneGroupToggle(mapzenMap, SceneGroupType.Layer);
+        SceneGroupToggle(mapzenMap, SceneGroupType.Tile);
         EditorGUILayout.EndHorizontal();
 
         EditorGUI.indentLevel--;

@@ -35,7 +35,7 @@ public class MapzenMap : MonoBehaviour
 
     [HideInInspector]
     [SerializeField]
-    private SceneGroup.Type groupOptions;
+    private SceneGroupType groupOptions;
 
     [HideInInspector]
     [SerializeField]
@@ -49,10 +49,11 @@ public class MapzenMap : MonoBehaviour
 
     private AsyncWorker worker = new AsyncWorker(2);
 
-    public void DownloadTiles()
+    public void DownloadTilesAsync()
     {
         TileBounds bounds = new TileBounds(Area);
 
+        // Abort currently running tasks and increase generation
         worker.ClearTasks();
         readyTasks.Clear();
         nTasksForArea = 0;
@@ -129,7 +130,12 @@ public class MapzenMap : MonoBehaviour
         }
     }
 
-    public void CheckPendingTasks()
+    public bool HasPendingTasks()
+    {
+        return nTasksForArea > 0;
+    }
+
+    public bool FinishedRunningTasks()
     {
         // Number of tasks ready for the current generation
         int nTasksReady = 0;
@@ -142,20 +148,19 @@ public class MapzenMap : MonoBehaviour
             }
         }
 
-        if (nTasksReady < nTasksForArea)
-        {
-            return;
-        }
+        return nTasksReady == nTasksForArea;
+    }
 
-        var regionMap = new SceneGroup(SceneGroup.Type.None, RegionName);
-
+    public void GenerateSceneGraph()
+    {
+        // Merge all feature meshes
         List<FeatureMesh> features = new List<FeatureMesh>();
         foreach (var task in readyTasks)
         {
             features.AddRange(task.Data);
         }
 
-        GameObject mapRegion = new GameObject(RegionName);
+        var mapRegion = new GameObject(RegionName);
         SceneGraph.Generate(features, mapRegion, groupOptions, gameObjectOptions);
 
         readyTasks.Clear();
@@ -182,7 +187,7 @@ public class MapzenMap : MonoBehaviour
         set { regionScaleRatio = value; }
     }
 
-    public SceneGroup.Type GroupOptions
+    public SceneGroupType GroupOptions
     {
         get { return groupOptions; }
         set { groupOptions = value; }

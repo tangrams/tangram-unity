@@ -4,44 +4,27 @@ using Mapzen.Unity;
 
 namespace Mapzen
 {
-    public class SceneGroup
+    [Flags]
+    public enum SceneGroupType
     {
-        [Flags]
-        public enum Type
-        {
-            None = 0,
-            Tile = 1 << 0,
-            Filter = 1 << 1,
-            Layer = 1 << 2,
-            Feature = 1 << 3,
-            All = ~None,
-        }
+        None = 0,
+        Tile = 1 << 0,
+        Filter = 1 << 1,
+        Layer = 1 << 2,
+        Feature = 1 << 3,
+        All = ~None,
+    }
 
-        // Childs of this scene group, identifier by their name
-        public Dictionary<string, SceneGroup> childs;
-        // A name identifer
-        public string name;
-        // The mesh data, may be empty
-        public MeshData meshData;
-
-        public Type type;
-
-        public SceneGroup(Type type, string name)
-        {
-            this.childs = new Dictionary<string, SceneGroup>();
-            this.type = type;
-            this.name = name;
-            this.meshData = new MeshData();
-        }
-
+    public class SceneGroup 
+    {
         /// <summary>
         /// Tests whether this group is enabled in the group type options.
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="options">The group type options.</param>
-        public static bool Test(Type type, Type options)
+        public static bool Test(SceneGroupType type, SceneGroupType options)
         {
-			return type == Type.None ? type == options : ((int)type & (int)options) == (int)type;
+            return type == SceneGroupType.None ? type == options : ((int)type & (int)options) == (int)type;
         }
 
         /// <summary>
@@ -49,34 +32,22 @@ namespace Mapzen
         /// </summary>
         /// <returns>The leaf type for the group options.</returns>
         /// <param name="options">The group type options.</param>
-        public static Type Leaf(Type options)
+        public static SceneGroupType GetLeaf(SceneGroupType options)
         {
-            if (options == Type.None)
+            if (options == SceneGroupType.None)
             {
                 return options;
             }
 
-            int val = (int)options;
-            int enumCount = Enum.GetNames(typeof(Type)).Length;
-
+            int enumCount = Enum.GetNames(typeof(SceneGroupType)).Length;
             int leftMost = 1 << enumCount;
 
-            while (!SceneGroup.Test((Type)leftMost, options))
+            while (!Test((SceneGroupType)leftMost, options))
             {
                 leftMost >>= 1;
             }
 
-            return (Type)leftMost;
-        }
-
-        public override string ToString()
-        {
-            if (type == Type.None || type == Type.All)
-            {
-                return name;
-            }
-
-            return type.ToString() + "_" + name;
+            return (SceneGroupType)leftMost;
         }
     }
 }

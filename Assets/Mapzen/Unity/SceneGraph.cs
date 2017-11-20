@@ -12,8 +12,8 @@ namespace Mapzen.Unity
 {
     public class SceneGraph
     {
-        private static GameObject AddGameObjectGroupToHierarchy(SceneGroup.Type groupType, GameObject parentGameObject,
-                SceneGroup.Type groupOptions, FeatureMesh featureMesh)
+        private static GameObject AddGameObjectGroupToHierarchy(SceneGroupType groupType, GameObject parentGameObject,
+                SceneGroupType groupOptions, FeatureMesh featureMesh)
         {
             GameObject gameObject = null;
 
@@ -26,7 +26,7 @@ namespace Mapzen.Unity
 
             if (SceneGroup.Test(groupType, groupOptions))
             {
-                if (groupOptions == SceneGroup.Type.None)
+                if (groupOptions == SceneGroupType.None)
                 {
                     gameObject = parentGameObject;
                 }
@@ -56,11 +56,11 @@ namespace Mapzen.Unity
             return gameObject;
         }
 
-        public static void MergeGameObjectGroupMeshData(Dictionary<GameObject, MeshData> gameObjects, SceneGroup.Type groupType,
-                GameObject gameObject, SceneGroup.Type groupOptions, FeatureMesh featureMesh)
+        public static void MergeGameObjectGroupMeshData(Dictionary<GameObject, MeshData> gameObjects, SceneGroupType groupType,
+                GameObject gameObject, SceneGroupType groupOptions, FeatureMesh featureMesh)
         {
             // Merge the mesh data from the feature for the game object
-            if (gameObject != null && groupType == SceneGroup.Leaf(groupOptions))
+            if (gameObject != null && groupType == SceneGroup.GetLeaf(groupOptions))
             {
                 if (gameObjects.ContainsKey(gameObject))
                 {
@@ -75,7 +75,7 @@ namespace Mapzen.Unity
             }
         }
 
-        public static void Generate(List<FeatureMesh> features, GameObject mapRegion, SceneGroup.Type groupOptions, GameObjectOptions gameObjectOptions)
+        public static void Generate(List<FeatureMesh> features, GameObject mapRegion, SceneGroupType groupOptions, GameObjectOptions gameObjectOptions)
         {
             Dictionary<GameObject, MeshData> gameObjectMeshData = new Dictionary<GameObject, MeshData>();
 
@@ -87,27 +87,27 @@ namespace Mapzen.Unity
                 GameObject parent = mapRegion;
 
                 // Group 'none'
-                none = AddGameObjectGroupToHierarchy(SceneGroup.Type.None, parent, groupOptions, featureMesh);
-                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroup.Type.None, none, groupOptions, featureMesh);
+                none = AddGameObjectGroupToHierarchy(SceneGroupType.None, parent, groupOptions, featureMesh);
+                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.None, none, groupOptions, featureMesh);
 
                 // Group 'tile'
-                tile = AddGameObjectGroupToHierarchy(SceneGroup.Type.Tile, parent, groupOptions, featureMesh);
-                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroup.Type.Tile, tile, groupOptions, featureMesh);
+                tile = AddGameObjectGroupToHierarchy(SceneGroupType.Tile, parent, groupOptions, featureMesh);
+                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Tile, tile, groupOptions, featureMesh);
 
                 // group 'filter'
                 parent = tile == null ? parent : tile;
-                filter = AddGameObjectGroupToHierarchy(SceneGroup.Type.Filter, parent, groupOptions, featureMesh);
-                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroup.Type.Filter, filter, groupOptions, featureMesh);
+                filter = AddGameObjectGroupToHierarchy(SceneGroupType.Filter, parent, groupOptions, featureMesh);
+                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Filter, filter, groupOptions, featureMesh);
 
                 // group 'layer'
                 parent = filter == null ? parent : filter;
-                layer = AddGameObjectGroupToHierarchy(SceneGroup.Type.Layer, parent, groupOptions, featureMesh);
-                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroup.Type.Layer, layer, groupOptions, featureMesh);
+                layer = AddGameObjectGroupToHierarchy(SceneGroupType.Layer, parent, groupOptions, featureMesh);
+                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Layer, layer, groupOptions, featureMesh);
 
                 // group 'feature'
                 parent = layer == null ? parent : layer;
-                feature = AddGameObjectGroupToHierarchy( SceneGroup.Type.Feature, parent, groupOptions, featureMesh);
-                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroup.Type.Feature, feature, groupOptions, featureMesh);
+                feature = AddGameObjectGroupToHierarchy( SceneGroupType.Feature, parent, groupOptions, featureMesh);
+                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Feature, feature, groupOptions, featureMesh);
             }
 
             // Initialize game objects and associate their components (physics, rendering)
