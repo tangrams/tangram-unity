@@ -35,5 +35,15 @@ namespace Mapzen
         {
             return Geo.Unproject(this);
         }
+
+        public static MercatorMeters operator +(MercatorMeters a, MercatorMeters b)
+        {
+            return new MercatorMeters(a.x + b.x, a.y + b.y);
+        }
+
+        public static MercatorMeters operator -(MercatorMeters a, MercatorMeters b)
+        {
+            return new MercatorMeters(a.x - b.x, a.y - b.y);
+        }
     }
 }
