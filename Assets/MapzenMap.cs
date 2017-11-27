@@ -64,6 +64,9 @@ public class MapzenMap : MonoBehaviour
             nTasksForArea++;
         }
 
+        // Use a local generation variable to be used in IORequestCallback
+        int currentGeneration = generation;
+
         foreach (var tileAddress in bounds.TileAddressRange)
         {
             var wrappedTileAddress = tileAddress.Wrapped();
@@ -112,12 +115,12 @@ public class MapzenMap : MonoBehaviour
                 Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
                 Matrix4x4 transform = translate * scale;
 
-                TileTask task = new TileTask(featureStyling, tileAddress, transform, response.data, generation);
+                TileTask task = new TileTask(featureStyling, tileAddress, transform, response.data, currentGeneration);
 
                 worker.RunAsync(() =>
                 {
                     // Skip any task that has been generated for a different generation
-                    if (generation == task.Generation)
+                    if (currentGeneration == task.Generation)
                     {
                         task.Start();
                         readyTasks.Add(task);
