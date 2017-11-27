@@ -39,6 +39,8 @@ namespace Mapzen.Unity.Editor
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("GameObjectOptions"), true);
 
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("TerrainMaterial"), true);
+
             EditorGUILayout.PropertyField(serializedObject.FindProperty("Styles"), true);
 
             bool valid = IsValid();

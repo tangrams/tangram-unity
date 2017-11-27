@@ -31,6 +31,8 @@ namespace Mapzen
 
         public GameObjectOptions GameObjectOptions;
 
+        public Material TerrainMaterial;
+
         public List<MapStyle> Styles = new List<MapStyle>();
 
         // Private fields
@@ -67,35 +69,27 @@ namespace Mapzen
             foreach (var tileAddress in bounds.TileAddressRange)
             {
                 var wrappedTileAddress = tileAddress.Wrapped();
-                var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
-                    wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey));
 
-                IO.IORequestCallback onTileFetched = (response) =>
-                    {
-                        if (response.hasError())
-                        {
-                            Debug.Log("TileIO Error: " + response.error);
-                            return;
-                        }
+                // Create a GameObject for this tile.
+                var terrainTileObject = new GameObject(wrappedTileAddress.ToString());
+                terrainTileObject.transform.SetParent(transform);
 
-                        if (response.data.Length == 0)
-                        {
-                            Debug.Log("Empty Response");
-                            return;
-                        }
+                // Set the local position of the GameObject.
+                var offset = wrappedTileAddress.GetOriginMercatorMeters() - Area.min.ToMercatorMeters();
+                terrainTileObject.transform.localPosition = new Vector3((float)offset.x, 0.0f, (float)offset.y) * UnitsPerMeter;
 
-                        float offsetX = (tileAddress.x - bounds.min.x);
-                        float offsetY = (-tileAddress.y + bounds.min.y);
+                // Create a TerrainTileTask to generate this tile.
+                var terrainTileTask = new TerrainTileTask {
+                    Address = wrappedTileAddress,
+                    ApiKey = ApiKey,
+                    Resolution = 128,
+                    UnitsPerMeter = UnitsPerMeter,
+                    Material = TerrainMaterial,
+                    TargetObject = terrainTileObject,
+                };
 
-                        TileTask task = new TileTask(tileAddress, GroupOptions, response.data, offsetX, offsetY, UnitsPerMeter);
-
-                        task.Start(Styles, regionMap);
-
-                        OnTaskReady(task);
-                    };
-
-                // Starts the HTTP request
-                StartCoroutine(tileIO.FetchNetworkData(uri, onTileFetched));
+                // Run the task as a Coroutine.
+                StartCoroutine(terrainTileTask.Run());
             }
         }
 

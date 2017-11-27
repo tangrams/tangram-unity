@@ -38,11 +38,11 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44659358, g: 0.49642974, b: 0.574825, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 0
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 1
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 2
     m_BakeResolution: 40
     m_TextureWidth: 1024
@@ -87,7 +87,7 @@ LightmapSettings:
     m_PVRFilteringAtrousNormalSigma: 1
     m_PVRFilteringAtrousPositionSigma: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -118,7 +118,7 @@ GameObject:
   - component: {fileID: 349009245}
   - component: {fileID: 349009244}
   m_Layer: 0
-  m_Name: Mapzen
+  m_Name: RegionMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -132,27 +132,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 349009243}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f99f332e167bc4c5cb799d5f5171e0b0, type: 3}
+  m_Script: {fileID: 11500000, guid: 673da631ad95c423cbdabfdc9202e581, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameObjectOptions:
+  ApiKey: 
+  Area:
+    min:
+      longitude: -122
+      latitude: 37.76
+    max:
+      longitude: -121.8
+      latitude: 37.92
+    zoom: 12
+  UnitsPerMeter: 0.01
+  RegionName: Manhattan
+  GroupOptions: 4
+  GameObjectOptions:
     IsStatic: 0
     GeneratePhysicMeshCollider: 0
     PhysicMaterial: {fileID: 0}
-  regionScaleRatio: 0.01
-  ApiKey: mapzen-MTyWgFy
-  Area:
-    min:
-      longitude: -74.019463
-      latitude: 40.700446
-    max:
-      longitude: -73.998306
-      latitude: 40.716939
-    zoom: 16
-  RegionName: region_0
-  featureStyling:
-  - {fileID: 11400000, guid: fc13486fe526f434c97435d16023999a, type: 2}
-  groupOptions: 4
+  TerrainMaterial: {fileID: 2100000, guid: 4d4bdc027afa042afbf970d47332c92b, type: 2}
+  Styles:
+  - {fileID: 11400000, guid: cc2ab290d3f274a74b433cd6d601f051, type: 2}
 --- !u!4 &349009245
 Transform:
   m_ObjectHideFlags: 0
