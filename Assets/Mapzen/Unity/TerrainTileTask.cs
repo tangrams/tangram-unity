@@ -56,13 +56,18 @@ namespace Mapzen.Unity
 
         public static Mesh GenerateElevationGridMesh(Texture2D elevationTexture, int resolution, float metersPerTile, float unitsPerMeter)
         {
-            // Create empty lists for all of the vertex values we need to set.
-            var vertices = new List<Vector3>();
-            var indices = new List<int>();
-            var uvs = new List<Vector2>();
+            // Create pre-allocated arrays for all of the mesh values we need to set.
+            int totalVertices = (resolution + 1) * (resolution + 1);
+            int totalIndices = resolution * resolution * 6;
+            var vertices = new Vector3[totalVertices];
+            var indices = new int[totalIndices];
+            var uvs = new Vector2[totalVertices];
 
             // Iterate over the rows and columns of a grid in X and Z.
-            int index = 0;
+            int textureWidth = elevationTexture.width;
+            int textureHeight = elevationTexture.height;
+            int vertexCount = 0;
+            int indexCount = 0;
             for (int col = 0; col <= resolution; col++)
             {
                 float z = (float)col / resolution;
@@ -70,36 +75,36 @@ namespace Mapzen.Unity
                 {
                     float x = (float)row / resolution;
 
-                    int xPixel = Convert.ToInt32(x * elevationTexture.width);
-                    int yPixel = Convert.ToInt32(z * elevationTexture.height);
+                    int xPixel = (int)(x * textureWidth);
+                    int yPixel = (int)(z * textureHeight);
                     float elevation = ColorToElevation(elevationTexture.GetPixel(xPixel, yPixel));
                     float y = elevation / metersPerTile;
 
                     // Add the values for a new vertex.
-                    vertices.Add(new Vector3(x, y, z) * (unitsPerMeter * metersPerTile));
-                    uvs.Add(new Vector2(x, z));
+                    vertices[vertexCount] = new Vector3(x, y, z) * (unitsPerMeter * metersPerTile);
+                    uvs[vertexCount] = new Vector2(x, z);
 
                     // Add indices for form triangles between this vertex and its neighbors left and down, unless
                     // we're at the end of a column or row.
                     if (row < resolution && col < resolution)
                     {
-                        indices.Add(index);
-                        indices.Add(index + resolution + 1);
-                        indices.Add(index + 1);
+                        indices[indexCount++] = vertexCount;
+                        indices[indexCount++] = vertexCount + resolution + 1;
+                        indices[indexCount++] = vertexCount + 1;
 
-                        indices.Add(index + 1);
-                        indices.Add(index + resolution + 1);
-                        indices.Add(index + resolution + 2);
+                        indices[indexCount++] = vertexCount + 1;
+                        indices[indexCount++] = vertexCount + resolution + 1;
+                        indices[indexCount++] = vertexCount + resolution + 2;
                     }
 
-                    index++;
+                    vertexCount++;
                 }
             }
 
             var mesh = new Mesh();
-            mesh.SetVertices(vertices);
-            mesh.SetUVs(0, uvs);
-            mesh.SetTriangles(indices, 0);
+            mesh.vertices = vertices;
+            mesh.uv = uvs;
+            mesh.triangles = indices;
             return mesh;
         }
     }
