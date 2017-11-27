@@ -17,11 +17,13 @@ namespace Mapzen.Unity
         /// </summary>
         /// <param name="group">The scene group to visit.</param>
         /// <param name="parent">The parent transform of the generated game object for the current scene group.</param>
-        public static void Generate(SceneGroup group, Transform parent, GameObjectOptions options)
+        public static List<MeshFilter> Generate(SceneGroup group, Transform parent, GameObjectOptions options)
         {
+            List<MeshFilter> meshFilters = new List<MeshFilter>();
+
             if (group.meshData.Meshes.Count == 0 && group.childs.Count == 0)
             {
-                return;
+                return meshFilters;
             }
 
             if (group.childs.Count > 0)
@@ -36,7 +38,7 @@ namespace Mapzen.Unity
 
                 foreach (var child in group.childs)
                 {
-                    Generate(child.Value, gameObject.transform, options);
+                    meshFilters.AddRange(Generate(child.Value, gameObject.transform, options));
                 }
             }
             else
@@ -107,8 +109,12 @@ namespace Mapzen.Unity
                         meshColliderComponent.material = options.PhysicMaterial;
                         meshColliderComponent.sharedMesh = mesh;
                     }
+
+                    meshFilters.Add(meshFilterComponent);
                 }
             }
+
+            return meshFilters;
         }
     }
 }
