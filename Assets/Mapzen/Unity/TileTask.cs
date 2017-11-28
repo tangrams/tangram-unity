@@ -33,7 +33,6 @@ public class TileTask
         get { return ready; }
     }
 
-    // public TileTask(TileAddress address, SceneGroupType groupOptions, byte[] response, float offsetX, float offsetY, float regionScaleRatio)
     public TileTask(List<MapStyle> featureStyling, TileAddress address, Matrix4x4 transform, byte[] tileData, int generation)
     {
         this.data = new List<FeatureMesh>();

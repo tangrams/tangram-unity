@@ -13,7 +13,17 @@ namespace Mapzen
         /// <param name="options">The group type options.</param>
         public static bool Test(SceneGroupType type, SceneGroupType options)
         {
-            return type == SceneGroupType.None ? type == options : ((int)type & (int)options) == (int)type;
+            if (options == SceneGroupType.Nothing)
+            {
+                return type == options;
+            }
+
+            if (options == SceneGroupType.Everything)
+            {
+                return true;
+            }
+
+            return ((int)type & (int)options) == (int)type;
         }
 
         /// <summary>
@@ -23,9 +33,14 @@ namespace Mapzen
         /// <param name="options">The group type options.</param>
         public static SceneGroupType GetLeaf(SceneGroupType options)
         {
-            if (options == SceneGroupType.None)
+            if (options == SceneGroupType.Nothing)
             {
                 return options;
+            }
+
+            if (options == SceneGroupType.Everything)
+            {
+                return SceneGroupType.Feature;
             }
 
             int enumCount = Enum.GetNames(typeof(SceneGroupType)).Length;

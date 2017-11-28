@@ -5,10 +5,11 @@ namespace Mapzen
     [Flags]
     public enum SceneGroupType
     {
-        None = 0,
-        Tile = 1 << 0,
-        Filter = 1 << 1,
-        Layer = 1 << 2,
-        Feature = 1 << 3,
+        Nothing = 0,
+        Tile = 1 << 1,
+        Filter = 1 << 2,
+        Layer = 1 << 3,
+        Feature = 1 << 4,
+        Everything = ~Nothing,
     }
 }

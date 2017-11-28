@@ -22,7 +22,7 @@ namespace Mapzen.Unity
 
             if (SceneGroup.Test(groupType, groupOptions))
             {
-                if (groupOptions == SceneGroupType.None)
+                if (groupOptions == SceneGroupType.Nothing)
                 {
                     gameObject = parentGameObject;
                 }
@@ -82,28 +82,33 @@ namespace Mapzen.Unity
             {
                 GameObject parent = mapRegion;
 
-                // Group 'none'
-                none = AddGameObjectGroupToHierarchy(SceneGroupType.None, parent, groupOptions, featureMesh);
-                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.None, none, groupOptions, featureMesh);
+                if (groupOptions == SceneGroupType.Nothing)
+                {
+                    // Group 'none'
+                    none = AddGameObjectGroupToHierarchy(0, parent, groupOptions, featureMesh);
+                    MergeGameObjectGroupMeshData(gameObjectMeshData, 0, none, groupOptions, featureMesh);
+                }
+                else
+                {
+                    // Group 'tile'
+                    tile = AddGameObjectGroupToHierarchy(SceneGroupType.Tile, parent, groupOptions, featureMesh);
+                    MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Tile, tile, groupOptions, featureMesh);
 
-                // Group 'tile'
-                tile = AddGameObjectGroupToHierarchy(SceneGroupType.Tile, parent, groupOptions, featureMesh);
-                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Tile, tile, groupOptions, featureMesh);
+                    // group 'filter'
+                    parent = tile == null ? parent : tile;
+                    filter = AddGameObjectGroupToHierarchy(SceneGroupType.Filter, parent, groupOptions, featureMesh);
+                    MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Filter, filter, groupOptions, featureMesh);
 
-                // group 'filter'
-                parent = tile == null ? parent : tile;
-                filter = AddGameObjectGroupToHierarchy(SceneGroupType.Filter, parent, groupOptions, featureMesh);
-                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Filter, filter, groupOptions, featureMesh);
+                    // group 'layer'
+                    parent = filter == null ? parent : filter;
+                    layer = AddGameObjectGroupToHierarchy(SceneGroupType.Layer, parent, groupOptions, featureMesh);
+                    MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Layer, layer, groupOptions, featureMesh);
 
-                // group 'layer'
-                parent = filter == null ? parent : filter;
-                layer = AddGameObjectGroupToHierarchy(SceneGroupType.Layer, parent, groupOptions, featureMesh);
-                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Layer, layer, groupOptions, featureMesh);
-
-                // group 'feature'
-                parent = layer == null ? parent : layer;
-                feature = AddGameObjectGroupToHierarchy( SceneGroupType.Feature, parent, groupOptions, featureMesh);
-                MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Feature, feature, groupOptions, featureMesh);
+                    // group 'feature'
+                    parent = layer == null ? parent : layer;
+                    feature = AddGameObjectGroupToHierarchy( SceneGroupType.Feature, parent, groupOptions, featureMesh);
+                    MergeGameObjectGroupMeshData(gameObjectMeshData, SceneGroupType.Feature, feature, groupOptions, featureMesh);
+                }
             }
 
             // Initialize game objects and associate their components (physics, rendering)
