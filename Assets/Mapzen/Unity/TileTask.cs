@@ -11,9 +11,11 @@ public class TileTask
     private TileAddress address;
     private byte[] tileData;
     private bool ready;
+    private SceneGroupType groupOptions;
+    private float inverseTileScale;
     private Matrix4x4 transform;
     private List<FeatureMesh> data;
-    private List<FeatureStyle> featureStyling;
+    private List<MapStyle> featureStyling;
     private int generation;
 
     public int Generation
@@ -31,7 +33,8 @@ public class TileTask
         get { return ready; }
     }
 
-    public TileTask(List<FeatureStyle> featureStyling, TileAddress address, Matrix4x4 transform, byte[] tileData, int generation)
+    // public TileTask(TileAddress address, SceneGroupType groupOptions, byte[] response, float offsetX, float offsetY, float regionScaleRatio)
+    public TileTask(List<MapStyle> featureStyling, TileAddress address, Matrix4x4 transform, byte[] tileData, int generation)
     {
         this.data = new List<FeatureMesh>();
         this.address = address;
@@ -57,14 +60,14 @@ public class TileTask
                 continue;
             }
 
-            foreach (var filterStyle in style.FilterStyles)
+            foreach (var filterStyle in style.Layers)
             {
                 foreach (var layer in mvtTile.FeatureCollections)
                 {
+
                     foreach (var feature in filterStyle.GetFilter().Filter(layer))
                     {
-                        var layerStyle = filterStyle.LayerStyles.Find(ls => ls.LayerName == layer.Name);
-
+                        var layerStyle = filterStyle.Style;
                         string featureName = "";
                         object identifier;
 

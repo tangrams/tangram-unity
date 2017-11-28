@@ -4,10 +4,6 @@ using Mapzen;
 using UnityEngine;
 using System.Collections.Generic;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 namespace Mapzen.Unity
 {
     public class SceneGraph
