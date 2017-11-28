@@ -54,7 +54,7 @@ namespace Mapzen
             get { return tiles; }
         }
 
-        public void DownloadTiles()
+        public void DownloadTilesAsync()
         {
             TileBounds bounds = new TileBounds(Area);
 
