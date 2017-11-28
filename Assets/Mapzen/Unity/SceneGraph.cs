@@ -19,12 +19,12 @@ namespace Mapzen.Unity
         /// <param name="parent">The parent transform of the generated game object for the current scene group.</param>
         public static void Generate(SceneGroup group, Transform parent, GameObjectOptions options)
         {
-            if (group.meshData.Meshes.Count == 0 && group.childs.Count == 0)
+            if (group.meshData.Meshes.Count == 0 && group.children.Count == 0)
             {
                 return;
             }
 
-            if (group.childs.Count > 0)
+            if (group.children.Count > 0)
             {
                 var gameObject = new GameObject(group.ToString());
                 gameObject.isStatic = options.IsStatic;
@@ -34,9 +34,9 @@ namespace Mapzen.Unity
                     gameObject.transform.parent = parent;
                 }
 
-                foreach (var child in group.childs)
+                foreach (var child in group.children)
                 {
-                    Generate(child.Value, gameObject.transform, options);
+                    Generate(child, gameObject.transform, options);
                 }
             }
             else

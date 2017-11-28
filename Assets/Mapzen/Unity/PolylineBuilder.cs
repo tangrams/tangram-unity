@@ -10,28 +10,15 @@ namespace Mapzen.Unity
     {
         private PolygonBuilder polygonBuilder;
         private List<Vector2> polyline;
-        private Options options;
+        private PolylineOptions options;
 
         private float uvDistance;
 
-
-        [Serializable]
-        public struct Options
-        {
-            public Material Material;
-            public PolygonBuilder.ExtrusionType Extrusion;
-            public float MinHeight;
-            public float MaxHeight;
-            public float Width;
-            public float MiterLimit;
-            public bool Enabled;
-        }
-
-        public PolylineBuilder(MeshData outputMeshData, Options options, Matrix4x4 transform)
+        public PolylineBuilder(MeshData outputMeshData, PolylineOptions options, Matrix4x4 transform)
         {
             this.options = options;
 
-            var polygonOptions = new PolygonBuilder.Options();
+            var polygonOptions = new PolygonOptions();
             polygonOptions.Material = options.Material;
             polygonOptions.Extrusion = options.Extrusion;
             polygonOptions.MinHeight = options.MinHeight;
