@@ -149,7 +149,8 @@ namespace Mapzen
             }
 
             var mapRegion = new GameObject(RegionName);
-            SceneGraph.Generate(features, mapRegion, GroupOptions, GameObjectOptions);
+            var sceneGraph = new SceneGraph(mapRegion, GroupOptions, GameObjectOptions, features);
+            sceneGraph.Generate();
 
             tasks.Clear();
             nTasksForArea = 0;

@@ -22,7 +22,7 @@ namespace Mapzen.Unity
 
         public string GetName(SceneGroupType groupType)
         {
-            string name = "";
+            string name;
 
             switch (groupType)
             {
@@ -30,6 +30,7 @@ namespace Mapzen.Unity
                 case SceneGroupType.Filter: name = filter; break;
                 case SceneGroupType.Layer: name = layer; break;
                 case SceneGroupType.Tile: name = tile; break;
+                default: name = ""; break;
             }
 
             return name;
