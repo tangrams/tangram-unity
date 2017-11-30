@@ -5,16 +5,16 @@ namespace Mapzen.Unity
     {
         private string identifier;
         private string tile;
+        private string collection;
         private string layer;
-        private string filter;
 
         private MeshData mesh;
 
-        public FeatureMesh(string tile, string layer, string filter, string identifier)
+        public FeatureMesh(string tile, string collection, string layer, string identifier)
         {
             this.tile = tile;
+            this.collection = collection;
             this.layer = layer;
-            this.filter = filter;
             this.identifier = identifier;
 
             this.mesh = new MeshData();
@@ -27,8 +27,8 @@ namespace Mapzen.Unity
             switch (groupType)
             {
                 case SceneGroupType.Feature: name = identifier; break;
-                case SceneGroupType.Filter: name = filter; break;
                 case SceneGroupType.Layer: name = layer; break;
+                case SceneGroupType.Collection: name = collection; break;
                 case SceneGroupType.Tile: name = tile; break;
                 default: name = ""; break;
             }
@@ -46,14 +46,14 @@ namespace Mapzen.Unity
             get { return tile; }
         }
 
+        public string Collection
+        {
+            get { return collection; }
+        }
+
         public string Layer
         {
             get { return layer; }
-        }
-
-        public string Filter
-        {
-            get { return filter; }
         }
 
         public MeshData Mesh

@@ -59,14 +59,14 @@ public class TileTask
                 continue;
             }
 
-            foreach (var filterStyle in style.Layers)
+            foreach (var styleLayer in style.Layers)
             {
-                foreach (var layer in mvtTile.FeatureCollections)
+                foreach (var collection in mvtTile.FeatureCollections)
                 {
 
-                    foreach (var feature in filterStyle.GetFilter().Filter(layer))
+                    foreach (var feature in styleLayer.GetFilter().Filter(collection))
                     {
-                        var layerStyle = filterStyle.Style;
+                        var layerStyle = styleLayer.Style;
                         string featureName = "";
                         object identifier;
 
@@ -75,7 +75,7 @@ public class TileTask
                             featureName += identifier.ToString();
                         }
 
-                        FeatureMesh featureMesh = new FeatureMesh(address.ToString(), layer.Name, filterStyle.Name, featureName);
+                        FeatureMesh featureMesh = new FeatureMesh(address.ToString(), collection.Name, styleLayer.Name, featureName);
 
                         IGeometryHandler handler = null;
 
