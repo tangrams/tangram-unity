@@ -145,7 +145,10 @@ namespace Mapzen
             List<FeatureMesh> features = new List<FeatureMesh>();
             foreach (var task in tasks)
             {
-                features.AddRange(task.Data);
+                if (task.Generation == generation)
+                {
+                    features.AddRange(task.Data);
+                }
             }
 
             var mapRegion = new GameObject(RegionName);
