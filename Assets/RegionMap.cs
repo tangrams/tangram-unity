@@ -47,8 +47,6 @@ namespace Mapzen
 
         private AsyncWorker worker = new AsyncWorker(2);
 
-        private SceneGroup regionMap;
-
         public List<GameObject> Tiles
         {
             get { return tiles; }

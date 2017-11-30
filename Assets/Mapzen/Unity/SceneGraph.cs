@@ -28,7 +28,7 @@ namespace Mapzen.Unity
             this.groupOptions = groupOptions;
             this.gameObjectOptions = gameObjectOptions;
             this.features = features;
-            this.leafGroup = SceneGroup.GetLeaf(groupOptions);
+            this.leafGroup = groupOptions.GetLeaf();
         }
 
         private GameObject AddGameObjectGroup(SceneGroupType groupType, GameObject parentGameObject, FeatureMesh featureMesh)
@@ -103,7 +103,7 @@ namespace Mapzen.Unity
                             continue;
                         }
 
-                        if (SceneGroup.Test(group, groupOptions))
+                        if (groupOptions.Includes(group))
                         {
                             // Use currentGroup as the parentGroup for the current generation
                             var parentGroup = currentGroup;
