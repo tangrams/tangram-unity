@@ -75,6 +75,11 @@ namespace Mapzen.Unity.Editor
             EditorConfig.ResetColor();
 
             serializedObject.ApplyModifiedProperties();
+
+            foreach (var mapStyle in map.Styles)
+            {
+                mapStyle.Map = map;
+            }
         }
 
         private bool IsValid()

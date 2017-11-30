@@ -10,6 +10,8 @@ namespace Mapzen.Unity
     {
         public List<FeatureLayer> Layers;
 
+        public RegionMap Map;
+
         public MapStyle()
         {
             this.Layers = new List<FeatureLayer>();

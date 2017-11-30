@@ -47,6 +47,10 @@ namespace Mapzen
 
         private AsyncWorker worker = new AsyncWorker(2);
 
+        private GameObject regionMap;
+
+        private Dictionary<TileAddress, byte[]> tileCache = new Dictionary<TileAddress, byte[]>();
+
         public List<GameObject> Tiles
         {
             get { return tiles; }
@@ -72,11 +76,38 @@ namespace Mapzen
 
             foreach (var tileAddress in bounds.TileAddressRange)
             {
-                var wrappedTileAddress = tileAddress.Wrapped();
-                var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
-                    wrappedTileAddress.z, wrappedTileAddress.x, wrappedTileAddress.y, ApiKey));
+                float offsetX = (tileAddress.x - bounds.min.x);
+                float offsetY = (-tileAddress.y + bounds.min.y);
 
-                IO.IORequestCallback onTileFetched = (response) =>
+                float scaleRatio = (float)tileAddress.GetSizeMercatorMeters() * UnitsPerMeter;
+                Matrix4x4 scale = Matrix4x4.Scale(new Vector3(scaleRatio, scaleRatio, scaleRatio));
+                Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
+                Matrix4x4 transform = translate * scale;
+
+                if (tileCache.ContainsKey(tileAddress))
+                {
+                    var task = new TileTask(Styles, tileAddress, transform, tileCache[tileAddress], currentGeneration);
+
+                    worker.RunAsync(() =>
+                    {
+                        if (currentGeneration == task.Generation)
+                        {
+                            task.Start();
+                            tasks.Add(task);
+                        }
+                    });
+                }
+                else
+                {
+                    var wrappedTileAddress = tileAddress.Wrapped();
+
+                    var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
+                        wrappedTileAddress.z,
+                        wrappedTileAddress.x,
+                        wrappedTileAddress.y,
+                        ApiKey));
+
+                    IO.IORequestCallback onTileFetched = (response) =>
                     {
                         if (requestGeneration != generation)
                         {
@@ -106,6 +137,8 @@ namespace Mapzen
 
                         TileTask task = new TileTask(Styles, tileAddress, transform, response.data, generation);
 
+                        tileCache.Add(tileAddress, response.data);
+
                         worker.RunAsync(() =>
                         {
                             // Skip any tasks that have been generated for a different generation
@@ -117,8 +150,9 @@ namespace Mapzen
                         });
                     };
 
-                // Starts the HTTP request
-                StartCoroutine(tileIO.FetchNetworkData(uri, onTileFetched));
+                    // Starts the HTTP request
+                    StartCoroutine(tileIO.FetchNetworkData(uri, onTileFetched));
+                }
             }
         }
 
@@ -145,6 +179,11 @@ namespace Mapzen
 
         public void GenerateSceneGraph()
         {
+            if (regionMap != null)
+            {
+                DestroyImmediate(regionMap);
+            }
+
             // Merge all feature meshes
             List<FeatureMesh> features = new List<FeatureMesh>();
             foreach (var task in tasks)
@@ -160,6 +199,7 @@ namespace Mapzen
 
             var mapRegion = new GameObject(RegionName);
             var sceneGraph = new SceneGraph(mapRegion, GroupOptions, GameObjectOptions, features);
+
             sceneGraph.Generate();
         }
     }

@@ -91,6 +91,23 @@ namespace Mapzen.Unity.Editor
             }
 
             serializedObject.ApplyModifiedProperties();
+
+            var map = mapStyle.Map;
+
+            if (GUI.changed && map != null)
+            {
+                map.DownloadTilesAsync();
+            }
+
+            if (map.HasPendingTasks())
+            {
+                Repaint();
+
+                if (map.FinishedRunningTasks())
+                {
+                    map.GenerateSceneGraph();
+                }
+            }
         }
 
         void DrawSelectedLayer(SerializedProperty layerProperty)
