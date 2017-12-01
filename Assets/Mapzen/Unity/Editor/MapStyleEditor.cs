@@ -94,18 +94,21 @@ namespace Mapzen.Unity.Editor
 
             var map = mapStyle.Map;
 
-            if (GUI.changed && map != null)
+            if (map != null)
             {
-                map.DownloadTilesAsync();
-            }
-
-            if (map.HasPendingTasks())
-            {
-                Repaint();
-
-                if (map.FinishedRunningTasks())
+                if (GUI.changed)
                 {
-                    map.GenerateSceneGraph();
+                    map.DownloadTilesAsync();
+                }
+
+                if (map.HasPendingTasks())
+                {
+                    Repaint();
+
+                    if (map.FinishedRunningTasks())
+                    {
+                        map.GenerateSceneGraph();
+                    }
                 }
             }
         }
