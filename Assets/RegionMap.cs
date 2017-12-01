@@ -7,6 +7,7 @@ using UnityEngine.Networking;
 using Mapzen.VectorData;
 using Mapzen.Unity;
 using Mapzen.VectorData.Filters;
+using Mapzen.VectorData.Formats;
 using Mapzen;
 
 namespace Mapzen
@@ -49,7 +50,7 @@ namespace Mapzen
 
         private GameObject regionMap;
 
-        private Dictionary<TileAddress, byte[]> tileCache = new Dictionary<TileAddress, byte[]>();
+        private Dictionary<TileAddress, IEnumerable<FeatureCollection>> tileCache = new Dictionary<TileAddress, IEnumerable<FeatureCollection>>();
 
         public List<GameObject> Tiles
         {
@@ -84,15 +85,22 @@ namespace Mapzen
                 Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
                 Matrix4x4 transform = translate * scale;
 
-                if (tileCache.ContainsKey(tileAddress))
+                IEnumerable<FeatureCollection> featureCollections = null;
+
+                lock (tileCache)
                 {
-                    var task = new TileTask(Styles, tileAddress, transform, tileCache[tileAddress], currentGeneration);
+                    tileCache.TryGetValue(tileAddress, out featureCollections);
+                }
+
+                if (featureCollections != null)
+                {
+                    var task = new TileTask(Styles, tileAddress, transform, generation);
 
                     worker.RunAsync(() =>
                     {
                         if (currentGeneration == task.Generation)
                         {
-                            task.Start();
+                            task.Start(featureCollections);
                             tasks.Add(task);
                         }
                     });
@@ -135,16 +143,22 @@ namespace Mapzen
                         Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
                         Matrix4x4 transform = translate * scale;
 
-                        TileTask task = new TileTask(Styles, tileAddress, transform, response.data, generation);
-
-                        tileCache.Add(tileAddress, response.data);
+                        var task = new TileTask(Styles, tileAddress, transform, generation);
 
                         worker.RunAsync(() =>
                         {
                             // Skip any tasks that have been generated for a different generation
                             if (generation == task.Generation)
                             {
-                                task.Start();
+                                // var tileData = new GeoJsonTile(address, response);
+                                var mvtTile = new MvtTile(tileAddress, response.data);
+
+                                lock (tileCache)
+                                {
+                                    tileCache.Add(tileAddress, mvtTile.FeatureCollections);
+                                }
+
+                                task.Start(mvtTile.FeatureCollections);
                                 tasks.Add(task);
                             }
                         });

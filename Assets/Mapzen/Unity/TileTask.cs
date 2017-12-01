@@ -2,21 +2,17 @@
 using Mapzen;
 using Mapzen.Unity;
 using Mapzen.VectorData;
-using Mapzen.VectorData.Formats;
 using Mapzen.VectorData.Filters;
 using UnityEngine;
 
 public class TileTask
 {
     private TileAddress address;
-    private byte[] tileData;
     private bool ready;
-    private SceneGroupType groupOptions;
-    private float inverseTileScale;
     private Matrix4x4 transform;
+    private int generation;
     private List<FeatureMesh> data;
     private List<MapStyle> featureStyling;
-    private int generation;
 
     public int Generation
     {
@@ -33,24 +29,19 @@ public class TileTask
         get { return ready; }
     }
 
-    public TileTask(List<MapStyle> featureStyling, TileAddress address, Matrix4x4 transform, byte[] tileData, int generation)
+    public TileTask(List<MapStyle> featureStyling, TileAddress address, Matrix4x4 transform, int generation)
     {
         this.data = new List<FeatureMesh>();
         this.address = address;
-        this.tileData = tileData;
         this.transform = transform;
         this.ready = false;
-        this.featureStyling = featureStyling;
         this.generation = generation;
+        this.featureStyling = featureStyling;
     }
 
-    public void Start()
+    public void Start(IEnumerable<FeatureCollection> featureCollections)
     {
         float inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
-
-        // TODO: Reuse tile parsing data
-        // var tileData = new GeoJsonTile(address, response);
-        var mvtTile = new MvtTile(address, tileData);
 
         foreach (var style in featureStyling)
         {
@@ -61,7 +52,7 @@ public class TileTask
 
             foreach (var styleLayer in style.Layers)
             {
-                foreach (var collection in mvtTile.FeatureCollections)
+                foreach (var collection in featureCollections)
                 {
 
                     foreach (var feature in styleLayer.GetFilter().Filter(collection))
