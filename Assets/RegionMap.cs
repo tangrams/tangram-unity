@@ -72,9 +72,6 @@ namespace Mapzen
                 nTasksForArea++;
             }
 
-            // Use a local generation variable to be used in IORequestCallback coroutine
-            int requestGeneration = generation;
-
             foreach (var tileAddress in bounds.TileAddressRange)
             {
                 float offsetX = (tileAddress.x - bounds.min.x);
@@ -102,6 +99,9 @@ namespace Mapzen
                 }
                 else
                 {
+                    // Use a local generation variable to be used in IORequestCallback coroutine
+                    int requestGeneration = generation;
+
                     var wrappedTileAddress = tileAddress.Wrapped();
 
                     var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
@@ -129,14 +129,6 @@ namespace Mapzen
                             Debug.Log("Empty Response");
                             return;
                         }
-
-                        float offsetX = (tileAddress.x - bounds.min.x);
-                        float offsetY = (-tileAddress.y + bounds.min.y);
-
-                        float scaleRatio = (float)tileAddress.GetSizeMercatorMeters() * UnitsPerMeter;
-                        Matrix4x4 scale = Matrix4x4.Scale(new Vector3(scaleRatio, scaleRatio, scaleRatio));
-                        Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
-                        Matrix4x4 transform = translate * scale;
 
                         var task = new TileTask(Styles, tileAddress, transform, generation);
 
@@ -205,8 +197,8 @@ namespace Mapzen
             tasks.Clear();
             nTasksForArea = 0;
 
-            var mapRegion = new GameObject(RegionName);
-            var sceneGraph = new SceneGraph(mapRegion, GroupOptions, GameObjectOptions, features);
+            regionMap = new GameObject(RegionName);
+            var sceneGraph = new SceneGraph(regionMap, GroupOptions, GameObjectOptions, features);
 
             sceneGraph.Generate();
         }
