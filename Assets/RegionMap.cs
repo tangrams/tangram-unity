@@ -50,7 +50,7 @@ namespace Mapzen
 
         private GameObject regionMap;
 
-        private Dictionary<TileAddress, IEnumerable<FeatureCollection>> tileCache = new Dictionary<TileAddress, IEnumerable<FeatureCollection>>();
+        private TileCache tileCache = new TileCache(50);
 
         public List<GameObject> Tiles
         {
@@ -85,12 +85,7 @@ namespace Mapzen
                 Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
                 Matrix4x4 transform = translate * scale;
 
-                IEnumerable<FeatureCollection> featureCollections = null;
-
-                lock (tileCache)
-                {
-                    tileCache.TryGetValue(tileAddress, out featureCollections);
-                }
+                IEnumerable<FeatureCollection> featureCollections = tileCache.Get(tileAddress);
 
                 if (featureCollections != null)
                 {
@@ -98,7 +93,7 @@ namespace Mapzen
 
                     worker.RunAsync(() =>
                     {
-                        if (currentGeneration == task.Generation)
+                        if (generation == task.Generation)
                         {
                             task.Start(featureCollections);
                             tasks.Add(task);
@@ -153,12 +148,11 @@ namespace Mapzen
                                 // var tileData = new GeoJsonTile(address, response);
                                 var mvtTile = new MvtTile(tileAddress, response.data);
 
-                                lock (tileCache)
-                                {
-                                    tileCache.Add(tileAddress, mvtTile.FeatureCollections);
-                                }
+                                // Save the tile feature collections in the cache for later use
+                                tileCache.Add(tileAddress, mvtTile.FeatureCollections);
 
                                 task.Start(mvtTile.FeatureCollections);
+
                                 tasks.Add(task);
                             }
                         });
