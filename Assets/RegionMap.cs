@@ -36,8 +36,6 @@ namespace Mapzen
 
         // Private fields
 
-        private List<GameObject> tiles = new List<GameObject>();
-
         private IO tileIO = new IO();
 
         private List<TileTask> tasks = new List<TileTask>();
@@ -51,11 +49,6 @@ namespace Mapzen
         private GameObject regionMap;
 
         private TileCache tileCache = new TileCache(50);
-
-        public List<GameObject> Tiles
-        {
-            get { return tiles; }
-        }
 
         public void DownloadTilesAsync()
         {
