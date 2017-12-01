@@ -42,6 +42,11 @@ namespace Mapzen.Unity
             {
                 foreach (var submesh in bucket.Submeshes)
                 {
+                    if (submesh.Indices.Count == 0)
+                    {
+                        continue;
+                    }
+
                     int minIndex = int.MaxValue;
                     int maxIndex = int.MinValue;
 

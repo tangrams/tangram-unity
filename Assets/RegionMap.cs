@@ -67,8 +67,8 @@ namespace Mapzen
                 nTasksForArea++;
             }
 
-            // Use a local generation variable to be used in IORequestCallback
-            int currentGeneration = generation;
+            // Use a local generation variable to be used in IORequestCallback coroutine
+            int requestGeneration = generation;
 
             foreach (var tileAddress in bounds.TileAddressRange)
             {
@@ -78,6 +78,12 @@ namespace Mapzen
 
                 IO.IORequestCallback onTileFetched = (response) =>
                     {
+                        if (requestGeneration != generation)
+                        {
+                            // Another request has been made before the coroutine was triggered
+                            return;
+                        }
+
                         if (response.hasError())
                         {
                             Debug.Log("TileIO Error: " + response.error);
@@ -98,12 +104,12 @@ namespace Mapzen
                         Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
                         Matrix4x4 transform = translate * scale;
 
-                        TileTask task = new TileTask(Styles, tileAddress, transform, response.data, currentGeneration);
+                        TileTask task = new TileTask(Styles, tileAddress, transform, response.data, generation);
 
                         worker.RunAsync(() =>
                         {
-                            // Skip any task that has been generated for a different generation
-                            if (currentGeneration == task.Generation)
+                            // Skip any tasks that have been generated for a different generation
+                            if (generation == task.Generation)
                             {
                                 task.Start();
                                 tasks.Add(task);
@@ -149,12 +155,12 @@ namespace Mapzen
                 }
             }
 
+            tasks.Clear();
+            nTasksForArea = 0;
+
             var mapRegion = new GameObject(RegionName);
             var sceneGraph = new SceneGraph(mapRegion, GroupOptions, GameObjectOptions, features);
             sceneGraph.Generate();
-
-            tasks.Clear();
-            nTasksForArea = 0;
         }
     }
 }
