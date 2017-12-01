@@ -53,11 +53,22 @@ namespace Mapzen.Unity.Editor
                 {
                     LogWarnings();
 
-                    map.DownloadTiles();
+                    map.DownloadTilesAsync();
                 }
                 else
                 {
                     LogErrors();
+                }
+            }
+
+            if (map.HasPendingTasks())
+            {
+                // Go through another OnInspectorGUI cycle
+                Repaint();
+
+                if (map.FinishedRunningTasks())
+                {
+                    map.GenerateSceneGraph();
                 }
             }
 

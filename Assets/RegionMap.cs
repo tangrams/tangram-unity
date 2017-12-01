@@ -43,26 +43,32 @@ namespace Mapzen
 
         private int nTasksForArea = 0;
 
-        private SceneGroup regionMap;
+        private int generation = 0;
+
+        private AsyncWorker worker = new AsyncWorker(2);
 
         public List<GameObject> Tiles
         {
             get { return tiles; }
         }
 
-        public void DownloadTiles()
+        public void DownloadTilesAsync()
         {
             TileBounds bounds = new TileBounds(Area);
 
+            // Abort currently running tasks and increase generation
+            worker.ClearTasks();
             tasks.Clear();
             nTasksForArea = 0;
-
-            regionMap = new SceneGroup(0, RegionName);
+            generation++;
 
             foreach (var tileAddress in bounds.TileAddressRange)
             {
                 nTasksForArea++;
             }
+
+            // Use a local generation variable to be used in IORequestCallback
+            int currentGeneration = generation;
 
             foreach (var tileAddress in bounds.TileAddressRange)
             {
@@ -87,11 +93,22 @@ namespace Mapzen
                         float offsetX = (tileAddress.x - bounds.min.x);
                         float offsetY = (-tileAddress.y + bounds.min.y);
 
-                        TileTask task = new TileTask(tileAddress, GroupOptions, response.data, offsetX, offsetY, UnitsPerMeter);
+                        float scaleRatio = (float)tileAddress.GetSizeMercatorMeters() * UnitsPerMeter;
+                        Matrix4x4 scale = Matrix4x4.Scale(new Vector3(scaleRatio, scaleRatio, scaleRatio));
+                        Matrix4x4 translate = Matrix4x4.Translate(new Vector3(offsetX * scaleRatio, 0.0f, offsetY * scaleRatio));
+                        Matrix4x4 transform = translate * scale;
 
-                        task.Start(Styles, regionMap);
+                        TileTask task = new TileTask(Styles, tileAddress, transform, response.data, currentGeneration);
 
-                        OnTaskReady(task);
+                        worker.RunAsync(() =>
+                        {
+                            // Skip any task that has been generated for a different generation
+                            if (currentGeneration == task.Generation)
+                            {
+                                task.Start();
+                                tasks.Add(task);
+                            }
+                        });
                     };
 
                 // Starts the HTTP request
@@ -99,16 +116,45 @@ namespace Mapzen
             }
         }
 
-        void OnTaskReady(TileTask readyTask)
+        public bool HasPendingTasks()
         {
-            tasks.Add(readyTask);
+            return nTasksForArea > 0;
+        }
 
-            if (tasks.Count == nTasksForArea)
+        public bool FinishedRunningTasks()
+        {
+            // Number of tasks ready for the current generation
+            int nTasksReady = 0;
+
+            foreach (var task in tasks)
             {
-                tasks.Clear();
-
-                SceneGraph.Generate(regionMap, null, GameObjectOptions);
+                if (task.Generation == generation)
+                {
+                    nTasksReady++;
+                }
             }
+
+            return nTasksReady == nTasksForArea;
+        }
+
+        public void GenerateSceneGraph()
+        {
+            // Merge all feature meshes
+            List<FeatureMesh> features = new List<FeatureMesh>();
+            foreach (var task in tasks)
+            {
+                if (task.Generation == generation)
+                {
+                    features.AddRange(task.Data);
+                }
+            }
+
+            var mapRegion = new GameObject(RegionName);
+            var sceneGraph = new SceneGraph(mapRegion, GroupOptions, GameObjectOptions, features);
+            sceneGraph.Generate();
+
+            tasks.Clear();
+            nTasksForArea = 0;
         }
     }
 }
