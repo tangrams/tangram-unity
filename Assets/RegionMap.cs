@@ -1,14 +1,9 @@
-using System.Collections;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.Networking;
 using Mapzen.VectorData;
 using Mapzen.Unity;
-using Mapzen.VectorData.Filters;
 using Mapzen.VectorData.Formats;
-using Mapzen;
 
 namespace Mapzen
 {
