@@ -78,7 +78,10 @@ namespace Mapzen.Unity.Editor
 
             foreach (var mapStyle in map.Styles)
             {
-                mapStyle.Map = map;
+                if (mapStyle != null)
+                {
+                    mapStyle.Map = map;
+                }
             }
         }
 
