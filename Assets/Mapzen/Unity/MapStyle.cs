@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Mapzen.Unity
 {
     [Serializable]
-    [CreateAssetMenu(menuName = "Mapzen/Style")]
+    [CreateAssetMenu(menuName = "Mapzen/MapStyle")]
     public class MapStyle : ScriptableObject
     {
         public List<FeatureLayer> Layers;
