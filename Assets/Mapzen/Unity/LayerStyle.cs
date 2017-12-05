@@ -15,18 +15,26 @@ namespace Mapzen.Unity
         {
             var options = PolygonBuilder;
 
-            if (options.MaxHeight > 0.0f)
-            {
-                options.MaxHeight *= inverseTileScale;
-            }
-            else
+            if (options.MaxHeight == 0.0f)
             {
                 object heightValue;
                 if (feature.TryGetProperty("height", out heightValue) && heightValue is double)
                 {
-                    options.MaxHeight = (float)((double)heightValue * inverseTileScale);
+                    options.MaxHeight = (float)(double)heightValue;
                 }
             }
+
+            if (options.MinHeight == 0.0f)
+            {
+                object heightValue;
+                if (feature.TryGetProperty("min_height", out heightValue) && heightValue is double)
+                {
+                    options.MinHeight = (float)(double)heightValue;
+                }
+            }
+
+            options.MaxHeight *= inverseTileScale;
+            options.MinHeight *= inverseTileScale;
 
             return options;
         }
