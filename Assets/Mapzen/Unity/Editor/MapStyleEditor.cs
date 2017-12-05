@@ -17,6 +17,9 @@ namespace Mapzen.Unity.Editor
         GUIStyle labelBoldStyle;
         GUIStyle labelItalicCenteredStyle;
 
+        [SerializeField]
+        private bool previewMode;
+
         void OnEnable()
         {
             // Check whether we already had a serialized tree view state.
@@ -40,6 +43,16 @@ namespace Mapzen.Unity.Editor
                 // ????
                 return;
             }
+
+            GUILayout.Label("Style hot reloading", labelBoldStyle);
+
+            previewMode = GUILayout.Toggle(previewMode, "Preview mode");
+
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+
+            GUILayout.Label("Enable this mode to preview your changes dynamically", labelItalicCenteredStyle);
+
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
             GUILayout.Label("Layers", labelBoldStyle);
 
@@ -93,8 +106,7 @@ namespace Mapzen.Unity.Editor
             serializedObject.ApplyModifiedProperties();
 
             var map = mapStyle.Map;
-
-            if (map != null)
+            if (previewMode && map != null)
             {
                 if (GUI.changed)
                 {
