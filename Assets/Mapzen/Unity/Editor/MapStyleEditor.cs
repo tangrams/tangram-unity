@@ -97,9 +97,9 @@ namespace Mapzen.Unity.Editor
         {
             // EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("FeatureCollection"));
 
-            EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("Combiner"));
-
             EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("Matchers"), true);
+
+            EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("Combiner"), new GUIContent { text = "Combine matchers" });
 
             EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("Style"), true);
         }

@@ -1,0 +1,118 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4edcc12ded754f86bc8b9ea3b3c3ee6, type: 3}
+  m_Name: SimpleMapStyle
+  m_EditorClassIdentifier: 
+  Layers:
+  - Name: Water
+    FeatureCollection: 256
+    Combiner: 0
+    Matchers: []
+    Style:
+      PolygonBuilder:
+        Material: {fileID: 2100000, guid: bb0267789bf4345c7916b57b125fc6ca, type: 2}
+        Extrusion: 0
+        UVMode: 1
+        MinHeight: 0
+        MaxHeight: 0.25
+        Enabled: 1
+      PolylineBuilder:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0
+        Width: 0
+        MiterLimit: 0
+        Enabled: 0
+  - Name: Earth
+    FeatureCollection: 4
+    Combiner: 0
+    Matchers: []
+    Style:
+      PolygonBuilder:
+        Material: {fileID: 2100000, guid: 0cdfce05273914dd4823f77af6b71663, type: 2}
+        Extrusion: 0
+        UVMode: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilder:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0
+        Width: 0
+        MiterLimit: 0
+        Enabled: 0
+  - Name: Roads
+    FeatureCollection: 64
+    Combiner: 2
+    Matchers:
+    - MatcherKind: 4
+      PropertyKey: kind
+      PropertyValue: major_road
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 0
+      MaxRangeEnabled: 0
+    - MatcherKind: 4
+      PropertyKey: kind
+      PropertyValue: highway
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 0
+      MaxRangeEnabled: 0
+    Style:
+      PolygonBuilder:
+        Material: {fileID: 0}
+        Extrusion: 0
+        UVMode: 0
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 0
+      PolylineBuilder:
+        Material: {fileID: 2100000, guid: ca945bef7446a48c3a7e6c2241195361, type: 2}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0.5
+        Width: 10
+        MiterLimit: 0
+        Enabled: 1
+  - Name: Buildings
+    FeatureCollection: 2
+    Combiner: 0
+    Matchers:
+    - MatcherKind: 1
+      PropertyKey: height
+      PropertyValue: 
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 0
+      MaxRangeEnabled: 0
+    Style:
+      PolygonBuilder:
+        Material: {fileID: 2100000, guid: 7f88baed2a0f94bb3a42f7bc45b5fcf8, type: 2}
+        Extrusion: 1
+        UVMode: 1
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 1
+      PolylineBuilder:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0
+        Width: 0
+        MiterLimit: 0
+        Enabled: 0
