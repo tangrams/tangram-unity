@@ -2,21 +2,21 @@
 using Mapzen;
 using Mapzen.Unity;
 using Mapzen.VectorData;
-using Mapzen.VectorData.Formats;
 using Mapzen.VectorData.Filters;
 using UnityEngine;
 
 public class TileTask
 {
+    // The tile address this task is working on
     private TileAddress address;
-    private byte[] tileData;
-    private bool ready;
-    private SceneGroupType groupOptions;
-    private float inverseTileScale;
+    // The transform applied to the geometry built the tile task builders
     private Matrix4x4 transform;
-    private List<FeatureMesh> data;
-    private List<MapStyle> featureStyling;
+    // The generation of this tile task
     private int generation;
+    // The resulting data of the tile task is stored in this container
+    private List<FeatureMesh> data;
+    // The map styling this tile task is working on
+    private List<MapStyle> featureStyling;
 
     public int Generation
     {
@@ -28,29 +28,22 @@ public class TileTask
         get { return data; }
     }
 
-    public bool Ready
-    {
-        get { return ready; }
-    }
-
-    public TileTask(List<MapStyle> featureStyling, TileAddress address, Matrix4x4 transform, byte[] tileData, int generation)
+    public TileTask(List<MapStyle> featureStyling, TileAddress address, Matrix4x4 transform, int generation)
     {
         this.data = new List<FeatureMesh>();
         this.address = address;
-        this.tileData = tileData;
         this.transform = transform;
-        this.ready = false;
-        this.featureStyling = featureStyling;
         this.generation = generation;
+        this.featureStyling = featureStyling;
     }
 
-    public void Start()
+    /// <summary>
+    /// Runs the tile task, resulting data will be stored in Data.
+    /// </summary>
+    /// <param name="featureCollections">The feature collections this tile task will be building.</param>
+    public void Start(IEnumerable<FeatureCollection> featureCollections)
     {
         float inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
-
-        // TODO: Reuse tile parsing data
-        // var tileData = new GeoJsonTile(address, response);
-        var mvtTile = new MvtTile(address, tileData);
 
         foreach (var style in featureStyling)
         {
@@ -61,9 +54,8 @@ public class TileTask
 
             foreach (var styleLayer in style.Layers)
             {
-                foreach (var collection in mvtTile.FeatureCollections)
+                foreach (var collection in featureCollections)
                 {
-
                     foreach (var feature in styleLayer.GetFilter().Filter(collection))
                     {
                         var layerStyle = styleLayer.Style;
@@ -75,6 +67,7 @@ public class TileTask
                             featureName += identifier.ToString();
                         }
 
+                        // Resulting data for this feature.
                         FeatureMesh featureMesh = new FeatureMesh(address.ToString(), collection.Name, styleLayer.Name, featureName);
 
                         IGeometryHandler handler = null;
@@ -108,7 +101,5 @@ public class TileTask
                 }
             }
         }
-
-        ready = true;
     }
 }

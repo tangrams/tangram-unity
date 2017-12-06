@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Linq;
 using System.Collections.Generic;
 using UnityEditor;
 
@@ -41,7 +40,7 @@ namespace Mapzen.Unity.Editor
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("Styles"), true);
 
-            bool valid = IsValid();
+            bool valid = map.IsValid();
 
             EditorConfig.SetColor(valid ?
                 EditorConfig.DownloadButtonEnabledColor :
@@ -49,15 +48,15 @@ namespace Mapzen.Unity.Editor
 
             if (GUILayout.Button("Download"))
             {
+                map.LogWarnings();
+
                 if (valid)
                 {
-                    LogWarnings();
-
                     map.DownloadTilesAsync();
                 }
                 else
                 {
-                    LogErrors();
+                    map.LogErrors();
                 }
             }
 
@@ -75,50 +74,6 @@ namespace Mapzen.Unity.Editor
             EditorConfig.ResetColor();
 
             serializedObject.ApplyModifiedProperties();
-        }
-
-        private bool IsValid()
-        {
-            bool hasStyle = map.Styles.Any(style => style != null);
-            return map.RegionName.Length > 0 && hasStyle;
-        }
-
-        private void LogWarnings()
-        {
-            foreach (var style in map.Styles)
-            {
-                if (style == null)
-                {
-                    Debug.LogWarning("'Null' style provided in feature styling collection");
-                    continue;
-                }
-
-                if (style.Layers.Count == 0)
-                {
-                    Debug.LogWarning("The style " + style.name + " has no filter");
-                }
-
-                foreach (var filterStyle in style.Layers)
-                {
-                    if (filterStyle.GetFilter().CollectionNameSet.Count == 0)
-                    {
-                        Debug.LogWarning("The style " + style.name + " has a filter selecting no layer");
-                    }
-                }
-            }
-        }
-
-        private void LogErrors()
-        {
-            if (map.RegionName.Length == 0)
-            {
-                Debug.LogError("Make sure to give a region name");
-            }
-
-            if (!map.Styles.Any(style => style != null))
-            {
-                Debug.LogError("Make sure to create at least one style");
-            }
         }
     }
 }

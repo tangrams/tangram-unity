@@ -9,7 +9,6 @@ namespace Mapzen.Unity.Editor
     [CustomEditor(typeof(MapStyle))]
     public class MapStyleEditor : UnityEditor.Editor
     {
-        [SerializeField]
         TreeViewState layerTreeViewState;
 
         FeatureLayerTreeView layerTreeView;
@@ -40,6 +39,13 @@ namespace Mapzen.Unity.Editor
                 // ????
                 return;
             }
+
+            GUILayout.Label("Editing options", labelBoldStyle);
+
+            var liveUpdateProperty = serializedObject.FindProperty("liveUpdateEnabled");
+            EditorGUILayout.PropertyField(liveUpdateProperty, new GUIContent { text = "Update RegionMap while editing" });
+
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
             GUILayout.Label("Layers", labelBoldStyle);
 
@@ -91,6 +97,47 @@ namespace Mapzen.Unity.Editor
             }
 
             serializedObject.ApplyModifiedProperties();
+
+            if (liveUpdateProperty.boolValue)
+            {
+                // Find the regionMap containing the style mapStyle
+                var regionMaps = GameObject.FindObjectsOfType<RegionMap>();
+                RegionMap map = null;
+                foreach (var regionMap in regionMaps)
+                {
+                    var style = regionMap.Styles.Find(s => s == mapStyle);
+                    if (style != null)
+                    {
+                        map = regionMap;
+                        break;
+                    }
+                }
+
+                if (map != null)
+                {
+                    if (GUI.changed)
+                    {
+                        map.LogWarnings();
+                        if (map.IsValid())
+                        {
+                            map.DownloadTilesAsync();
+                        }
+                        else
+                        {
+                            map.LogErrors();
+                        }
+                    }
+
+                    if (map.HasPendingTasks())
+                    {
+                        Repaint();
+                        if (map.FinishedRunningTasks())
+                        {
+                            map.GenerateSceneGraph();
+                        }
+                    }
+                }
+            }
         }
 
         void DrawSelectedLayer(SerializedProperty layerProperty)
