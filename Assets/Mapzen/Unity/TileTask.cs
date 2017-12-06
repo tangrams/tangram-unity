@@ -9,8 +9,6 @@ public class TileTask
 {
     // The tile address this task is working on
     private TileAddress address;
-    // Whether the tile task has finished its work
-    private bool ready;
     // The transform applied to the geometry built the tile task builders
     private Matrix4x4 transform;
     // The generation of this tile task

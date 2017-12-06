@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Mapzen.VectorData;
 using Mapzen.Unity;
@@ -189,6 +190,56 @@ namespace Mapzen
             var sceneGraph = new SceneGraph(regionMap, GroupOptions, GameObjectOptions, features);
 
             sceneGraph.Generate();
+        }
+
+        public bool IsValid()
+        {
+            bool hasStyle = Styles.Any(style => style != null);
+            bool hasApiKey = ApiKey.Length > 0;
+            return RegionName.Length > 0 && hasStyle && hasApiKey;
+        }
+
+        public void LogWarnings()
+        {
+            if (ApiKey.Length == 0)
+            {
+                Debug.LogWarning("Make sure to set an API key in the Map Builder");
+            }
+
+            foreach (var style in Styles)
+            {
+                if (style == null)
+                {
+                    Debug.LogWarning("'Null' style provided in feature styling collection");
+                    continue;
+                }
+
+                if (style.Layers.Count == 0)
+                {
+                    Debug.LogWarning("The style " + style.name + " has no filter");
+                }
+
+                foreach (var filterStyle in style.Layers)
+                {
+                    if (filterStyle.GetFilter().CollectionNameSet.Count == 0)
+                    {
+                        Debug.LogWarning("The style " + style.name + " has a filter selecting no layer");
+                    }
+                }
+            }
+        }
+
+        public void LogErrors()
+        {
+            if (RegionName.Length == 0)
+            {
+                Debug.LogError("Make sure to give a region name");
+            }
+
+            if (!Styles.Any(style => style != null))
+            {
+                Debug.LogError("Make sure to create at least one style");
+            }
         }
     }
 }

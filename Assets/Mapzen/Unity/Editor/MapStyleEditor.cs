@@ -44,13 +44,9 @@ namespace Mapzen.Unity.Editor
                 return;
             }
 
-            GUILayout.Label("Style hot reloading", labelBoldStyle);
+            GUILayout.Label("Editing options", labelBoldStyle);
 
-            previewMode = GUILayout.Toggle(previewMode, "Preview mode");
-
-            GUILayout.Space(EditorGUIUtility.singleLineHeight);
-
-            GUILayout.Label("Enable this mode to preview your changes dynamically", labelItalicCenteredStyle);
+            previewMode = GUILayout.Toggle(previewMode, "Update RegionMap while editing");
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
@@ -105,21 +101,43 @@ namespace Mapzen.Unity.Editor
 
             serializedObject.ApplyModifiedProperties();
 
-            var map = mapStyle.Map;
-            if (previewMode && map != null)
+            if (previewMode)
             {
-                if (GUI.changed)
+                // Find the regionMap containing the style mapStyle
+                var regionMaps = GameObject.FindObjectsOfType<RegionMap>();
+                RegionMap map = null;
+                foreach (var regionMap in regionMaps)
                 {
-                    map.DownloadTilesAsync();
+                    var style = regionMap.Styles.Find(s => s == mapStyle);
+                    if (style != null)
+                    {
+                        map = regionMap;
+                        break;
+                    }
                 }
 
-                if (map.HasPendingTasks())
+                if (map != null)
                 {
-                    Repaint();
-
-                    if (map.FinishedRunningTasks())
+                    if (GUI.changed)
                     {
-                        map.GenerateSceneGraph();
+                        map.LogWarnings();
+                        if (map.IsValid())
+                        {
+                            map.DownloadTilesAsync();
+                        }
+                        else
+                        {
+                            map.LogErrors();
+                        }
+                    }
+
+                    if (map.HasPendingTasks())
+                    {
+                        Repaint();
+                        if (map.FinishedRunningTasks())
+                        {
+                            map.GenerateSceneGraph();
+                        }
                     }
                 }
             }
