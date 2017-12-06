@@ -5,12 +5,21 @@ Map Style Editor
 
 You can edit and save the settings for your map in an asset called a Map Style. To create a new Map Style, go to the 'Assets' menu and choose 'Create' -> 'Mapzen' -> 'MapStyle'. To edit the Map Style, select it from the project window and then use the inspector window to view and change settings.
 
+Editing Options
+---------------
+
+![MapStyle editing options](Images/MapStyleEditingOptions.png)
+
+If you enable the option to update while editing, any RegionMap instances in the current scene that use this MapStyle will be rebuilt using the current MapStyle settings whenever a change is made.
+
+**IMPORTANT:** These automatic updates will overwrite any manual edits you have made to the map objects in the scene.
+
 Layer List
 ----------
 
 ![MapStyle layer list editor](Images/MapStyleLayerList.png)
 
-The first item in the Map Style editor is a list of "Layers". Each Layer in a Map Style represents a grouping of objects in the map data (these objects are called features) and the settings that will be applied to those objects when they are downloaded.
+Next is a list of "Layers". Each Layer in a Map Style represents a grouping of objects in the map data (these objects are called features) and the settings that will be applied to those objects when they are downloaded.
 
 You can add a new layer with the 'Add Layer' button and remove one or more layers by selecting them in the list and pressing the 'Remove Selected' button. The ordering of Layers in the list does not affect the construction of the map.
 
