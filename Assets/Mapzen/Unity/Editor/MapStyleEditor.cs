@@ -9,16 +9,12 @@ namespace Mapzen.Unity.Editor
     [CustomEditor(typeof(MapStyle))]
     public class MapStyleEditor : UnityEditor.Editor
     {
-        [SerializeField]
         TreeViewState layerTreeViewState;
 
         FeatureLayerTreeView layerTreeView;
 
         GUIStyle labelBoldStyle;
         GUIStyle labelItalicCenteredStyle;
-
-        [SerializeField]
-        private bool previewMode;
 
         void OnEnable()
         {
@@ -46,7 +42,8 @@ namespace Mapzen.Unity.Editor
 
             GUILayout.Label("Editing options", labelBoldStyle);
 
-            previewMode = GUILayout.Toggle(previewMode, "Update RegionMap while editing");
+            var liveUpdateProperty = serializedObject.FindProperty("liveUpdateEnabled");
+            EditorGUILayout.PropertyField(liveUpdateProperty, new GUIContent { text = "Update RegionMap while editing" });
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
@@ -101,7 +98,7 @@ namespace Mapzen.Unity.Editor
 
             serializedObject.ApplyModifiedProperties();
 
-            if (previewMode)
+            if (liveUpdateProperty.boolValue)
             {
                 // Find the regionMap containing the style mapStyle
                 var regionMaps = GameObject.FindObjectsOfType<RegionMap>();

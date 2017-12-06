@@ -10,6 +10,9 @@ namespace Mapzen.Unity
     {
         public List<FeatureLayer> Layers;
 
+        [SerializeField]
+        private bool liveUpdateEnabled;
+
         public MapStyle()
         {
             this.Layers = new List<FeatureLayer>();
