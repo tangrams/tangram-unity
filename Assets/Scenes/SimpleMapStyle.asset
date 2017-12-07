@@ -11,6 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4edcc12ded754f86bc8b9ea3b3c3ee6, type: 3}
   m_Name: SimpleMapStyle
   m_EditorClassIdentifier: 
+  serializedAssetVersion: 1
   Layers:
   - Name: Water
     FeatureCollection: 256
@@ -116,3 +117,4 @@ MonoBehaviour:
         Width: 0
         MiterLimit: 0
         Enabled: 0
+  liveUpdateEnabled: 0
