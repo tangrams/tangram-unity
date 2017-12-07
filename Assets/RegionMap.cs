@@ -10,6 +10,13 @@ namespace Mapzen
 {
     public class RegionMap : MonoBehaviour
     {
+        // Version information
+        // This allows us to check whether an asset was serialized with a different version than this code.
+        // If a serialized field of this class is changed or renamed, currentAssetVersion should be incremented.
+
+        private const int currentAssetVersion = 1;
+        [SerializeField] private int serializedAssetVersion = currentAssetVersion;
+
         // Public fields
         // These are serialized, so renaming them will break asset compatibility.
 
@@ -239,6 +246,16 @@ namespace Mapzen
             if (!Styles.Any(style => style != null))
             {
                 Debug.LogError("Make sure to create at least one style");
+            }
+        }
+
+        public void OnValidate()
+        {
+            if (serializedAssetVersion != currentAssetVersion)
+            {
+                Debug.LogWarningFormat("The RegionMap \"{0}\" was created with a different version of this tool. " +
+                    "Some properties may be missing or have unexpected values.", this.name);
+                serializedAssetVersion = currentAssetVersion;
             }
         }
     }

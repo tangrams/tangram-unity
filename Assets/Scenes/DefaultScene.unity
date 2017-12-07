@@ -135,6 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 673da631ad95c423cbdabfdc9202e581, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializedAssetVersion: 1
   ApiKey: 
   Area:
     min:
