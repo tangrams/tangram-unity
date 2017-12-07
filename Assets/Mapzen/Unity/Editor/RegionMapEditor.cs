@@ -26,6 +26,8 @@ namespace Mapzen.Unity.Editor
             }
             GUILayout.EndHorizontal();
 
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("Style"), true);
+
             EditorGUILayout.PropertyField(serializedObject.FindProperty("Area"), true);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("UnitsPerMeter"));
@@ -37,8 +39,6 @@ namespace Mapzen.Unity.Editor
             // EditorGUILayout.PropertyField(serializedObject.FindProperty("GroupOptions"));
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("GameObjectOptions"), true);
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("Styles"), true);
 
             bool valid = map.IsValid();
 
