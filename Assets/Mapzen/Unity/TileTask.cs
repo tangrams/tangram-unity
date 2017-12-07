@@ -16,7 +16,7 @@ public class TileTask
     // The resulting data of the tile task is stored in this container
     private List<FeatureMesh> data;
     // The map styling this tile task is working on
-    private List<MapStyle> featureStyling;
+    private MapStyle featureStyling;
 
     public int Generation
     {
@@ -28,7 +28,7 @@ public class TileTask
         get { return data; }
     }
 
-    public TileTask(List<MapStyle> featureStyling, TileAddress address, Matrix4x4 transform, int generation)
+    public TileTask(MapStyle featureStyling, TileAddress address, Matrix4x4 transform, int generation)
     {
         this.data = new List<FeatureMesh>();
         this.address = address;
@@ -45,58 +45,50 @@ public class TileTask
     {
         float inverseTileScale = 1.0f / (float)address.GetSizeMercatorMeters();
 
-        foreach (var style in featureStyling)
+        foreach (var styleLayer in featureStyling.Layers)
         {
-            if (style == null)
+            foreach (var collection in featureCollections)
             {
-                continue;
-            }
-
-            foreach (var styleLayer in style.Layers)
-            {
-                foreach (var collection in featureCollections)
+                foreach (var feature in styleLayer.GetFilter().Filter(collection))
                 {
-                    foreach (var feature in styleLayer.GetFilter().Filter(collection))
+                    var layerStyle = styleLayer.Style;
+                    string featureName = "";
+                    object identifier;
+
+                    if (feature.TryGetProperty("id", out identifier))
                     {
-                        var layerStyle = styleLayer.Style;
-                        string featureName = "";
-                        object identifier;
+                        featureName += identifier.ToString();
+                    }
 
-                        if (feature.TryGetProperty("id", out identifier))
+                    // Resulting data for this feature.
+                    FeatureMesh featureMesh = new FeatureMesh(address.ToString(), collection.Name, styleLayer.Name, featureName);
+
+                    IGeometryHandler handler = null;
+
+                    if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
+                    {
+                        var polygonOptions = layerStyle.GetPolygonOptions(feature, inverseTileScale);
+
+                        if (polygonOptions.Enabled)
                         {
-                            featureName += identifier.ToString();
+                            handler = new PolygonBuilder(featureMesh.Mesh, polygonOptions, transform);
                         }
+                    }
 
-                        // Resulting data for this feature.
-                        FeatureMesh featureMesh = new FeatureMesh(address.ToString(), collection.Name, styleLayer.Name, featureName);
+                    if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
+                    {
+                        var polylineOptions = layerStyle.GetPolylineOptions(feature, inverseTileScale);
 
-                        IGeometryHandler handler = null;
-
-                        if (feature.Type == GeometryType.Polygon || feature.Type == GeometryType.MultiPolygon)
+                        if (polylineOptions.Enabled)
                         {
-                            var polygonOptions = layerStyle.GetPolygonOptions(feature, inverseTileScale);
-
-                            if (polygonOptions.Enabled)
-                            {
-                                handler = new PolygonBuilder(featureMesh.Mesh, polygonOptions, transform);
-                            }
+                            handler = new PolylineBuilder(featureMesh.Mesh, polylineOptions, transform);
                         }
+                    }
 
-                        if (feature.Type == GeometryType.LineString || feature.Type == GeometryType.MultiLineString)
-                        {
-                            var polylineOptions = layerStyle.GetPolylineOptions(feature, inverseTileScale);
-
-                            if (polylineOptions.Enabled)
-                            {
-                                handler = new PolylineBuilder(featureMesh.Mesh, polylineOptions, transform);
-                            }
-                        }
-
-                        if (handler != null)
-                        {
-                            feature.HandleGeometry(handler);
-                            data.Add(featureMesh);
-                        }
+                    if (handler != null)
+                    {
+                        feature.HandleGeometry(handler);
+                        data.Add(featureMesh);
                     }
                 }
             }

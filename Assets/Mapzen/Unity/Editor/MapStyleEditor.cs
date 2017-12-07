@@ -105,8 +105,7 @@ namespace Mapzen.Unity.Editor
                 RegionMap map = null;
                 foreach (var regionMap in regionMaps)
                 {
-                    var style = regionMap.Styles.Find(s => s == mapStyle);
-                    if (style != null)
+                    if (regionMap.Style == mapStyle)
                     {
                         map = regionMap;
                         break;

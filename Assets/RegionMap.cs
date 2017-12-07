@@ -28,7 +28,7 @@ namespace Mapzen
 
         public GameObjectOptions GameObjectOptions;
 
-        public List<MapStyle> Styles = new List<MapStyle>();
+        public MapStyle Style;
 
         // Private fields
 
@@ -75,7 +75,7 @@ namespace Mapzen
 
                 if (featureCollections != null)
                 {
-                    var task = new TileTask(Styles, tileAddress, transform, generation);
+                    var task = new TileTask(Style, tileAddress, transform, generation);
 
                     worker.RunAsync(() =>
                     {
@@ -119,7 +119,7 @@ namespace Mapzen
                             return;
                         }
 
-                        var task = new TileTask(Styles, tileAddress, transform, generation);
+                        var task = new TileTask(Style, tileAddress, transform, generation);
 
                         worker.RunAsync(() =>
                         {
@@ -194,7 +194,7 @@ namespace Mapzen
 
         public bool IsValid()
         {
-            bool hasStyle = Styles.Any(style => style != null);
+            bool hasStyle = Style != null;
             bool hasApiKey = ApiKey.Length > 0;
             return RegionName.Length > 0 && hasStyle && hasApiKey;
         }
@@ -203,29 +203,12 @@ namespace Mapzen
         {
             if (ApiKey.Length == 0)
             {
-                Debug.LogWarning("Make sure to set an API key in the Map Builder");
+                Debug.LogWarning("Make sure to set an API key in the RegionMap");
             }
 
-            foreach (var style in Styles)
+            if (Style != null && Style.Layers.Count == 0)
             {
-                if (style == null)
-                {
-                    Debug.LogWarning("'Null' style provided in feature styling collection");
-                    continue;
-                }
-
-                if (style.Layers.Count == 0)
-                {
-                    Debug.LogWarning("The style " + style.name + " has no filter");
-                }
-
-                foreach (var filterStyle in style.Layers)
-                {
-                    if (filterStyle.GetFilter().CollectionNameSet.Count == 0)
-                    {
-                        Debug.LogWarning("The style " + style.name + " has a filter selecting no layer");
-                    }
-                }
+                Debug.LogWarning("The current MapStyle has no layers, no output will be produced");
             }
         }
 
@@ -236,9 +219,9 @@ namespace Mapzen
                 Debug.LogError("Make sure to give a region name");
             }
 
-            if (!Styles.Any(style => style != null))
+            if (Style == null)
             {
-                Debug.LogError("Make sure to create at least one style");
+                Debug.LogError("Make sure to set a MapStyle");
             }
         }
     }
