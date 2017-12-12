@@ -165,4 +165,4 @@ MonoBehaviour:
         Width: 8
         MiterLimit: 0
         Enabled: 1
-  liveUpdateEnabled: 1
+  liveUpdateEnabled: 0
