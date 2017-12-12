@@ -85,7 +85,7 @@ MonoBehaviour:
         Material: {fileID: 2100000, guid: ca945bef7446a48c3a7e6c2241195361, type: 2}
         Extrusion: 0
         MinHeight: 0
-        MaxHeight: 0.75
+        MaxHeight: 1
         Width: 12
         MiterLimit: 0
         Enabled: 1
