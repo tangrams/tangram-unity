@@ -9,7 +9,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4edcc12ded754f86bc8b9ea3b3c3ee6, type: 3}
-  m_Name: SimpleMapStyle
+  m_Name: ExampleMapStyle
   m_EditorClassIdentifier: 
   serializedAssetVersion: 1
   Layers:
@@ -23,7 +23,7 @@ MonoBehaviour:
         Extrusion: 0
         UVMode: 1
         MinHeight: 0
-        MaxHeight: 0.25
+        MaxHeight: 0
         Enabled: 1
       PolylineBuilder:
         Material: {fileID: 0}
@@ -39,11 +39,11 @@ MonoBehaviour:
     Matchers: []
     Style:
       PolygonBuilder:
-        Material: {fileID: 2100000, guid: 0cdfce05273914dd4823f77af6b71663, type: 2}
+        Material: {fileID: 2100000, guid: 65006d96c145043e4a6c4eff651e5c83, type: 2}
         Extrusion: 0
         UVMode: 1
         MinHeight: 0
-        MaxHeight: 0
+        MaxHeight: 0.25
         Enabled: 1
       PolylineBuilder:
         Material: {fileID: 0}
@@ -85,8 +85,8 @@ MonoBehaviour:
         Material: {fileID: 2100000, guid: ca945bef7446a48c3a7e6c2241195361, type: 2}
         Extrusion: 0
         MinHeight: 0
-        MaxHeight: 0.5
-        Width: 10
+        MaxHeight: 0.75
+        Width: 12
         MiterLimit: 0
         Enabled: 1
   - Name: Buildings
@@ -117,4 +117,52 @@ MonoBehaviour:
         Width: 0
         MiterLimit: 0
         Enabled: 0
-  liveUpdateEnabled: 0
+  - Name: Landuse
+    FeatureCollection: 8
+    Combiner: 0
+    Matchers: []
+    Style:
+      PolygonBuilder:
+        Material: {fileID: 2100000, guid: 0cdfce05273914dd4823f77af6b71663, type: 2}
+        Extrusion: 0
+        UVMode: 0
+        MinHeight: 0
+        MaxHeight: 0.5
+        Enabled: 1
+      PolylineBuilder:
+        Material: {fileID: 0}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0
+        Width: 0
+        MiterLimit: 0
+        Enabled: 0
+  - Name: Minor Roads
+    FeatureCollection: 64
+    Combiner: 1
+    Matchers:
+    - MatcherKind: 4
+      PropertyKey: kind
+      PropertyValue: minor_road
+      RegexPattern: 
+      MinRange: 0
+      MaxRange: 0
+      MinRangeEnabled: 0
+      MaxRangeEnabled: 0
+    Style:
+      PolygonBuilder:
+        Material: {fileID: 0}
+        Extrusion: 0
+        UVMode: 0
+        MinHeight: 0
+        MaxHeight: 0
+        Enabled: 0
+      PolylineBuilder:
+        Material: {fileID: 2100000, guid: 59eea86d9d6ad439697c739214cbd3bf, type: 2}
+        Extrusion: 0
+        MinHeight: 0
+        MaxHeight: 0.75
+        Width: 8
+        MiterLimit: 0
+        Enabled: 1
+  liveUpdateEnabled: 1
