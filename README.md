@@ -1,29 +1,28 @@
 Tangram Unity
 =============
 
-
 ![screenshot](tangram-unity.png)
 
-Tools for using Mapzen vector tiles in the Unity engine. The repository contains the assets and main plugin to design and generate a map region to be used in your Unity scene.
+Tangram Unity is a library of tools for using OpenStreetMap data in the Unity3D game engine. This repository contains the code and GUI tools along with an example scene that demonstrates how to use them.
+
+This project requires Unity version 2017.1.1 or newer.
 
 Quickstart
 -----------
 
 1. Create a [Mapzen API Key](https://mapzen.com/developers/sign_up)
-2. Open the Unity plugin project
-4. Drag and drop `Assets/Mapzen.prefab` in a Unity scene
-4. Create a new _style_ to selectively generate and filter data for your map region: Assets > Create > Mapzen > Style
-5. Start authoring the style by adding filters to select map layers and associate them with materials
-6. Select the game object `Mapzen`
-	- Add your API key created in 1.
-	- Reference the newly created style asset in `Feature styling`
-	- Give a a region name
-	- Hit the `Download` button
+2. Open the example scene `Assets/Scenes/RegionMapExample.unity` in Unity.
+4. Select the `Map Builder` object in the scene and enter your API key in the "Api Key" field in the inspector.
+4. Press the `Download` button in the inspector and wait a few seconds for the download to complete.
+
+The scene should now contain geometry from New York City! To learn how to customize your own map with a different style or a different location, check out these documentation pages:
+
+ - [Region Map Editor](Documentation/RegionMapEditor.md)
+ - [Map Style Editor](Documentation/MapStyleEditor.md)
 
 Roadmap
 -------
 
 - Terrain support
-- Tile streaming 
+- Tile streaming
 - Map data access from game objects
-
