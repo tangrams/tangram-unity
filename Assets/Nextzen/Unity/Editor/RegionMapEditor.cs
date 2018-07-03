@@ -33,7 +33,7 @@ namespace Nextzen.Unity.Editor
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("RegionName"));
 
-            map.GroupOptions = (SceneGroupType)EditorGUILayout.EnumMaskPopup("Grouping Options", map.GroupOptions);
+            map.GroupOptions = (SceneGroupType)EditorGUILayout.EnumFlagsField("Grouping Options", map.GroupOptions);
 
             // EditorGUILayout.PropertyField(serializedObject.FindProperty("GroupOptions"));
 

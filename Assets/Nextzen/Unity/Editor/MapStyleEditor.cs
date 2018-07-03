@@ -86,7 +86,7 @@ namespace Nextzen.Unity.Editor
 
                 var layer = mapStyle.Layers[index];
 
-                layer.FeatureCollection = (FeatureLayer.NextzenFeatureCollection)EditorGUILayout.EnumMaskPopup("Feature Collections", layer.FeatureCollection);
+                layer.FeatureCollection = (FeatureLayer.NextzenFeatureCollection)EditorGUILayout.EnumFlagsField("Feature Collections", layer.FeatureCollection);
 
                 DrawSelectedLayer(layerProperty);
             }
