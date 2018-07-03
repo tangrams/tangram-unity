@@ -113,7 +113,6 @@ namespace Mapbox
             }
         }
 
-
         private static bool isEarHashed(Node ear, float minX, float minY, float size)
         {
             var a = ear.prev;
@@ -251,7 +250,6 @@ namespace Mapbox
 
                 if (!equals(a, b) && intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a))
                 {
-
                     triangles.Add(a.i / dim);
                     triangles.Add(p.i / dim);
                     triangles.Add(b.i / dim);
@@ -348,7 +346,6 @@ namespace Mapbox
 
                     while (pSize > 0 || (qSize > 0 && q != null))
                     {
-
                         if (pSize != 0 && (qSize == 0 || q == null || p.mZOrder <= q.mZOrder))
                         {
                             e = p;
@@ -374,7 +371,6 @@ namespace Mapbox
 
                 tail.nextZ = null;
                 inSize *= 2;
-
             } while (numMerges > 1);
 
             return list;
@@ -439,7 +435,6 @@ namespace Mapbox
                     p = end = p.prev;
                     if (p == p.next) return null;
                     again = true;
-
                 }
                 else
                 {
@@ -524,7 +519,6 @@ namespace Mapbox
                 if (hx >= p.x && p.x >= mx && hx != p.x &&
                     pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, p.x, p.y))
                 {
-
                     tan = Math.Abs(hy - p.y) / (hx - p.x); // tangential
 
                     if ((tan < tanMin || (tan == tanMin && p.x > m.x)) && locallyInside(p, hole))
@@ -630,7 +624,6 @@ namespace Mapbox
             {
                 p.prev = p;
                 p.next = p;
-
             }
             else
             {
@@ -703,7 +696,6 @@ namespace Mapbox
 
     public class Node
     {
-
         /* Member Variables. */
         public int i;
         public float x;
@@ -777,6 +769,5 @@ namespace Mapbox
         {
             return this.nextZ;
         }
-
     }
 }
