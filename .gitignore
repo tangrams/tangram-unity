@@ -56,6 +56,7 @@ Temporary Items
 /[Oo]bj/
 /[Bb]uild/
 /[Bb]uilds/
+/[Ll]ogs/
 /Assets/AssetStoreTools*
 
 # Visual Studio 2015 cache directory
