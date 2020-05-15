@@ -1,10 +1,6 @@
 version: 2.1
 jobs:
   build:
-    environment:
-      UNITY_EXE: /opt/Unity/Editor/Unity
-      EDITOR_LOG_FILE: /dev/stdout
-      PACKAGE_FILE: tangram-unity.unitypackage
     docker:
       - image: gableroux/unity3d:2019.3.0f6
       # https://gitlab.com/gableroux/unity3d
@@ -22,15 +18,15 @@ jobs:
       - run:
           name: Run Unity
           command: |
-            $UNITY_EXE \
+            /opt/Unity/Editor/Unity \
             -quit \
             -batchmode \
             -nographics \
             -disable-assembly-updater \
-            -exportPackage Assets $PACKAGE_FILE
+            -exportPackage Assets tangram-unity.unitypackage
       - store_artifacts:
           name: Store Unity package output
-          path: $PACKAGE_FILE
+          path: tangram-unity.unitypackage
           destination: Package
 workflows:
   version: 2
