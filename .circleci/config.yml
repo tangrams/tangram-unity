@@ -23,7 +23,7 @@ jobs:
             -batchmode \
             -nographics \
             -disable-assembly-updater \
-            -exportPackage Assets tangram-unity.unitypackage
+            -executeMethod Mapzen.Unity.Editor.Project.ExportPackage
       - store_artifacts:
           name: Store Unity package output
           path: tangram-unity.unitypackage
