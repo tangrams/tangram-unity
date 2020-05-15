@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mvtcs;
 
-#if UNITY_EDITOR
-using UnityEngine;
-#else
 using System.Diagnostics;
-#endif
 
 namespace Mapzen.VectorData.Formats
 {

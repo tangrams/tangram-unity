@@ -1,0 +1,16 @@
+{
+    "name": "Mapzen.Unity",
+    "references": [
+        "GUID:239203bfef193c04ca1a5ed8f05425b7",
+        "GUID:69320b606dfc9534197a5e87cc514733"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

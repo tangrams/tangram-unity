@@ -1,7 +1,7 @@
 
 namespace Mapzen
 {
-    class Util
+    public class Util
     {
         public static void Swap<T>(ref T lhs, ref T rhs)
         {

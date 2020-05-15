@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using Mapzen.VectorData;
-using Mapzen.Unity;
 using Mapzen.VectorData.Formats;
+using UnityEngine;
 
-namespace Mapzen
+namespace Mapzen.Unity
 {
     public class RegionMap : MonoBehaviour
     {
