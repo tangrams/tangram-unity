@@ -3,7 +3,6 @@ jobs:
   build:
     environment:
       UNITY_EXE: /opt/Unity/Editor/Unity
-      MAIN_PROJECT: .
       EDITOR_LOG_FILE: /dev/stdout
       PACKAGE_FILE: tangram-unity.unitypackage
     docker:
@@ -28,8 +27,6 @@ jobs:
             -batchmode \
             -nographics \
             -disable-assembly-updater \
-            -logFile $EDITOR_LOG_FILE \
-            -projectPath $MAIN_PROJECT \
             -exportPackage Assets $PACKAGE_FILE
       - store_artifacts:
           name: Store Unity package output
