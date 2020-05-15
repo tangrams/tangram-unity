@@ -108,3 +108,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/macos,windows,linux,unity
+
+# Rider generated files
+/.idea/
