@@ -22,7 +22,7 @@ namespace Mapzen.Unity.Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("ApiKey"));
             if (GUILayout.Button("Get an API key", EditorStyles.miniButtonRight))
             {
-                Application.OpenURL("https://mapzen.com/developers");
+                Application.OpenURL("https://developers.nextzen.org/");
             }
             GUILayout.EndHorizontal();
 

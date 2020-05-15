@@ -100,7 +100,7 @@ namespace Mapzen
 
                     var wrappedTileAddress = tileAddress.Wrapped();
 
-                    var uri = new Uri(string.Format("https://tile.mapzen.com/mapzen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
+                    var uri = new Uri(string.Format("https://tile.nextzen.org/tilezen/vector/v1/all/{0}/{1}/{2}.mvt?api_key={3}",
                         wrappedTileAddress.z,
                         wrappedTileAddress.x,
                         wrappedTileAddress.y,

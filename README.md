@@ -10,7 +10,7 @@ This project requires Unity version 2017.1.1 or newer.
 Quickstart
 -----------
 
-1. Create a [Mapzen API Key](https://mapzen.com/developers/sign_up)
+1. Create a [Nextzen API Key](https://developers.nextzen.org/)
 2. Open the example scene `Assets/Scenes/RegionMapExample.unity` in Unity.
 4. Select the `Map Builder` object in the scene and enter your API key in the "Api Key" field in the inspector.
 4. Press the `Download` button in the inspector and wait a few seconds for the download to complete.
