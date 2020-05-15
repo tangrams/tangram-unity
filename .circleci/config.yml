@@ -1,0 +1,42 @@
+version: 2.1
+jobs:
+  build:
+    environment:
+      UNITY_EXE: /opt/Unity/Editor/Unity
+      MAIN_PROJECT: .
+      EDITOR_LOG_FILE: /dev/stdout
+      PACKAGE_FILE: tangram-unity.unitypackage
+    docker:
+      - image: gableroux/unity3d:2019.3.0f6
+      # https://gitlab.com/gableroux/unity3d
+    steps:
+      - run:
+          name: Install Unity License
+          command: |
+            mkdir -p ~/.cache/unity3d
+            mkdir -p ~/.local/share/unity3d/Unity/
+            echo $UNITY_2019_3_LICENSE_BASE64 | base64 --decode > ~/.local/share/unity3d/Unity/Unity_lic.ulf
+          # License process is described well here: https://gitlab.com/gableroux/unity3d-gitlab-ci-example#how-to-activate
+          # The easiest way to inject the license file into our builds is with an environment variable. However,
+          # line breaks are lost if we just copy-paste the text. Instead, we base64-encode the license content and then
+          # decode it when we write the variable into a license file.
+      - run:
+          name: Run Unity
+          command: |
+            $UNITY_EXE \
+            -quit \
+            -batchmode \
+            -nographics
+            -disable-assembly-updater \
+            -logFile $EDITOR_LOG_FILE \
+            -projectPath $MAIN_PROJECT \
+            -exportPackage Assets $PACKAGE_FILE
+      - store_artifacts:
+          name: Store Unity package output
+          path: $PACKAGE_FILE
+          destination: Package
+workflows:
+  version: 2
+  build-workflow:
+    jobs:
+      - build
