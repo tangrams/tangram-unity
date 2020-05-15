@@ -22,7 +22,7 @@ jobs:
             -quit \
             -batchmode \
             -nographics \
-            -projectPath $(pwd) \
+            -projectPath . \
             -executeMethod Mapzen.Unity.Editor.Project.ExportPackage
       - store_artifacts:
           name: Store Unity package output
