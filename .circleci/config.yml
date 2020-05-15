@@ -26,7 +26,7 @@ jobs:
             $UNITY_EXE \
             -quit \
             -batchmode \
-            -nographics
+            -nographics \
             -disable-assembly-updater \
             -logFile $EDITOR_LOG_FILE \
             -projectPath $MAIN_PROJECT \
