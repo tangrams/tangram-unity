@@ -45,7 +45,7 @@ namespace Mapzen.Unity
             else
             {
                 UnityWebRequest request = UnityWebRequest.Get(uri.AbsoluteUri);
-                yield return request.Send();
+                yield return request.SendWebRequest();
                 string requestError = null;
 
                 if (request.isNetworkError)

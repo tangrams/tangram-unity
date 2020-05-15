@@ -34,7 +34,7 @@ namespace Mapzen.Unity.Editor
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("RegionName"));
 
-            map.GroupOptions = (SceneGroupType)EditorGUILayout.EnumMaskPopup("Grouping Options", map.GroupOptions);
+            map.GroupOptions = (SceneGroupType)EditorGUILayout.EnumFlagsField("GroupingOptions", map.GroupOptions);
 
             // EditorGUILayout.PropertyField(serializedObject.FindProperty("GroupOptions"));
 
