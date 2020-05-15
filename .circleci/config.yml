@@ -22,7 +22,6 @@ jobs:
             -quit \
             -batchmode \
             -nographics \
-            -disable-assembly-updater \
             -executeMethod Mapzen.Unity.Editor.Project.ExportPackage
       - store_artifacts:
           name: Store Unity package output
