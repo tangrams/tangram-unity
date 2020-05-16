@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: gableroux/unity3d:2019.3.0f6
+      - image: gableroux/unity3d:2019.3.0f6-windows
       # https://gitlab.com/gableroux/unity3d
     steps:
       - run:
