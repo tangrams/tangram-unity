@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: gableroux/unity3d:2019.3.0f6-windows
+      - image: gableroux/unity3d:2019.3.0f6
       # https://gitlab.com/gableroux/unity3d
     steps:
       - run:
@@ -22,8 +22,7 @@ jobs:
             -quit \
             -batchmode \
             -nographics \
-            -logFile /dev/stdout \
-            -executeMethod Mapzen.Unity.Editor.Project.ExportPackage
+            -exportPackage Assets tangram-unity.unitypackage
       - store_artifacts:
           name: Store Unity package output
           path: tangram-unity.unitypackage
