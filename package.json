@@ -1,0 +1,19 @@
+{
+  "name": "tangram-unity",
+  "version": "1.0.0",
+  "displayName": "Tangram Unity",
+  "description": "Tangram Unity is a library of tools for using OpenStreetMap data in the Unity3D game engine. This repository contains the code and GUI tools along with an example scene that demonstrates how to use them.",
+  "unity": "2021.3",
+  "unityRelease": "22f1",
+  "documentationUrl": "https://github.com/tangrams/tangram-unity",
+  "keywords": [
+    "nextzen",
+    "mapzen",
+    "tangrams",
+    "tangram-unity"
+  ],
+  "author": {
+    "name": "tangrams",
+    "url": "https://github.com/tangrams/tangram-unity"
+  }
+}
